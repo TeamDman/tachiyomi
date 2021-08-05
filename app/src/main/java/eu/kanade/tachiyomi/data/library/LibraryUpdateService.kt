@@ -492,9 +492,8 @@ class LibraryUpdateService(
                                 val updatedTrack = service.refresh(track)
                                 db.insertTrack(updatedTrack).executeAsBlocking()
 
-                                if (service is EnhancedTrackService) {
-                                    syncChaptersWithTrackServiceTwoWay(db, db.getChapters(manga).executeAsBlocking(), track, service)
-                                }
+                                syncChaptersWithTrackServiceTwoWay(db, db.getChapters(manga).executeAsBlocking(), track, service)
+
                             } catch (e: Throwable) {
                                 // Ignore errors and continue
                                 Timber.e(e)

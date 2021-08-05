@@ -807,9 +807,8 @@ class MangaPresenter(
                                 val track = it.service.refresh(it.track!!)
                                 db.insertTrack(track).executeAsBlocking()
 
-                                if (it.service is EnhancedTrackService) {
-                                    syncChaptersWithTrackServiceTwoWay(db, allChapters, track, it.service)
-                                }
+                                syncChaptersWithTrackServiceTwoWay(db, allChapters, track, it.service)
+
                             }
                         }
                         .awaitAll()
@@ -843,9 +842,8 @@ class MangaPresenter(
                     service.bind(item, hasReadChapters)
                     db.insertTrack(item).executeAsBlocking()
 
-                    if (service is EnhancedTrackService) {
-                        syncChaptersWithTrackServiceTwoWay(db, allChapters, item, service)
-                    }
+                    syncChaptersWithTrackServiceTwoWay(db, allChapters, item, service)
+
                 } catch (e: Throwable) {
                     withUIContext { view?.applicationContext?.toast(e.message) }
                 }
