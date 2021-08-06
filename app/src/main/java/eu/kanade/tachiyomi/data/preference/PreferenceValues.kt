@@ -37,6 +37,12 @@ object PreferenceValues {
         HOT_PINK(null),
     }
 
+    enum class MarkReadBehaviour {
+        ALWAYS,
+        NEVER,
+        NOT_SPECIAL
+    }
+
     enum class TappingInvertMode(val shouldInvertHorizontal: Boolean = false, val shouldInvertVertical: Boolean = false) {
         NONE,
         HORIZONTAL(shouldInvertHorizontal = true),

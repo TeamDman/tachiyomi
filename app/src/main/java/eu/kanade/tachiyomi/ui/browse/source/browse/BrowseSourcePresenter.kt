@@ -285,7 +285,13 @@ open class BrowseSourcePresenter(
                             (service as TrackService).bind(track)
                             db.insertTrack(track).executeAsBlocking()
 
-                            syncChaptersWithTrackServiceTwoWay(db, db.getChapters(manga).executeAsBlocking(), track, service as TrackService)
+                            syncChaptersWithTrackServiceTwoWay(
+                                db,
+                                db.getChapters(manga).executeAsBlocking(),
+                                track,
+                                service as TrackService,
+                                prefs.autoUpdateTrackersMarkReadBehaviour().get()
+                            )
                         }
                     } catch (e: Exception) {
                         Timber.w(e, "Could not match manga: ${manga.title} with service $service")

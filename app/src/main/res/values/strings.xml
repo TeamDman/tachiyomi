@@ -216,6 +216,10 @@
     <string name="pref_library_update_refresh_metadata">Automatically refresh metadata</string>
     <string name="pref_library_update_refresh_metadata_summary">Check for new cover and details when updating library</string>
     <string name="pref_library_update_refresh_trackers">Automatically refresh trackers</string>
+    <string name="pref_library_update_refresh_trackers_mark_read_behaviour">Tracker update behaviour</string>
+    <string name="pref_library_update_refresh_trackers_mark_read_behaviour_never_mark_read">Never mark read</string>
+    <string name="pref_library_update_refresh_trackers_mark_read_behaviour_always_mark_read">Always mark read</string>
+    <string name="pref_library_update_refresh_trackers_mark_read_behaviour_mark_read_except_special">Mark read except specials</string>
     <string name="pref_library_update_refresh_trackers_summary">Update trackers when updating library</string>
     <string name="pref_library_update_error_notification">Show update errors notifications</string>
 

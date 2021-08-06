@@ -11,26 +11,14 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Category
 import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
-import eu.kanade.tachiyomi.data.preference.CHARGING
-import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.UNMETERED_NETWORK
-import eu.kanade.tachiyomi.data.preference.asImmediateFlow
+import eu.kanade.tachiyomi.data.preference.*
+import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.databinding.PrefLibraryColumnsBinding
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.ui.category.CategoryController
-import eu.kanade.tachiyomi.util.preference.defaultValue
-import eu.kanade.tachiyomi.util.preference.entriesRes
-import eu.kanade.tachiyomi.util.preference.intListPreference
-import eu.kanade.tachiyomi.util.preference.multiSelectListPreference
-import eu.kanade.tachiyomi.util.preference.onChange
-import eu.kanade.tachiyomi.util.preference.onClick
-import eu.kanade.tachiyomi.util.preference.preference
-import eu.kanade.tachiyomi.util.preference.preferenceCategory
-import eu.kanade.tachiyomi.util.preference.summaryRes
-import eu.kanade.tachiyomi.util.preference.switchPreference
-import eu.kanade.tachiyomi.util.preference.titleRes
+import eu.kanade.tachiyomi.util.preference.*
 import eu.kanade.tachiyomi.util.system.isTablet
 import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import eu.kanade.tachiyomi.widget.materialdialogs.setQuadStateMultiChoiceItems
@@ -280,6 +268,22 @@ class SettingsLibraryController : SettingsController() {
                     titleRes = R.string.pref_library_update_refresh_trackers
                     summaryRes = R.string.pref_library_update_refresh_trackers_summary
                     defaultValue = false
+                }
+                listPreference {
+                    key = Keys.autoUpdateTrackersMarkReadBehaviour
+                    titleRes = R.string.pref_library_update_refresh_trackers_mark_read_behaviour
+                    entriesRes = arrayOf(
+                        R.string.pref_library_update_refresh_trackers_mark_read_behaviour_always_mark_read,
+                        R.string.pref_library_update_refresh_trackers_mark_read_behaviour_never_mark_read,
+                        R.string.pref_library_update_refresh_trackers_mark_read_behaviour_mark_read_except_special
+                    )
+                    entryValues = arrayOf(
+                        MarkReadBehaviour.ALWAYS.name,
+                        MarkReadBehaviour.NEVER.name,
+                        MarkReadBehaviour.NOT_SPECIAL.name
+                    )
+                    defaultValue = MarkReadBehaviour.NEVER.name
+                    summary = "%s"
                 }
             }
             switchPreference {

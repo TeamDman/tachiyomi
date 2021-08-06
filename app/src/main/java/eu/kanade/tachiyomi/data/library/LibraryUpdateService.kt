@@ -20,7 +20,6 @@ import eu.kanade.tachiyomi.data.library.LibraryUpdateRanker.rankingScheme
 import eu.kanade.tachiyomi.data.library.LibraryUpdateService.Companion.start
 import eu.kanade.tachiyomi.data.notification.Notifications
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.track.EnhancedTrackService
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.source.SourceManager
@@ -491,9 +490,13 @@ class LibraryUpdateService(
                             try {
                                 val updatedTrack = service.refresh(track)
                                 db.insertTrack(updatedTrack).executeAsBlocking()
-
-                                syncChaptersWithTrackServiceTwoWay(db, db.getChapters(manga).executeAsBlocking(), track, service)
-
+                                syncChaptersWithTrackServiceTwoWay(
+                                    db,
+                                    db.getChapters(manga).executeAsBlocking(),
+                                    track,
+                                    service,
+                                    preferences.autoUpdateTrackersMarkReadBehaviour().get()
+                                )
                             } catch (e: Throwable) {
                                 // Ignore errors and continue
                                 Timber.e(e)
