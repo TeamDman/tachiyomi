@@ -22,28 +22,32 @@ fun syncChaptersWithTrackServiceTwoWay(db: DatabaseHelper, chapters: List<Chapte
     // mark local chapters read based on remote
     if (behaviour != NEVER) {
         chapters
-            .filter { !it.read }
-            .filter { it.chapter_number <= remoteTrack.last_chapter_read }
-            .filter {
-                if (behaviour == NOT_SPECIAL) { // only mark read if whole-numbered chapter
-                    it.chapter_number % 1.0 == 0.0
-                } else { // always mark read
-                    true
+                .filter { !it.read }
+                .filter { it.chapter_number <= remoteTrack.last_chapter_read }
+                .filter {
+                    if (behaviour == NOT_SPECIAL) { // only mark read if whole-numbered chapter
+                        it.chapter_number % 1.0 == 0.0
+                    } else { // always mark read
+                        true
+                    }
                 }
-            }
-            .forEach { it.read = true }
+                .forEach { it.read = true }
         db.updateChaptersProgress(chapters).executeAsBlocking()
     }
-    // find last read local chapter number
-    // default to existing tracker value
-    val lastReadLocalChapterNumber = chapters
-        .filter { it.read }
-        .maxByOrNull { it.chapter_number }
-        ?.chapter_number?.toInt()
-        ?: remoteTrack.last_chapter_read
+
+    // find the first unread chapter
+    val nextUnreadChapterIndex = chapters
+            .sortedBy { it.chapter_number }
+            .indexOfFirst { !it.read }
+
+    // the chapter before the unread one is considered the latest locally read chapter
+    // fallback to the remote tracker value
+    val latestUnreadChapterNumber = chapters.getOrNull(nextUnreadChapterIndex - 1)
+            ?.chapter_number?.toInt()
+            ?: remoteTrack.last_chapter_read
 
     // update tracker, no backtracking allowed
-    remoteTrack.last_chapter_read = max(remoteTrack.last_chapter_read, lastReadLocalChapterNumber)
+    remoteTrack.last_chapter_read = max(remoteTrack.last_chapter_read, latestUnreadChapterNumber)
 
     // publish changes
     launchIO {
