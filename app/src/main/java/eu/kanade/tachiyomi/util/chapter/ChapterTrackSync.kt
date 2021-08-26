@@ -42,12 +42,12 @@ fun syncChaptersWithTrackServiceTwoWay(db: DatabaseHelper, chapters: List<Chapte
 
     // the chapter before the unread one is considered the latest locally read chapter
     // fallback to the remote tracker value
-    val latestUnreadChapterNumber = chapters.getOrNull(nextUnreadChapterIndex - 1)
+    val latestReadChapterNumber = chapters.getOrNull(nextUnreadChapterIndex - 1)
             ?.chapter_number?.toInt()
             ?: remoteTrack.last_chapter_read
 
     // update tracker, no backtracking allowed
-    remoteTrack.last_chapter_read = max(remoteTrack.last_chapter_read, latestUnreadChapterNumber)
+    remoteTrack.last_chapter_read = max(remoteTrack.last_chapter_read, latestReadChapterNumber)
 
     // publish changes
     launchIO {
