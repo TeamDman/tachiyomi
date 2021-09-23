@@ -48,7 +48,7 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
                 put("query", query)
                 putJsonObject("variables") {
                     put("mangaId", track.media_id)
-                    put("progress", track.last_chapter_read)
+                    put("progress", track.last_chapter_read.toInt())
                     put("status", track.toAnilistStatus())
                 }
             }
@@ -89,7 +89,7 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
                 put("query", query)
                 putJsonObject("variables") {
                     put("listId", track.library_id)
-                    put("progress", track.last_chapter_read)
+                    put("progress", track.last_chapter_read.toInt())
                     put("status", track.toAnilistStatus())
                     put("score", track.score.toInt())
                     put("startedAt", createDate(track.started_reading_date))
@@ -110,12 +110,12 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
                     |media(search: ${'$'}query, type: MANGA, format_not_in: [NOVEL]) {
                         |id
                         |title {
-                            |romaji
+                            |userPreferred
                         |}
                         |coverImage {
                             |large
                         |}
-                        |type
+                        |format
                         |status
                         |chapters
                         |description
@@ -175,12 +175,12 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
                         |media {
                             |id
                             |title {
-                                |romaji
+                                |userPreferred
                             |}
                             |coverImage {
                                 |large
                             |}
-                            |type
+                            |format
                             |status
                             |chapters
                             |description
@@ -264,10 +264,10 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
     private fun jsonToALManga(struct: JsonObject): ALManga {
         return ALManga(
             struct["id"]!!.jsonPrimitive.int,
-            struct["title"]!!.jsonObject["romaji"]!!.jsonPrimitive.content,
+            struct["title"]!!.jsonObject["userPreferred"]!!.jsonPrimitive.content,
             struct["coverImage"]!!.jsonObject["large"]!!.jsonPrimitive.content,
             struct["description"]!!.jsonPrimitive.contentOrNull,
-            struct["type"]!!.jsonPrimitive.content,
+            struct["format"]!!.jsonPrimitive.content.replace("_", "-"),
             struct["status"]!!.jsonPrimitive.contentOrNull ?: "",
             parseDate(struct, "startDate"),
             struct["chapters"]!!.jsonPrimitive.intOrNull ?: 0

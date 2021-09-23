@@ -1,33 +1,21 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.pager
 
 import android.annotation.SuppressLint
-import android.app.ActionBar
-import android.graphics.PointF
-import android.graphics.drawable.Animatable
-import android.view.GestureDetector
+import android.content.Context
 import android.view.Gravity
-import android.view.MotionEvent
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
-import coil.imageLoader
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import com.davemorrissey.labs.subscaleview.ImageSource
-import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-import com.github.chrisbanes.photoview.PhotoView
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.ui.reader.model.InsertPage
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
+import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
-import eu.kanade.tachiyomi.ui.reader.viewer.pager.PagerConfig.ZoomType
 import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.util.system.ImageUtil
 import eu.kanade.tachiyomi.util.system.dpToPx
@@ -36,8 +24,8 @@ import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.io.ByteArrayInputStream
 import java.io.InputStream
-import java.nio.ByteBuffer
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,9 +33,10 @@ import java.util.concurrent.TimeUnit
  */
 @SuppressLint("ViewConstructor")
 class PagerPageHolder(
+    readerThemedContext: Context,
     val viewer: PagerViewer,
     val page: ReaderPage
-) : FrameLayout(viewer.activity), ViewPagerAdapter.PositionableView {
+) : ReaderPageImageView(readerThemedContext), ViewPagerAdapter.PositionableView {
 
     /**
      * Item that identifies this view. Needed by the adapter to not recreate views.
@@ -58,21 +47,11 @@ class PagerPageHolder(
     /**
      * Loading progress bar to indicate the current progress.
      */
-    private val progressIndicator = ReaderProgressIndicator(context).apply {
+    private val progressIndicator: ReaderProgressIndicator = ReaderProgressIndicator(readerThemedContext).apply {
         updateLayoutParams<LayoutParams> {
             gravity = Gravity.CENTER
         }
     }
-
-    /**
-     * Image view that supports subsampling on zoom.
-     */
-    private var subsamplingImageView: SubsamplingScaleImageView? = null
-
-    /**
-     * Simple image view only used on GIFs.
-     */
-    private var imageView: ImageView? = null
 
     /**
      * Retry button used to allow retrying.
@@ -100,31 +79,9 @@ class PagerPageHolder(
      */
     private var readImageHeaderSubscription: Subscription? = null
 
-    val stateChangedListener = object : SubsamplingScaleImageView.OnStateChangedListener {
-        override fun onScaleChanged(newScale: Float, origin: Int) {
-            viewer.activity.hideMenu()
-        }
-
-        override fun onCenterChanged(newCenter: PointF?, origin: Int) {
-            viewer.activity.hideMenu()
-        }
-    }
-    private var visibilityListener = ActionBar.OnMenuVisibilityListener { isVisible ->
-        if (isVisible.not()) {
-            subsamplingImageView?.setOnStateChangedListener(null)
-            return@OnMenuVisibilityListener
-        }
-        subsamplingImageView?.setOnStateChangedListener(stateChangedListener)
-    }
-
     init {
         addView(progressIndicator)
         observeStatus()
-        viewer.activity.addOnMenuVisibilityListener(visibilityListener)
-        if (viewer.activity.menuVisible) {
-            // Listener will not be available if user changed page with seek bar
-            subsamplingImageView?.setOnStateChangedListener(stateChangedListener)
-        }
     }
 
     /**
@@ -136,9 +93,6 @@ class PagerPageHolder(
         unsubscribeProgress()
         unsubscribeStatus()
         unsubscribeReadImageHeader()
-        subsamplingImageView?.setOnImageEventListener(null)
-        subsamplingImageView?.setOnStateChangedListener(null)
-        viewer.activity.removeOnMenuVisibilityListener(visibilityListener)
     }
 
     /**
@@ -248,38 +202,52 @@ class PagerPageHolder(
      * Called when the page is ready.
      */
     private fun setImage() {
-        progressIndicator.setCompleteProgressAndHide()
+        progressIndicator.hide()
         retryButton?.isVisible = false
         decodeErrorLayout?.isVisible = false
 
         unsubscribeReadImageHeader()
         val streamFn = page.stream ?: return
 
-        var openStream: InputStream? = null
         readImageHeaderSubscription = Observable
             .fromCallable {
                 val stream = streamFn().buffered(16)
-                openStream = process(item, stream)
-
-                ImageUtil.isAnimatedAndSupported(stream)
+                val itemStream = process(item, stream)
+                val bais = ByteArrayInputStream(itemStream.readBytes())
+                try {
+                    val isAnimated = ImageUtil.isAnimatedAndSupported(bais)
+                    bais.reset()
+                    val background = if (!isAnimated && viewer.config.automaticBackground) {
+                        ImageUtil.chooseBackground(context, bais)
+                    } else {
+                        null
+                    }
+                    bais.reset()
+                    Triple(bais, isAnimated, background)
+                } finally {
+                    stream.close()
+                    itemStream.close()
+                }
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { isAnimated ->
-                if (!isAnimated) {
-                    initSubsamplingImageView().apply {
-                        if (viewer.config.automaticBackground) {
-                            background = ImageUtil.chooseBackground(context, openStream!!)
-                        }
-                        setImage(ImageSource.inputStream(openStream!!))
+            .doOnNext { (bais, isAnimated, background) ->
+                bais.use {
+                    setImage(
+                        it,
+                        isAnimated,
+                        Config(
+                            zoomDuration = viewer.config.doubleTapAnimDuration,
+                            minimumScaleType = viewer.config.imageScaleType,
+                            cropBorders = viewer.config.imageCropBorders,
+                            zoomStartPosition = viewer.config.imageZoomType
+                        )
+                    )
+                    if (!isAnimated) {
+                        this.background = background
                     }
-                } else {
-                    initImageView().setImage(openStream!!)
                 }
             }
-            // Keep the Rx stream alive to close the input stream only when unsubscribed
-            .flatMap { Observable.never<Unit>() }
-            .doOnUnsubscribe { openStream?.close() }
             .subscribe({}, {})
     }
 
@@ -337,76 +305,18 @@ class PagerPageHolder(
     /**
      * Called when an image fails to decode.
      */
-    private fun onImageDecodeError() {
+    override fun onImageLoadError() {
+        super.onImageLoadError()
         progressIndicator.hide()
         initDecodeErrorLayout().isVisible = true
     }
 
     /**
-     * Initializes a subsampling scale view.
+     * Called when an image is zoomed in/out.
      */
-    private fun initSubsamplingImageView(): SubsamplingScaleImageView {
-        if (subsamplingImageView != null) return subsamplingImageView!!
-
-        val config = viewer.config
-
-        subsamplingImageView = SubsamplingScaleImageView(context).apply {
-            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            setMaxTileSize(viewer.activity.maxBitmapSize)
-            setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER)
-            setDoubleTapZoomDuration(config.doubleTapAnimDuration)
-            setPanLimit(SubsamplingScaleImageView.PAN_LIMIT_INSIDE)
-            setMinimumScaleType(config.imageScaleType)
-            setMinimumDpi(90)
-            setMinimumTileDpi(180)
-            setCropBorders(config.imageCropBorders)
-            setOnImageEventListener(
-                object : SubsamplingScaleImageView.DefaultOnImageEventListener() {
-                    override fun onReady() {
-                        when (config.imageZoomType) {
-                            ZoomType.Left -> setScaleAndCenter(scale, PointF(0f, 0f))
-                            ZoomType.Right -> setScaleAndCenter(scale, PointF(sWidth.toFloat(), 0f))
-                            ZoomType.Center -> setScaleAndCenter(scale, center.also { it?.y = 0f })
-                        }
-                    }
-
-                    override fun onImageLoadError(e: Exception) {
-                        onImageDecodeError()
-                    }
-                }
-            )
-        }
-        addView(subsamplingImageView)
-        return subsamplingImageView!!
-    }
-
-    /**
-     * Initializes an image view, used for GIFs.
-     */
-    private fun initImageView(): ImageView {
-        if (imageView != null) return imageView!!
-
-        imageView = PhotoView(context, null).apply {
-            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
-            adjustViewBounds = true
-            setZoomTransitionDuration(viewer.config.doubleTapAnimDuration)
-            setScaleLevels(1f, 2f, 3f)
-            // Force 2 scale levels on double tap
-            setOnDoubleTapListener(
-                object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onDoubleTap(e: MotionEvent): Boolean {
-                        if (scale > 1f) {
-                            setScale(1f, e.x, e.y, true)
-                        } else {
-                            setScale(2f, e.x, e.y, true)
-                        }
-                        return true
-                    }
-                }
-            )
-        }
-        addView(imageView)
-        return imageView!!
+    override fun onScaleChanged(newScale: Float) {
+        super.onScaleChanged(newScale)
+        viewer.activity.hideMenu()
     }
 
     /**
@@ -444,7 +354,7 @@ class PagerPageHolder(
 
         TextView(context).apply {
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                setMargins(margins, margins, margins, margins)
+                setMargins(margins)
             }
             gravity = Gravity.CENTER
             setText(R.string.decode_image_error)
@@ -454,7 +364,7 @@ class PagerPageHolder(
 
         PagerButton(context, viewer).apply {
             layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                setMargins(margins, margins, margins, margins)
+                setMargins(margins)
             }
             setText(R.string.action_retry)
             setOnClickListener {
@@ -468,7 +378,7 @@ class PagerPageHolder(
         if (imageUrl.orEmpty().startsWith("http", true)) {
             PagerButton(context, viewer).apply {
                 layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
-                    setMargins(margins, margins, margins, margins)
+                    setMargins(margins)
                 }
                 setText(R.string.action_open_in_web_view)
                 setOnClickListener {
@@ -482,29 +392,5 @@ class PagerPageHolder(
 
         addView(decodeLayout)
         return decodeLayout
-    }
-
-    /**
-     * Extension method to set a [stream] into this ImageView.
-     */
-    private fun ImageView.setImage(stream: InputStream) {
-        val request = ImageRequest.Builder(context)
-            .data(ByteBuffer.wrap(stream.readBytes()))
-            .memoryCachePolicy(CachePolicy.DISABLED)
-            .diskCachePolicy(CachePolicy.DISABLED)
-            .target(
-                onSuccess = { result ->
-                    if (result is Animatable) {
-                        result.start()
-                    }
-                    setImageDrawable(result)
-                },
-                onError = {
-                    onImageDecodeError()
-                }
-            )
-            .crossfade(false)
-            .build()
-        context.imageLoader.enqueue(request)
     }
 }

@@ -4,11 +4,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import coil.clear
 import coil.loadAny
-import coil.transform.RoundedCornersTransformation
 import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.databinding.SourceListItemBinding
-import eu.kanade.tachiyomi.util.isLocal
 
 /**
  * Class used to hold the displayed data of a manga in the library, like the cover or the title.
@@ -58,11 +55,8 @@ class LibraryListHolder(
             onLongClick(itemView)
         }
 
-        // Update the cover.
-        val radius = view.context.resources.getDimension(R.dimen.card_radius)
+        // Update the cover
         binding.thumbnail.clear()
-        binding.thumbnail.loadAny(item.manga) {
-            transformations(RoundedCornersTransformation(radius))
-        }
+        binding.thumbnail.loadAny(item.manga)
     }
 }

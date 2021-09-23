@@ -29,8 +29,8 @@ android {
         minSdk = AndroidConfig.minSdk
         targetSdk = AndroidConfig.targetSdk
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 65
-        versionName = "0.11.1"
+        versionCode = 68
+        versionName = "0.12.2"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${getGitSha()}\"")
@@ -79,7 +79,7 @@ android {
         getByName("debugFull").res.srcDirs("src/debug/res")
     }
 
-    flavorDimensions("default")
+    flavorDimensions.add("default")
 
     productFlavors {
         create("standard") {
@@ -87,18 +87,20 @@ android {
             dimension = "default"
         }
         create("dev") {
-            resConfigs("en", "xxhdpi")
+            resourceConfigurations.addAll(listOf("en", "xxhdpi"))
             dimension = "default"
         }
     }
 
     packagingOptions {
-        exclude("META-INF/DEPENDENCIES")
-        exclude("LICENSE.txt")
-        exclude("META-INF/LICENSE")
-        exclude("META-INF/LICENSE.txt")
-        exclude("META-INF/NOTICE")
-        exclude("META-INF/*.kotlin_module")
+        resources.excludes.addAll(listOf(
+            "META-INF/DEPENDENCIES",
+            "LICENSE.txt",
+            "META-INF/LICENSE",
+            "META-INF/LICENSE.txt",
+            "META-INF/NOTICE",
+            "META-INF/*.kotlin_module",
+        ))
     }
 
     dependenciesInfo {
@@ -126,10 +128,9 @@ android {
 }
 
 dependencies {
-
     implementation(kotlin("reflect", version = BuildPluginsVersion.KOTLIN))
 
-    val coroutinesVersion = "1.5.1"
+    val coroutinesVersion = "1.5.2"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
 
@@ -140,34 +141,28 @@ dependencies {
     implementation("androidx.annotation:annotation:1.3.0-alpha01")
     implementation("androidx.appcompat:appcompat:1.4.0-alpha03")
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha03")
-    implementation("androidx.browser:browser:1.3.0")
-    implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.0-rc01")
+    implementation("androidx.browser:browser:1.4.0-alpha01")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("androidx.core:core-ktx:1.7.0-alpha01")
+    implementation("androidx.core:core-ktx:1.7.0-beta01")
     implementation("androidx.core:core-splashscreen:1.0.0-alpha01")
-    implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.recyclerview:recyclerview:1.3.0-alpha01")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+    implementation("androidx.viewpager:viewpager:1.1.0-alpha01")
 
-    val lifecycleVersion = "2.4.0-alpha01"
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
+    val lifecycleVersion = "2.4.0-beta01"
+    implementation("androidx.lifecycle:lifecycle-common:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
     // Job scheduling
-    implementation("androidx.work:work-runtime-ktx:2.6.0-beta01")
+    implementation("androidx.work:work-runtime-ktx:2.6.0")
 
-    // UI library
-    implementation("com.google.android.material:material:1.5.0-alpha01")
-
-    "standardImplementation"("com.google.firebase:firebase-core:19.0.0")
-
-    // ReactiveX
+    // RX
     implementation("io.reactivex:rxandroid:1.2.1")
     implementation("io.reactivex:rxjava:1.3.8")
     implementation("com.jakewharton.rxrelay:rxrelay:1.2.0")
-    implementation("com.github.pwittchen:reactivenetwork:0.13.0")
+    implementation("ru.beryukhov:flowreactivenetwork:1.0.4")
 
     // Network client
     val okhttpVersion = "4.9.1"
@@ -179,23 +174,25 @@ dependencies {
     // TLS 1.3 support for Android < 10
     implementation("org.conscrypt:conscrypt-android:2.5.2")
 
-    // JSON
-    val kotlinSerializationVersion = "1.2.2"
+    // Data serialization (JSON, protobuf)
+    val kotlinSerializationVersion = "1.3.0-RC"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinSerializationVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:$kotlinSerializationVersion")
+
+    // TODO: remove these once they're no longer used in any extensions
     implementation("com.google.code.gson:gson:2.8.7")
     implementation("com.github.salomonbrys.kotson:kotson:2.5.0")
 
     // JavaScript engine
-    implementation("com.squareup.duktape:duktape-android:1.3.0")
+    implementation("com.squareup.duktape:duktape-android:1.4.0")
+
+    // HTML parser
+    implementation("org.jsoup:jsoup:1.14.2")
 
     // Disk
     implementation("com.jakewharton:disklrucache:2.0.2")
     implementation("com.github.tachiyomiorg:unifile:17bec43")
     implementation("com.github.junrar:junrar:7.4.0")
-
-    // HTML parser
-    implementation("org.jsoup:jsoup:1.14.1")
 
     // Database
     implementation("androidx.sqlite:sqlite-ktx:2.1.0")
@@ -204,6 +201,7 @@ dependencies {
     implementation("com.github.requery:sqlite-android:3.36.0")
 
     // Preferences
+    implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("com.github.tfcporciuncula.flow-preferences:flow-preferences:1.4.0")
 
     // Model View Presenter
@@ -214,8 +212,8 @@ dependencies {
     // Dependency injection
     implementation("com.github.inorichi.injekt:injekt-core:65b0440")
 
-    // Image library
-    val coilVersion = "1.3.1"
+    // Image loading
+    val coilVersion = "1.3.2"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-gif:$coilVersion")
 
@@ -224,22 +222,19 @@ dependencies {
     }
     implementation("com.github.tachiyomiorg:image-decoder:7481a4a")
 
-    // Logging
-    implementation("com.jakewharton.timber:timber:4.7.1")
-
-    // Crash reports
-    implementation("ch.acra:acra-http:5.8.1")
-
     // Sort
     implementation("com.github.gpanther:java-nat-sort:natural-comparator-1.1")
 
-    // UI
+    // UI libraries
+    implementation("com.google.android.material:material:1.5.0-alpha03")
     implementation("com.github.dmytrodanylyk.android-process-button:library:1.0.4")
     implementation("eu.davidea:flexible-adapter:5.1.0")
     implementation("eu.davidea:flexible-adapter-ui:1.0.0")
     implementation("com.nightlynexus.viewstatepageradapter:viewstatepageradapter:1.1.0")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
-    implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0")
+    implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") {
+        exclude(group = "androidx.viewpager", module = "viewpager")
+    }
     implementation("dev.chrisbanes.insetter:insetter:0.6.0")
 
     // Conductor
@@ -256,8 +251,15 @@ dependencies {
     implementation("io.github.reactivecircus.flowbinding:flowbinding-swiperefreshlayout:$flowbindingVersion")
     implementation("io.github.reactivecircus.flowbinding:flowbinding-viewpager:$flowbindingVersion")
 
+    // Logging
+    implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // Crash reports/analytics
+    implementation("ch.acra:acra-http:5.8.1")
+    "standardImplementation"("com.google.firebase:firebase-analytics:19.0.1")
+
     // Licenses
-    implementation("com.mikepenz:aboutlibraries:${BuildPluginsVersion.ABOUTLIB_PLUGIN}")
+    implementation("com.mikepenz:aboutlibraries-core:${BuildPluginsVersion.ABOUTLIB_PLUGIN}")
 
     // Tests
     testImplementation("junit:junit:4.13.2")

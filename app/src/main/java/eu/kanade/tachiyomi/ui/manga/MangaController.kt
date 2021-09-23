@@ -13,18 +13,22 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.annotation.FloatRange
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.os.bundleOf
-import androidx.core.view.children
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.imageLoader
 import coil.request.ImageRequest
+import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.ControllerChangeType
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -51,7 +55,7 @@ import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.online.HttpSource
 import eu.kanade.tachiyomi.ui.base.controller.FabController
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
-import eu.kanade.tachiyomi.ui.base.controller.ToolbarLiftOnScrollController
+import eu.kanade.tachiyomi.ui.base.controller.getMainAppBarHeight
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.ui.browse.migration.search.SearchController
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceController
@@ -68,6 +72,7 @@ import eu.kanade.tachiyomi.ui.manga.chapter.DeleteChaptersDialog
 import eu.kanade.tachiyomi.ui.manga.chapter.DownloadCustomChaptersDialog
 import eu.kanade.tachiyomi.ui.manga.chapter.MangaChaptersHeaderAdapter
 import eu.kanade.tachiyomi.ui.manga.chapter.base.BaseChaptersAdapter
+import eu.kanade.tachiyomi.ui.manga.info.MangaFullCoverDialog
 import eu.kanade.tachiyomi.ui.manga.info.MangaInfoHeaderAdapter
 import eu.kanade.tachiyomi.ui.manga.track.TrackItem
 import eu.kanade.tachiyomi.ui.manga.track.TrackSearchDialog
@@ -86,9 +91,10 @@ import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.getCoordinates
 import eu.kanade.tachiyomi.util.view.shrinkOnScroll
 import eu.kanade.tachiyomi.util.view.snack
+import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import reactivecircus.flowbinding.recyclerview.scrollEvents
+import reactivecircus.flowbinding.recyclerview.scrollStateChanges
 import reactivecircus.flowbinding.swiperefreshlayout.refreshes
 import timber.log.Timber
 import uy.kohesive.injekt.Injekt
@@ -99,7 +105,6 @@ import kotlin.math.min
 
 class MangaController :
     NucleusController<MangaControllerBinding, MangaPresenter>,
-    ToolbarLiftOnScrollController,
     FabController,
     ActionMode.Callback,
     FlexibleAdapter.OnItemClickListener,
@@ -140,8 +145,6 @@ class MangaController :
     private val preferences: PreferencesHelper by injectLazy()
     private val coverCache: CoverCache by injectLazy()
 
-    private var toolbarTextView: TextView? = null
-
     private var mangaInfoAdapter: MangaInfoHeaderAdapter? = null
     private var chaptersHeaderAdapter: MangaChaptersHeaderAdapter? = null
     private var chaptersAdapter: ChaptersAdapter? = null
@@ -174,6 +177,18 @@ class MangaController :
 
     private var trackSheet: TrackSheet? = null
 
+    private var dialog: MangaFullCoverDialog? = null
+
+    /**
+     * For [recyclerViewUpdatesToolbarTitleAlpha]
+     */
+    private var recyclerViewToolbarTitleAlphaUpdaterAdded = false
+    private val recyclerViewToolbarTitleAlphaUpdater = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            updateToolbarTitleAlpha()
+        }
+    }
+
     init {
         setHasOptionsMenu(true)
     }
@@ -184,11 +199,12 @@ class MangaController :
 
     override fun onChangeStarted(handler: ControllerChangeHandler, type: ControllerChangeType) {
         super.onChangeStarted(handler, type)
-
         // Hide toolbar title on enter
-        if (type.isEnter) {
-            updateToolbarTitleAlpha()
+        // No need to update alpha for cover dialog
+        if (dialog == null) {
+            updateToolbarTitleAlpha(if (type.isEnter) 0F else 1F)
         }
+        recyclerViewUpdatesToolbarTitleAlpha(type.isEnter)
     }
 
     override fun onChangeEnded(handler: ControllerChangeHandler, type: ControllerChangeType) {
@@ -224,7 +240,7 @@ class MangaController :
             }
         binding.actionToolbar.applyInsetter {
             type(navigationBars = true) {
-                margin(bottom = true)
+                margin(bottom = true, horizontal = true)
             }
         }
 
@@ -239,38 +255,55 @@ class MangaController :
         binding.fullRecycler?.let {
             it.adapter = ConcatAdapter(mangaInfoAdapter, chaptersHeaderAdapter, chaptersAdapter)
 
-            it.scrollEvents()
-                .onEach { updateToolbarTitleAlpha() }
-                .launchIn(viewScope)
-
             // Skips directly to chapters list if navigated to from the library
             it.post {
                 if (!fromSource && preferences.jumpToChapters()) {
-                    (it.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(1, 0)
-                }
-
-                // Delayed in case we need to jump to chapters
-                it.post {
-                    updateToolbarTitleAlpha()
+                    val mainActivityAppBar = (activity as? MainActivity)?.binding?.appbar
+                    (it.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(
+                        1,
+                        mainActivityAppBar?.height ?: 0
+                    )
+                    mainActivityAppBar?.isLifted = true
                 }
             }
-        }
-        // Tablet layout
-        binding.infoRecycler?.let {
-            it.adapter = mangaInfoAdapter
 
-            it.scrollEvents()
-                .onEach { updateToolbarTitleAlpha() }
+            it.scrollStateChanges()
+                .onEach { _ ->
+                    // Disable swipe refresh when view is not at the top
+                    val firstPos = (it.layoutManager as LinearLayoutManager)
+                        .findFirstCompletelyVisibleItemPosition()
+                    binding.swipeRefresh.isEnabled = firstPos <= 0
+                }
                 .launchIn(viewScope)
 
-            // Delayed in case we need to jump to chapters
-            it.post {
-                updateToolbarTitleAlpha()
+            binding.fastScroller.doOnLayout { scroller ->
+                scroller.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    topMargin = getMainAppBarHeight()
+                }
+                scroller.applyInsetter {
+                    type(navigationBars = true) {
+                        margin()
+                    }
+                }
+            }
+
+            binding.swipeRefresh.doOnLayout { swipeRefresh ->
+                swipeRefresh as SwipeRefreshLayout
+                swipeRefresh.setOnApplyWindowInsetsListener { _, windowInsets ->
+                    val topStatusBarInset = WindowInsetsCompat.toWindowInsetsCompat(windowInsets)
+                        .getInsets(WindowInsetsCompat.Type.statusBars())
+                        .top
+                    swipeRefresh.isRefreshing = false
+                    swipeRefresh.setProgressViewEndTarget(false, getMainAppBarHeight() + topStatusBarInset)
+                    updateRefreshing()
+                    windowInsets
+                }
             }
         }
-        binding.chaptersRecycler?.let {
-            it.adapter = ConcatAdapter(chaptersHeaderAdapter, chaptersAdapter)
-        }
+
+        // Tablet layout
+        binding.infoRecycler?.adapter = mangaInfoAdapter
+        binding.chaptersRecycler?.adapter = ConcatAdapter(chaptersHeaderAdapter, chaptersAdapter)
 
         chaptersAdapter?.fastScroller = binding.fastScroller
 
@@ -285,8 +318,6 @@ class MangaController :
             }
             .launchIn(viewScope)
 
-        (activity as? MainActivity)?.fixViewToBottom(binding.actionToolbar)
-
         settingsSheet = ChaptersSettingsSheet(router, presenter) { group ->
             if (group is ChaptersSettingsSheet.Filter.FilterGroup) {
                 updateFilterIconState()
@@ -297,15 +328,25 @@ class MangaController :
         trackSheet = TrackSheet(this, manga!!, (activity as MainActivity).supportFragmentManager)
 
         updateFilterIconState()
+        recyclerViewUpdatesToolbarTitleAlpha(true)
+    }
+
+    private fun recyclerViewUpdatesToolbarTitleAlpha(enable: Boolean) {
+        val recycler = binding.fullRecycler ?: binding.infoRecycler ?: return
+        if (enable) {
+            if (!recyclerViewToolbarTitleAlphaUpdaterAdded) {
+                recycler.addOnScrollListener(recyclerViewToolbarTitleAlphaUpdater)
+                recyclerViewToolbarTitleAlphaUpdaterAdded = true
+            }
+        } else if (recyclerViewToolbarTitleAlphaUpdaterAdded) {
+            recycler.removeOnScrollListener(recyclerViewToolbarTitleAlphaUpdater)
+            recyclerViewToolbarTitleAlphaUpdaterAdded = false
+        }
     }
 
     private fun updateToolbarTitleAlpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float? = null) {
         val scrolledList = binding.fullRecycler ?: binding.infoRecycler!!
-        if (toolbarTextView == null) {
-            toolbarTextView = (activity as? MainActivity)?.binding?.toolbar?.children
-                ?.find { it is TextView } as? TextView
-        }
-        toolbarTextView?.alpha = when {
+        (activity as? MainActivity)?.binding?.appbar?.titleTextAlpha = when {
             // Specific alpha provided
             alpha != null -> alpha
 
@@ -350,17 +391,25 @@ class MangaController :
         actionFab = null
     }
 
+    private fun updateFabVisibility() {
+        val context = view?.context ?: return
+        val adapter = chaptersAdapter ?: return
+        val fab = actionFab ?: return
+        fab.isVisible = adapter.items.any { !it.read }
+        if (adapter.items.any { it.read }) {
+            fab.text = context.getString(R.string.action_resume)
+        }
+    }
+
     override fun onDestroyView(view: View) {
+        recyclerViewUpdatesToolbarTitleAlpha(false)
         destroyActionModeIfNeeded()
-        (activity as? MainActivity)?.clearFixViewToBottom(binding.actionToolbar)
         binding.actionToolbar.destroy()
         mangaInfoAdapter = null
         chaptersHeaderAdapter = null
         chaptersAdapter = null
         settingsSheet = null
         addSnackbar?.dismiss()
-        updateToolbarTitleAlpha(1F)
-        toolbarTextView = null
         super.onDestroyView(view)
     }
 
@@ -389,7 +438,6 @@ class MangaController :
 
         // Hide options for non-library manga
         menu.findItem(R.id.action_edit_categories).isVisible = presenter.manga.favorite && presenter.getCategories().isNotEmpty()
-        menu.findItem(R.id.action_edit_cover).isVisible = presenter.manga.favorite
         menu.findItem(R.id.action_migrate).isVisible = presenter.manga.favorite
     }
 
@@ -399,10 +447,6 @@ class MangaController :
             R.id.download_next, R.id.download_next_5, R.id.download_next_10,
             R.id.download_custom, R.id.download_unread, R.id.download_all
             -> downloadChapters(item.itemId)
-
-            R.id.action_share_cover -> shareCover()
-            R.id.action_save_cover -> saveCover()
-            R.id.action_edit_cover -> changeCover()
 
             R.id.action_edit_categories -> onCategoriesClick()
             R.id.action_migrate -> migrateManga()
@@ -531,8 +575,12 @@ class MangaController :
             // Choose a category
             else -> {
                 val ids = presenter.getMangaCategoryIds(manga)
-                val preselected = ids.mapNotNull { id ->
-                    categories.indexOfFirst { it.id == id }.takeIf { it != -1 }
+                val preselected = categories.map {
+                    if (it.id in ids) {
+                        QuadStateTextView.State.CHECKED.ordinal
+                    } else {
+                        QuadStateTextView.State.UNCHECKED.ordinal
+                    }
                 }.toTypedArray()
 
                 ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
@@ -564,6 +612,9 @@ class MangaController :
      */
     private fun toggleFavorite() {
         val isNowFavorite = presenter.toggleFavorite()
+        if (isNowFavorite) {
+            addSnackbar?.dismiss()
+        }
         if (activity != null && !isNowFavorite && presenter.hasDownloads()) {
             (activity as? MainActivity)?.binding?.rootCoordinator?.snack(activity!!.getString(R.string.delete_downloads_for_manga)) {
                 setAction(R.string.action_delete) {
@@ -571,7 +622,6 @@ class MangaController :
                 }
             }
         }
-
         mangaInfoAdapter?.notifyDataSetChanged()
     }
 
@@ -580,15 +630,18 @@ class MangaController :
         val categories = presenter.getCategories()
 
         val ids = presenter.getMangaCategoryIds(manga)
-        val preselected = ids.mapNotNull { id ->
-            categories.indexOfFirst { it.id == id }.takeIf { it != -1 }
+        val preselected = categories.map {
+            if (it.id in ids) {
+                QuadStateTextView.State.CHECKED.ordinal
+            } else {
+                QuadStateTextView.State.UNCHECKED.ordinal
+            }
         }.toTypedArray()
-
         ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
             .showDialog(router)
     }
 
-    override fun updateCategoriesForMangas(mangas: List<Manga>, categories: List<Category>) {
+    override fun updateCategoriesForMangas(mangas: List<Manga>, addCategories: List<Category>, removeCategories: List<Category>) {
         val manga = mangas.firstOrNull() ?: return
 
         if (!manga.favorite) {
@@ -597,7 +650,7 @@ class MangaController :
             activity?.invalidateOptionsMenu()
         }
 
-        presenter.moveMangaToCategories(manga, categories)
+        presenter.moveMangaToCategories(manga, addCategories)
     }
 
     /**
@@ -682,6 +735,21 @@ class MangaController :
         context.imageLoader.enqueue(req)
     }
 
+    fun showFullCoverDialog() {
+        if (dialog != null) return
+        val manga = manga ?: return
+        dialog = MangaFullCoverDialog(this, manga)
+        dialog?.addLifecycleListener(
+            object : LifecycleListener() {
+                override fun postDestroy(controller: Controller) {
+                    super.postDestroy(controller)
+                    dialog = null
+                }
+            }
+        )
+        dialog?.showDialog(router)
+    }
+
     fun shareCover() {
         try {
             val activity = activity!!
@@ -754,6 +822,7 @@ class MangaController :
 
     fun onSetCoverSuccess() {
         mangaInfoAdapter?.notifyDataSetChanged()
+        dialog?.setImage(manga)
         activity?.toast(R.string.cover_updated)
     }
 
@@ -800,13 +869,7 @@ class MangaController :
             actionMode?.invalidate()
         }
 
-        val context = view?.context
-        if (context != null) {
-            actionFab?.isVisible = chapters.any { !it.read }
-            if (chapters.any { it.read }) {
-                actionFab?.text = context.getString(R.string.action_resume)
-            }
-        }
+        updateFabVisibility()
     }
 
     private fun fetchChaptersFromSource(manualFetch: Boolean = false) {
@@ -988,7 +1051,7 @@ class MangaController :
         chaptersAdapter?.clearSelection()
         selectedChapters.clear()
         actionMode = null
-        actionFab?.isVisible = true
+        updateFabVisibility()
     }
 
     override fun onDetach(view: View) {
@@ -1054,7 +1117,7 @@ class MangaController :
         val manga = presenter.manga
         presenter.downloadChapters(chapters)
         if (view != null && !manga.favorite) {
-            addSnackbar = (activity as? MainActivity)?.binding?.rootCoordinator?.snack(view.context.getString(R.string.snack_add_to_library), Snackbar.LENGTH_INDEFINITE) {
+            addSnackbar = (activity as? MainActivity)?.binding?.rootCoordinator?.snack(view.context.getString(R.string.snack_add_to_library)) {
                 setAction(R.string.action_add) {
                     if (!manga.favorite) {
                         addToLibrary(manga)

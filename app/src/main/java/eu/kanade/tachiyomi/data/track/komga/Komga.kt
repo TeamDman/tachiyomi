@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.annotation.StringRes
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.Track
 import eu.kanade.tachiyomi.data.track.EnhancedTrackService
@@ -12,8 +13,14 @@ import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import okhttp3.Dns
 import okhttp3.OkHttpClient
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 
-class Komga(private val context: Context, id: Int) : TrackService(id), EnhancedTrackService, NoLoginTrackService {
+class Komga(
+    private val context: Context,
+    id: Int,
+    private val db: DatabaseHelper = Injekt.get(),
+) : TrackService(id), EnhancedTrackService, NoLoginTrackService {
 
     companion object {
         const val UNREAD = 1

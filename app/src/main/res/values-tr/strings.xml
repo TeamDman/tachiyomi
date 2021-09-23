@@ -77,7 +77,6 @@
     <string name="pref_library_columns">Satır başına öge</string>
     <string name="portrait">Dikey</string>
     <string name="landscape">Yatay</string>
-    <string name="default_columns">Öntanımlı</string>
     <string name="pref_library_update_interval">Güncelleme sıklığı</string>
     <string name="update_never">Elle</string>
     <string name="update_3hour">3 saatte bir</string>
@@ -90,10 +89,8 @@
     <string name="pref_library_update_restriction">Güncelleme kısıtlamaları</string>
     <string name="charging">Şarj oluyor</string>
     <string name="pref_update_only_non_completed">Yalnızca devam eden mangaları güncelleme</string>
-    <string name="pref_auto_update_manga_sync">Okuyunca bölüm ilerlemesini güncelle</string>
+    <string name="pref_auto_update_manga_sync">Okuyunca ilerlemeyi güncelle</string>
     <string name="pref_start_screen">Başlangıç ekranı</string>
-    <string name="pref_language">Dil</string>
-    <string name="system_default">Sistem öntanımlı</string>
     <string name="default_category">Varsayılan kategori</string>
     <string name="default_category_summary">Her zaman sor</string>
     <string name="all_lang">Tümü</string>
@@ -132,7 +129,6 @@
     <string name="white_background">Beyaz</string>
     <string name="black_background">Siyah</string>
     <string name="pref_viewer_type">Öntanımlı okuma kipi</string>
-    <string name="default_viewer">Öntanımlı</string>
     <string name="left_to_right_viewer">Soldan sağa</string>
     <string name="right_to_left_viewer">Sağdan sola</string>
     <string name="vertical_viewer">Dikey</string>
@@ -164,7 +160,7 @@
     <string name="pref_download_directory">İndirme konumu</string>
     <string name="pref_download_only_over_wifi">Yalnızca Wi-Fi ile indir</string>
     <string name="pref_remove_after_marked_as_read">Okundu olarak işaretlenince</string>
-    <string name="pref_remove_after_read">Okunduktan sonra</string>
+    <string name="pref_remove_after_read">Okuduktan sonra otomatik olarak</string>
     <string name="custom_dir">Özel konum</string>
     <string name="disabled">Devre dışı</string>
     <string name="last_read_chapter">Son okunan bölüm</string>
@@ -301,7 +297,7 @@
     <string name="information_no_downloads">İndirme yok</string>
     <string name="information_no_recent">Yeni güncelleme yok</string>
     <string name="information_no_recent_manga">Yakında okunan yok</string>
-    <string name="information_empty_library">Kitaplığınız boş. Serileri Göz At\'dan kitaplığınıza ekleyin.</string>
+    <string name="information_empty_library">Kitaplığınız boş</string>
     <string name="information_empty_category">Kategoriniz yok. Kitaplığınızı düzenlemek için bir tane oluşturmak için artı düğmesine dokunun.</string>
     <string name="download_notifier_downloader_title">İndirici</string>
     <string name="download_notifier_title_error">Hata</string>
@@ -324,7 +320,6 @@
     <string name="pref_true_color">32-bit renk</string>
     <string name="pref_skip_read_chapters">Okundu olarak işaretli bölümleri atla</string>
     <string name="pref_color_filter_mode">Renk filtresi karışım kipi</string>
-    <string name="filter_mode_default">Öntanımlı</string>
     <string name="filter_mode_overlay">Kaplama</string>
     <string name="filter_mode_multiply">Çarpma</string>
     <string name="filter_mode_screen">Ekran</string>
@@ -357,10 +352,6 @@
     <string name="theme_light">Kapalı</string>
     <string name="theme_dark">Açık</string>
     <string name="theme_system">Sisteme uy</string>
-    <string name="pref_theme_dark">Karanlık tema</string>
-    <string name="theme_dark_default">Öntanımlı</string>
-    <string name="theme_dark_blue">Koyu Mavi</string>
-    <string name="theme_dark_amoled">AMOLED Siyah</string>
     <string name="pref_manage_notifications">Bildirimleri yönet</string>
     <string name="pref_category_security">Güvenlik</string>
     <string name="lock_with_biometrics">Kilit açma gerektir</string>
@@ -402,9 +393,6 @@
         <item quantity="one">1 başlık için</item>
         <item quantity="other">%d başlık için</item>
     </plurals>
-    <string name="pref_theme_light">Aydınlık tema</string>
-    <string name="theme_light_default">Öntanımlı</string>
-    <string name="theme_light_blue">Açık Mavi</string>
     <string name="action_menu">Menü</string>
     <string name="action_reorganize_by">Yeniden sırala</string>
     <string name="action_newest">En yeni</string>
@@ -530,7 +518,6 @@
     <string name="action_sort_date_added">Eklendiği tarih</string>
     <string name="action_global_search_query">\"%1$s\" için genel arama</string>
     <string name="pref_category_reading_mode">Okuma kipi</string>
-    <string name="pref_category_locale">Yerel</string>
     <string name="pref_category_theme">Tema</string>
     <plurals name="num_trackers">
         <item quantity="one">1 izleyici</item>
@@ -544,7 +531,7 @@
     <string name="download_notifier_download_finish">İndirme tamamlandı</string>
     <string name="channel_errors">Hatalar</string>
     <string name="backup_restore_missing_trackers">İzleyiciler giriş yapmadı:</string>
-    <string name="pref_remove_bookmarked_chapters">İşaretli bölümleri sil</string>
+    <string name="pref_remove_bookmarked_chapters">İşaretli bölümleri silmeye izin ver</string>
     <string name="pref_category_delete_chapters">Bölümleri sil</string>
     <string name="ext_nsfw_warning">Yetişkin (18+) içerik içerebilir</string>
     <string name="ext_nsfw_short">18+</string>
@@ -584,7 +571,6 @@
     <string name="edge_nav">Kenar</string>
     <string name="kindlish_nav">Kindle gibi</string>
     <string name="l_nav">L şeklinde</string>
-    <string name="default_nav">Öntanımlı</string>
     <string name="channel_crash_logs">Çökme günlükleri</string>
     <string name="track_finished_reading_date">Bitirme tarihi</string>
     <string name="track_started_reading_date">Başlama tarihi</string>
@@ -627,7 +613,6 @@
     <string name="rotation_landscape">Yatay</string>
     <string name="rotation_portrait">Dikey</string>
     <string name="rotation_type">Döndürme türü</string>
-    <string name="default_rotation_type">Ön tanımlı</string>
     <string name="pref_create_folder_per_manga_summary">Klasörleri manga başlığına göre oluşturur</string>
     <string name="pref_create_folder_per_manga">Sayfaları ayrı klasörlere kaydet</string>
     <string name="pref_reader_actions">Eylemler</string>
@@ -638,17 +623,12 @@
     <string name="error_no_match">Eşleşme bulunamadı</string>
     <string name="source_unsupported">Kaynak desteklenmiyor</string>
     <string name="unread">Okunmayan</string>
-    <string name="pref_auto_add_track">Kitaplığa manga eklerken sessizce izle</string>
-    <string name="theme_dark_amoled_hotpink">AMOLED Sıcak Pembe</string>
-    <string name="theme_dark_midnightdusk">Alacakaranlık</string>
     <string name="date">Tarih</string>
     <string name="local_filter_order_by">Sıralama ölçütü</string>
     <string name="local_invalid_format">Geçersiz bölüm biçimi</string>
     <string name="chapter_not_found">Bölüm bulunamadı</string>
     <string name="pref_library_update_refresh_trackers_summary">Kitaplığı güncellerken izleyicileri güncelle</string>
     <string name="pref_library_update_refresh_trackers">İzleyicileri otomatik olarak yenile</string>
-    <string name="theme_light_strawberrydaiquiri">Çilekli Kokteyl</string>
-    <string name="theme_dark_greenapple">Yeşil Elma</string>
     <string name="restrictions">Kısıtlamalar: %s</string>
     <string name="action_display_local_badge">Yerel rozetler</string>
     <string name="on">Açık</string>
@@ -663,7 +643,48 @@
     <string name="alignment_top">Üstte</string>
     <string name="pref_side_nav_icon_alignment">Yan gezinti simgesi hizalaması</string>
     <string name="tracking_guide">İzleme kılavuzu</string>
-    <string name="theme_light_yotsuba">Yotsuba</string>
     <string name="information_empty_category_dialog">Henüz bir kategoriniz yok.</string>
     <string name="action_start_downloading_now">Şimdi indirmeye başla</string>
+    <string name="notification_updating">Kitaplık güncelleniyor… (%1$d/%2$d)</string>
+    <string name="tracker_komga_warning">Bu izleyici yalnızca Komga kaynağıyla uyumludur.</string>
+    <string name="about_dont_kill_my_app">Bazı üreticilerin arka plan hizmetlerini öldüren ek uygulama kısıtlamaları vardır. Bu web sitesinde nasıl düzeltileceği hakkında daha fazla bilgi al.</string>
+    <string name="restore_miui_warning">Yedekleme/geri yükleme, MIUI Optimizasyonu devre dışıysa düzgün çalışmayabilir.</string>
+    <string name="enhanced_tracking_info">Belirli kaynaklar için gelişmiş özellikler sağlayan hizmetler. Manga, kitaplığınıza eklendiğinde otomatik olarak izlenir.</string>
+    <string name="enhanced_services">Gelişmiş hizmetler</string>
+    <string name="pref_dark_theme_pure_black">Saf siyah karanlık mod</string>
+    <string name="theme_yotsuba">Yotsuba</string>
+    <string name="theme_yinyang">Yin &amp; Yang</string>
+    <string name="theme_tako">Tako</string>
+    <string name="theme_strawberrydaiquiri">Çilekli Kokteyl</string>
+    <string name="theme_midnightdusk">Alacakaranlık</string>
+    <string name="theme_greenapple">Yeşil Elma</string>
+    <string name="theme_blue">Eski Mavi</string>
+    <string name="theme_monet">Dinamik</string>
+    <string name="pref_app_theme">Uygulama teması</string>
+    <string name="action_sort_next_updated">Sonraki beklenen güncelleme</string>
+    <string name="label_background_activity">Arka plan etkinliği</string>
+    <string name="pref_lowest">En düşük</string>
+    <string name="pref_low">Düşük</string>
+    <string name="pref_high">Yüksek</string>
+    <string name="pref_highest">En yüksek</string>
+    <string name="pref_hide_threshold">Kaydırma algılandığında menüyü gizle</string>
+    <string name="pref_inverted_colors">Ters Çevrilmiş</string>
+    <string name="pref_relative_time_long">Uzun (Kısa+, n gün önce)</string>
+    <string name="pref_relative_time_short">Kısa (Bugün, Dün)</string>
+    <string name="pref_relative_format">Göreceli zaman damgaları</string>
+    <plurals name="relative_time">
+        <item quantity="one">Dün</item>
+        <item quantity="other">%1$d gün önce</item>
+    </plurals>
+    <string name="relative_time_today">Bugün</string>
+    <string name="recently">Yakınlarda</string>
+    <string name="theme_tealturquoise">Deniz Mavisi ve Turkuaz</string>
+    <string name="confirm_lock_change">Değişikliği onaylamak için kimlik doğrula</string>
+    <string name="label_default">Öntanımlı</string>
+    <string name="pref_category_timestamps">Zaman damgaları</string>
+    <string name="pref_category_appearance">Görünüm</string>
+    <string name="action_track">İzle</string>
+    <string name="pref_category_navigation">Gezinme</string>
+    <string name="getting_started_guide">Başlangıç kılavuzu</string>
+    <string name="pref_tablet_ui_mode">Tablet arayüzü kullan</string>
 </resources>

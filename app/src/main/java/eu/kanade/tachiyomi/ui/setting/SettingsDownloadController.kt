@@ -21,6 +21,7 @@ import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.util.preference.defaultValue
 import eu.kanade.tachiyomi.util.preference.entriesRes
 import eu.kanade.tachiyomi.util.preference.intListPreference
+import eu.kanade.tachiyomi.util.preference.multiSelectListPreference
 import eu.kanade.tachiyomi.util.preference.onClick
 import eu.kanade.tachiyomi.util.preference.preference
 import eu.kanade.tachiyomi.util.preference.preferenceCategory
@@ -43,6 +44,9 @@ class SettingsDownloadController : SettingsController() {
 
     override fun setupPreferenceScreen(screen: PreferenceScreen) = screen.apply {
         titleRes = R.string.pref_category_downloads
+
+        val dbCategories = db.getCategories().executeAsBlocking()
+        val categories = listOf(Category.createDefault(context)) + dbCategories
 
         preference {
             key = Keys.downloadsDirectory
@@ -93,10 +97,26 @@ class SettingsDownloadController : SettingsController() {
                 titleRes = R.string.pref_remove_bookmarked_chapters
                 defaultValue = false
             }
-        }
+            multiSelectListPreference {
+                key = Keys.removeExcludeCategories
+                titleRes = R.string.pref_remove_exclude_categories
+                entries = categories.map { it.name }.toTypedArray()
+                entryValues = categories.map { it.id.toString() }.toTypedArray()
 
-        val dbCategories = db.getCategories().executeAsBlocking()
-        val categories = listOf(Category.createDefault()) + dbCategories
+                preferences.removeExcludeCategories().asFlow()
+                    .onEach { mutable ->
+                        val selected = mutable
+                            .mapNotNull { id -> categories.find { it.id == id.toInt() } }
+                            .sortedBy { it.order }
+
+                        summary = if (selected.isEmpty()) {
+                            resources?.getString(R.string.none)
+                        } else {
+                            selected.joinToString { it.name }
+                        }
+                    }.launchIn(viewScope)
+            }
+        }
 
         preferenceCategory {
             titleRes = R.string.pref_category_auto_download
@@ -228,7 +248,7 @@ class SettingsDownloadController : SettingsController() {
 
         override fun onCreateDialog(savedViewState: Bundle?): Dialog {
             val dbCategories = db.getCategories().executeAsBlocking()
-            val categories = listOf(Category.createDefault()) + dbCategories
+            val categories = listOf(Category.createDefault(activity!!)) + dbCategories
 
             val items = categories.map { it.name }
             var selected = categories
@@ -269,8 +289,6 @@ class SettingsDownloadController : SettingsController() {
                 .create()
         }
     }
-
-    private companion object {
-        const val DOWNLOAD_DIR = 104
-    }
 }
+
+private const val DOWNLOAD_DIR = 104

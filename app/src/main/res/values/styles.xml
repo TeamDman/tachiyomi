@@ -10,7 +10,7 @@
     </style>
 
     <style name="ThemeOverlay.Tachiyomi.ActionBar.Colored" parent="ThemeOverlay.MaterialComponents.ActionBar">
-        <item name="android:colorControlHighlight">?attr/colorOnPrimary</item>
+        <item name="android:colorControlHighlight">?attr/colorOnToolbar</item>
     </style>
 
     <style name="Widget.Tachiyomi.Toolbar.Button.Navigation" parent="Widget.AppCompat.Toolbar.Button.Navigation">
@@ -30,7 +30,10 @@
         <item name="android:tint">?attr/colorOnToolbar</item>
     </style>
 
-    <style name="Widget.Tachiyomi.Toolbar.Primary" parent="Widget.MaterialComponents.Toolbar.Primary">
+    <style name="Widget.Tachiyomi.Toolbar.Colored" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">?attr/colorToolbar</item>
+        <item name="titleTextColor">?attr/colorOnToolbar</item>
+        <item name="subtitleTextColor">?attr/colorOnToolbar</item>
         <item name="android:elevation">0dp</item>
     </style>
 
@@ -95,6 +98,10 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Regular.Body1.Secondary.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="TextAppearance.Regular.Caption">
         <item name="android:textSize">12sp</item>
     </style>
@@ -112,7 +119,7 @@
     </style>
 
     <style name="TextAppearance.Medium.Title">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="TextAppearance.Medium.Body2">
@@ -185,8 +192,6 @@
 
 
     <style name="Widget.Tachiyomi.Chip.Action" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipStrokeWidth">1dp</item>
-        <item name="chipStrokeColor">?attr/colorPrimary</item>
         <item name="chipBackgroundColor">?attr/chipBackgroundColor</item>
         <item name="android:textColor">?attr/chipTextColor</item>
         <item name="rippleColor">?attr/colorControlHighlight</item>
@@ -235,6 +240,8 @@
         <item name="rippleColor">@null</item>
     </style>
 
+    <style name="Widget.Tachiyomi.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton" />
+
 
     <!--=================-->
     <!--Widgets.TabLayout-->
@@ -251,6 +258,7 @@
     </style>
 
     <style name="Widget.Tachiyomi.TabLayout.Colored" parent="Widget.MaterialComponents.TabLayout.Colored">
+        <item name="android:background">?attr/colorToolbar</item>
         <item name="tabGravity">center</item>
         <item name="tabIndicator">@drawable/tab_indicator</item>
         <item name="tabIndicatorFullWidth">false</item>
@@ -259,6 +267,17 @@
         <item name="tabMinWidth">75dp</item>
         <item name="tabMode">scrollable</item>
         <item name="tabRippleColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!--==============-->
+    <!--Widgets.Switch-->
+    <!--==============-->
+    <style name="Widget.Tachiyomi.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Tachiyomi.Switch</item>
+    </style>
+
+    <style name="ThemeOverlay.Tachiyomi.Switch" parent="">
+        <item name="elevationOverlayEnabled">@bool/elevationOverlayEnabled</item>
     </style>
 
 
@@ -271,6 +290,7 @@
     </style>
 
     <style name="Widget.Tachiyomi.BottomNavigationView.Colored" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="android:background">?attr/colorToolbar</item>
         <item name="labelVisibilityMode">labeled</item>
     </style>
 
@@ -280,6 +300,7 @@
     </style>
 
     <style name="Widget.Tachiyomi.NavigationRailView.Colored" parent="Widget.MaterialComponents.NavigationRailView.Colored">
+        <item name="android:background">?attr/colorToolbar</item>
         <item name="labelVisibilityMode">labeled</item>
     </style>
 
@@ -306,6 +327,11 @@
     <style name="ShapeAppearanceOverlay.MaterialCardView.Tracker" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.Cover" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_radius</item>
     </style>
 
     <style name="ThemeOverlay.Tachiyomi.Dialog.Fullscreen" parent="ThemeOverlay.MaterialComponents">

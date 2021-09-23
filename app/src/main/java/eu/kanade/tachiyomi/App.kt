@@ -12,9 +12,8 @@ import android.webkit.WebView
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.getSystemService
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
@@ -30,6 +29,8 @@ import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.preference.asImmediateFlow
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.ui.security.SecureActivityDelegate
+import eu.kanade.tachiyomi.util.system.AuthenticatorUtil
+import eu.kanade.tachiyomi.util.system.animatorDurationScale
 import eu.kanade.tachiyomi.util.system.notification
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -43,14 +44,14 @@ import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
 import java.security.Security
 
-open class App : Application(), LifecycleObserver, ImageLoaderFactory {
+open class App : Application(), DefaultLifecycleObserver, ImageLoaderFactory {
 
     private val preferences: PreferencesHelper by injectLazy()
 
     private val disableIncognitoReceiver = DisableIncognitoReceiver()
 
     override fun onCreate() {
-        super.onCreate()
+        super<Application>.onCreate()
         if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
 
         // TLS 1.3 support for Android < 10
@@ -114,25 +115,23 @@ open class App : Application(), LifecycleObserver, ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this).apply {
             componentRegistry {
-                add(TachiyomiImageDecoder(this@App.resources))
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     add(ImageDecoderDecoder(this@App))
                 } else {
                     add(GifDecoder())
                 }
+                add(TachiyomiImageDecoder(this@App.resources))
                 add(ByteBufferFetcher())
                 add(MangaCoverFetcher())
             }
             okHttpClient(Injekt.get<NetworkHelper>().coilClient)
-            crossfade(300)
+            crossfade((300 * this@App.animatorDurationScale).toInt())
             allowRgb565(getSystemService<ActivityManager>()!!.isLowRamDevice)
         }.build()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    @Suppress("unused")
-    fun onAppBackgrounded() {
-        if (preferences.lockAppAfter().get() >= 0) {
+    override fun onStop(owner: LifecycleOwner) {
+        if (!AuthenticatorUtil.isAuthenticating && preferences.lockAppAfter().get() >= 0) {
             SecureActivityDelegate.locked = true
         }
     }
@@ -176,8 +175,6 @@ open class App : Application(), LifecycleObserver, ImageLoaderFactory {
             }
         }
     }
-
-    companion object {
-        private const val ACTION_DISABLE_INCOGNITO_MODE = "tachi.action.DISABLE_INCOGNITO_MODE"
-    }
 }
+
+private const val ACTION_DISABLE_INCOGNITO_MODE = "tachi.action.DISABLE_INCOGNITO_MODE"

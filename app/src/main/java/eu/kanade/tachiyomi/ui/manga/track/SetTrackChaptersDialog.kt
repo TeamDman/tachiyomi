@@ -41,7 +41,7 @@ class SetTrackChaptersDialog<T> : DialogController
         val np = pickerView.chaptersPicker
 
         // Set initial value
-        np.value = item.track?.last_chapter_read ?: 0
+        np.value = item.track?.last_chapter_read?.toInt() ?: 0
 
         // Enforce maximum value if tracker has total number of chapters set
         if (item.track != null && item.track.total_chapters > 0) {
@@ -65,8 +65,6 @@ class SetTrackChaptersDialog<T> : DialogController
     interface Listener {
         fun setChaptersRead(item: TrackItem, chaptersRead: Int)
     }
-
-    private companion object {
-        const val KEY_ITEM_TRACK = "SetTrackChaptersDialog.item.track"
-    }
 }
+
+private const val KEY_ITEM_TRACK = "SetTrackChaptersDialog.item.track"

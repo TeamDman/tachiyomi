@@ -11,6 +11,8 @@ import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.track.TrackManager
+import eu.kanade.tachiyomi.data.track.job.DelayedTrackingStore
+import eu.kanade.tachiyomi.data.track.job.DelayedTrackingUpdateJob
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.model.Page
@@ -31,6 +33,7 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.getPicturesDir
 import eu.kanade.tachiyomi.util.storage.getTempShareDir
 import eu.kanade.tachiyomi.util.system.ImageUtil
+import eu.kanade.tachiyomi.util.system.isOnline
 import eu.kanade.tachiyomi.util.updateCoverLastModified
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -53,7 +56,8 @@ class ReaderPresenter(
     private val sourceManager: SourceManager = Injekt.get(),
     private val downloadManager: DownloadManager = Injekt.get(),
     private val coverCache: CoverCache = Injekt.get(),
-    private val preferences: PreferencesHelper = Injekt.get()
+    private val preferences: PreferencesHelper = Injekt.get(),
+    private val delayedTrackingStore: DelayedTrackingStore = Injekt.get(),
 ) : BasePresenter<ReaderActivity>() {
 
     /**
@@ -405,6 +409,7 @@ class ReaderPresenter(
         val currentChapterPosition = chapterList.indexOf(currentChapter)
         val removeAfterReadSlots = preferences.removeAfterReadSlots()
         val chapterToDelete = chapterList.getOrNull(currentChapterPosition - removeAfterReadSlots)
+
         // Check if deleting option is enabled and chapter exists
         if (removeAfterReadSlots != -1 && chapterToDelete != null) {
             enqueueDeleteReadChapters(chapterToDelete)
@@ -698,9 +703,10 @@ class ReaderPresenter(
         if (!preferences.autoUpdateTrack()) return
         val manga = manga ?: return
 
-        val chapterRead = readerChapter.chapter.chapter_number.toInt()
+        val chapterRead = readerChapter.chapter.chapter_number
 
         val trackManager = Injekt.get<TrackManager>()
+        val context = Injekt.get<Application>()
 
         launchIO {
             db.getTracks(manga).executeAsBlocking()
@@ -713,8 +719,13 @@ class ReaderPresenter(
                         // for a while. The view can still be garbage collected.
                         async {
                             runCatching {
-                                service.update(track, true)
-                                db.insertTrack(track).executeAsBlocking()
+                                if (context.isOnline()) {
+                                    service.update(track, true)
+                                    db.insertTrack(track).executeAsBlocking()
+                                } else {
+                                    delayedTrackingStore.addItem(track)
+                                    DelayedTrackingUpdateJob.setupTask(context)
+                                }
                             }
                         }
                     } else {

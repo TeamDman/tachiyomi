@@ -6,8 +6,6 @@
 # ![app icon](./.github/readme-images/app-icon.png)Tachiyomi
 Tachiyomi is a free and open source manga reader for Android 6.0 and above.
 
-![screenshots of app](./.github/readme-images/screens.png)
-
 ## Features
 
 Features include:
@@ -38,7 +36,7 @@ Please make sure to read the full guidelines. Your issue may be closed without w
 
 <details><summary>Bugs</summary>
 
-* Include version (More > About > Version)
+* Include version (More → About → Version)
  * If not latest, try updating, it may have already been solved
  * Preview version is equal to the number of commits as seen in the main page
 * Include steps to reproduce (if not obvious from description)

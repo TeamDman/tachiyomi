@@ -6,10 +6,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.core.app.ActivityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.WebtoonLayoutManager
+import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
@@ -20,6 +22,8 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import rx.subscriptions.CompositeSubscription
 import timber.log.Timber
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import kotlin.math.max
 import kotlin.math.min
 
@@ -46,6 +50,11 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     private val layoutManager = WebtoonLayoutManager(activity)
 
     /**
+     * Configuration used by this viewer, like allow taps, or crop image borders.
+     */
+    val config = WebtoonConfig(scope)
+
+    /**
      * Adapter of the recycler view.
      */
     private val adapter = WebtoonAdapter(this)
@@ -61,18 +70,20 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
     private var currentPage: Any? = null
 
     /**
-     * Configuration used by this viewer, like allow taps, or crop image borders.
-     */
-    val config = WebtoonConfig(scope)
-
-    /**
      * Subscriptions to keep while this viewer is used.
      */
     val subscriptions = CompositeSubscription()
 
+    private val threshold: Int =
+        Injekt.get<PreferencesHelper>()
+            .readerHideTreshold()
+            .get()
+            .threshold
+
     init {
         recycler.isVisible = false // Don't let the recycler layout yet
         recycler.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
+        recycler.isFocusable = false
         recycler.itemAnimator = null
         recycler.layoutManager = layoutManager
         recycler.adapter = adapter
@@ -81,7 +92,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     onScrolled()
 
-                    if ((dy > 37 || dy < -37) && activity.menuVisible) {
+                    if ((dy > threshold || dy < -threshold) && activity.menuVisible) {
                         activity.hideMenu()
                     }
 
@@ -127,6 +138,10 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
 
         config.imagePropertyChangedListener = {
             refreshAdapter()
+        }
+
+        config.themeChangedListener = {
+            ActivityCompat.recreate(activity)
         }
 
         config.navigationModeChangedListener = {
@@ -329,6 +344,7 @@ class WebtoonViewer(val activity: ReaderActivity, val isContinuous: Boolean = tr
      */
     private fun refreshAdapter() {
         val position = layoutManager.findLastEndVisibleItemPosition()
+        adapter.refresh()
         adapter.notifyItemRangeChanged(
             max(0, position - 3),
             min(position + 3, adapter.itemCount - 1)

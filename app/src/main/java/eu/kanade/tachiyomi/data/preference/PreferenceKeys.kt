@@ -53,6 +53,8 @@ object PreferenceKeys {
 
     const val grayscale = "pref_grayscale"
 
+    const val invertedColors = "pref_inverted_colors"
+
     const val defaultReadingMode = "pref_default_reading_mode_key"
 
     const val defaultOrientationType = "pref_default_orientation_type_key"
@@ -86,6 +88,8 @@ object PreferenceKeys {
     const val showNavigationOverlayNewUser = "reader_navigation_overlay_new_user"
 
     const val showNavigationOverlayOnStart = "reader_navigation_overlay_on_start"
+
+    const val readerHideThreshold = "reader_hide_threshold"
 
     const val webtoonSidePadding = "webtoon_side_padding"
 
@@ -150,8 +154,6 @@ object PreferenceKeys {
     const val automaticExtUpdates = "automatic_ext_updates"
 
     const val showNsfwSource = "show_nsfw_source"
-    const val showNsfwExtension = "show_nsfw_extension"
-    const val labelNsfwExtension = "label_nsfw_extension"
 
     const val startScreen = "start_screen"
 
@@ -171,17 +173,15 @@ object PreferenceKeys {
 
     const val autoUpdateTrackersMarkReadBehaviour = "auto_update_trackers_mark_read_behaviour"
 
-    const val showLibraryUpdateErrors = "show_library_update_errors"
-
     const val downloadNew = "download_new"
 
     const val downloadNewCategories = "download_new_categories"
     const val downloadNewCategoriesExclude = "download_new_categories_exclude"
+    const val removeExcludeCategories = "remove_exclude_categories"
 
     const val libraryDisplayMode = "pref_display_mode_library"
 
-    const val lang = "app_language"
-
+    const val relativeTime: String = "relative_time"
     const val dateFormat = "app_date_format"
 
     const val defaultCategory = "default_category"
@@ -221,6 +221,8 @@ object PreferenceKeys {
     const val defaultChapterDisplayByNameOrNumber = "default_chapter_display_by_name_or_number"
 
     const val incognitoMode = "incognito_mode"
+
+    const val tabletUiMode = "tablet_ui_mode"
 
     fun trackUsername(syncId: Int) = "pref_mangasync_username_$syncId"
 

@@ -1,19 +1,14 @@
 package eu.kanade.tachiyomi.ui.more
 
-import android.app.Dialog
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.preference.PreferenceScreen
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.mikepenz.aboutlibraries.LibsBuilder
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.data.updater.GithubUpdateChecker
-import eu.kanade.tachiyomi.data.updater.GithubUpdateResult
-import eu.kanade.tachiyomi.data.updater.UpdaterService
-import eu.kanade.tachiyomi.ui.base.controller.DialogController
-import eu.kanade.tachiyomi.ui.base.controller.NoToolbarElevationController
+import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
+import eu.kanade.tachiyomi.data.updater.AppUpdateResult
+import eu.kanade.tachiyomi.ui.base.controller.NoAppBarElevationController
 import eu.kanade.tachiyomi.ui.base.controller.openInBrowser
+import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
+import eu.kanade.tachiyomi.ui.more.licenses.LicensesController
 import eu.kanade.tachiyomi.ui.setting.SettingsController
 import eu.kanade.tachiyomi.util.CrashLogUtil
 import eu.kanade.tachiyomi.util.lang.launchNow
@@ -30,13 +25,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class AboutController : SettingsController(), NoToolbarElevationController {
+class AboutController : SettingsController(), NoAppBarElevationController {
 
-    private val updateChecker by lazy { GithubUpdateChecker() }
+    private val updateChecker by lazy { AppUpdateChecker() }
 
     private val dateFormat: DateFormat = preferences.dateFormat()
-
-    private val isUpdaterEnabled = BuildConfig.INCLUDE_UPDATER
 
     override fun setupPreferenceScreen(screen: PreferenceScreen) = screen.apply {
         titleRes = R.string.pref_category_about
@@ -59,7 +52,7 @@ class AboutController : SettingsController(), NoToolbarElevationController {
                 }
             }
         }
-        if (isUpdaterEnabled) {
+        if (BuildConfig.INCLUDE_UPDATER) {
             preference {
                 key = "pref_about_check_for_updates"
                 titleRes = R.string.check_for_updates
@@ -81,16 +74,18 @@ class AboutController : SettingsController(), NoToolbarElevationController {
             }
         }
         preference {
+            key = "pref_about_help_translate"
+            titleRes = R.string.help_translate
+
+            onClick {
+                openInBrowser("https://tachiyomi.org/help/contribution/#translation")
+            }
+        }
+        preference {
             key = "pref_about_licenses"
             titleRes = R.string.licenses
             onClick {
-                LibsBuilder()
-                    .withActivityTitle(activity!!.getString(R.string.licenses))
-                    .withAboutIconShown(false)
-                    .withAboutVersionShown(false)
-                    .withLicenseShown(true)
-                    .withEdgeToEdge(true)
-                    .start(activity!!)
+                router.pushController(LicensesController().withFadeTransaction())
             }
         }
 
@@ -108,14 +103,10 @@ class AboutController : SettingsController(), NoToolbarElevationController {
         launchNow {
             try {
                 when (val result = updateChecker.checkForUpdate()) {
-                    is GithubUpdateResult.NewUpdate -> {
-                        val body = result.release.info
-                        val url = result.release.getDownloadLink()
-
-                        // Create confirmation window
-                        NewUpdateDialogController(body, url).showDialog(router)
+                    is AppUpdateResult.NewUpdate -> {
+                        NewUpdateDialogController(result).showDialog(router)
                     }
-                    is GithubUpdateResult.NoNewUpdate -> {
+                    is AppUpdateResult.NoNewUpdate -> {
                         activity?.toast(R.string.update_check_no_new_updates)
                     }
                 }
@@ -123,34 +114,6 @@ class AboutController : SettingsController(), NoToolbarElevationController {
                 activity?.toast(error.message)
                 Timber.e(error)
             }
-        }
-    }
-
-    class NewUpdateDialogController(bundle: Bundle? = null) : DialogController(bundle) {
-
-        constructor(body: String, url: String) : this(
-            bundleOf(BODY_KEY to body, URL_KEY to url)
-        )
-
-        override fun onCreateDialog(savedViewState: Bundle?): Dialog {
-            return MaterialAlertDialogBuilder(activity!!)
-                .setTitle(R.string.update_check_notification_update_available)
-                .setMessage(args.getString(BODY_KEY) ?: "")
-                .setPositiveButton(R.string.update_check_confirm) { _, _ ->
-                    val appContext = applicationContext
-                    if (appContext != null) {
-                        // Start download
-                        val url = args.getString(URL_KEY) ?: ""
-                        UpdaterService.start(appContext, url)
-                    }
-                }
-                .setNegativeButton(R.string.update_check_ignore, null)
-                .create()
-        }
-
-        private companion object {
-            const val BODY_KEY = "NewUpdateDialogController.body"
-            const val URL_KEY = "NewUpdateDialogController.key"
         }
     }
 

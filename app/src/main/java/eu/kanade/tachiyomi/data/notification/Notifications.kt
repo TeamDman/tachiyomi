@@ -1,12 +1,13 @@
 package eu.kanade.tachiyomi.data.notification
 
-import android.app.NotificationChannel
-import android.app.NotificationChannelGroup
-import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_HIGH
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_LOW
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.util.system.notificationManager
+import eu.kanade.tachiyomi.util.system.buildNotificationChannel
+import eu.kanade.tachiyomi.util.system.buildNotificationChannelGroup
 
 /**
  * Class to manage the basic information of all the notifications used in the app.
@@ -23,8 +24,10 @@ object Notifications {
     /**
      * Notification channel and ids used by the library updater.
      */
-    const val CHANNEL_LIBRARY = "library_channel"
+    private const val GROUP_LIBRARY = "group_library"
+    const val CHANNEL_LIBRARY_PROGRESS = "library_progress_channel"
     const val ID_LIBRARY_PROGRESS = -101
+    const val CHANNEL_LIBRARY_ERROR = "library_errors_channel"
     const val ID_LIBRARY_ERROR = -102
 
     /**
@@ -76,99 +79,90 @@ object Notifications {
 
     private val deprecatedChannels = listOf(
         "downloader_channel",
-        "backup_restore_complete_channel"
+        "backup_restore_complete_channel",
+        "library_channel",
     )
 
     /**
      * Creates the notification channels introduced in Android Oreo.
+     * This won't do anything on Android versions that don't support notification channels.
      *
      * @param context The application context.
      */
     fun createChannels(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        val notificationService = NotificationManagerCompat.from(context)
 
-        listOf(
-            NotificationChannelGroup(GROUP_BACKUP_RESTORE, context.getString(R.string.group_backup_restore)),
-            NotificationChannelGroup(GROUP_DOWNLOADER, context.getString(R.string.group_downloader))
-        ).forEach(context.notificationManager::createNotificationChannelGroup)
-
-        listOf(
-            NotificationChannel(
-                CHANNEL_COMMON,
-                context.getString(R.string.channel_common),
-                NotificationManager.IMPORTANCE_LOW
-            ),
-            NotificationChannel(
-                CHANNEL_LIBRARY,
-                context.getString(R.string.channel_library),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                setShowBadge(false)
-            },
-            NotificationChannel(
-                CHANNEL_DOWNLOADER_PROGRESS,
-                context.getString(R.string.channel_progress),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                group = GROUP_DOWNLOADER
-                setShowBadge(false)
-            },
-            NotificationChannel(
-                CHANNEL_DOWNLOADER_COMPLETE,
-                context.getString(R.string.channel_complete),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                group = GROUP_DOWNLOADER
-                setShowBadge(false)
-            },
-            NotificationChannel(
-                CHANNEL_DOWNLOADER_ERROR,
-                context.getString(R.string.channel_errors),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                group = GROUP_DOWNLOADER
-                setShowBadge(false)
-            },
-            NotificationChannel(
-                CHANNEL_NEW_CHAPTERS,
-                context.getString(R.string.channel_new_chapters),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                CHANNEL_UPDATES_TO_EXTS,
-                context.getString(R.string.channel_ext_updates),
-                NotificationManager.IMPORTANCE_DEFAULT
-            ),
-            NotificationChannel(
-                CHANNEL_BACKUP_RESTORE_PROGRESS,
-                context.getString(R.string.channel_progress),
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                group = GROUP_BACKUP_RESTORE
-                setShowBadge(false)
-            },
-            NotificationChannel(
-                CHANNEL_BACKUP_RESTORE_COMPLETE,
-                context.getString(R.string.channel_complete),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                group = GROUP_BACKUP_RESTORE
-                setShowBadge(false)
-                setSound(null, null)
-            },
-            NotificationChannel(
-                CHANNEL_CRASH_LOGS,
-                context.getString(R.string.channel_crash_logs),
-                NotificationManager.IMPORTANCE_HIGH
-            ),
-            NotificationChannel(
-                CHANNEL_INCOGNITO_MODE,
-                context.getString(R.string.pref_incognito_mode),
-                NotificationManager.IMPORTANCE_LOW
+        notificationService.createNotificationChannelGroupsCompat(
+            listOf(
+                buildNotificationChannelGroup(GROUP_BACKUP_RESTORE) {
+                    setName(context.getString(R.string.label_backup))
+                },
+                buildNotificationChannelGroup(GROUP_DOWNLOADER) {
+                    setName(context.getString(R.string.download_notifier_downloader_title))
+                },
+                buildNotificationChannelGroup(GROUP_LIBRARY) {
+                    setName(context.getString(R.string.label_library))
+                },
             )
-        ).forEach(context.notificationManager::createNotificationChannel)
+        )
+
+        notificationService.createNotificationChannelsCompat(
+            listOf(
+                buildNotificationChannel(CHANNEL_COMMON, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_common))
+                },
+                buildNotificationChannel(CHANNEL_LIBRARY_PROGRESS, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_progress))
+                    setGroup(GROUP_LIBRARY)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_LIBRARY_ERROR, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_errors))
+                    setGroup(GROUP_LIBRARY)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_NEW_CHAPTERS, IMPORTANCE_DEFAULT) {
+                    setName(context.getString(R.string.channel_new_chapters))
+                },
+                buildNotificationChannel(CHANNEL_DOWNLOADER_PROGRESS, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_progress))
+                    setGroup(GROUP_DOWNLOADER)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_DOWNLOADER_COMPLETE, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_complete))
+                    setGroup(GROUP_DOWNLOADER)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_DOWNLOADER_ERROR, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_errors))
+                    setGroup(GROUP_DOWNLOADER)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_BACKUP_RESTORE_PROGRESS, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_progress))
+                    setGroup(GROUP_BACKUP_RESTORE)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_BACKUP_RESTORE_COMPLETE, IMPORTANCE_HIGH) {
+                    setName(context.getString(R.string.channel_complete))
+                    setGroup(GROUP_BACKUP_RESTORE)
+                    setShowBadge(false)
+                    setSound(null, null)
+                },
+                buildNotificationChannel(CHANNEL_CRASH_LOGS, IMPORTANCE_HIGH) {
+                    setName(context.getString(R.string.channel_crash_logs))
+                },
+                buildNotificationChannel(CHANNEL_INCOGNITO_MODE, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.pref_incognito_mode))
+                },
+                buildNotificationChannel(CHANNEL_UPDATES_TO_EXTS, IMPORTANCE_DEFAULT) {
+                    setName(context.getString(R.string.channel_ext_updates))
+                },
+            )
+        )
 
         // Delete old notification channels
-        deprecatedChannels.forEach(context.notificationManager::deleteNotificationChannel)
+        deprecatedChannels.forEach(notificationService::deleteNotificationChannel)
     }
 }

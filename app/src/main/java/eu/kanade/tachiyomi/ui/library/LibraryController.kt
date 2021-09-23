@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.ControllerChangeType
@@ -34,7 +33,10 @@ import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchController
 import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.ui.manga.MangaController
 import eu.kanade.tachiyomi.util.system.getResourceColor
+import eu.kanade.tachiyomi.util.system.openInBrowser
 import eu.kanade.tachiyomi.util.system.toast
+import eu.kanade.tachiyomi.widget.EmptyView
+import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -167,7 +169,7 @@ class LibraryController(
 
         binding.actionToolbar.applyInsetter {
             type(navigationBars = true) {
-                margin(bottom = true)
+                margin(bottom = true, horizontal = true)
             }
         }
 
@@ -196,7 +198,12 @@ class LibraryController(
             when (group) {
                 is LibrarySettingsSheet.Filter.FilterGroup -> onFilterChanged()
                 is LibrarySettingsSheet.Sort.SortGroup -> onSortChanged()
-                is LibrarySettingsSheet.Display.DisplayGroup -> reattachAdapter()
+                is LibrarySettingsSheet.Display.DisplayGroup -> {
+                    if (!preferences.categorisedDisplaySettings().get() || activeCategory == 0) {
+                        // Reattach adapter when flow preference change
+                        reattachAdapter()
+                    }
+                }
                 is LibrarySettingsSheet.Display.BadgeGroup -> onBadgeSettingChanged()
                 is LibrarySettingsSheet.Display.TabsGroup -> onTabsSettingsChanged()
             }
@@ -209,8 +216,6 @@ class LibraryController(
                 )
             }
             .launchIn(viewScope)
-
-        (activity as? MainActivity)?.fixViewToBottom(binding.actionToolbar)
     }
 
     override fun onChangeStarted(handler: ControllerChangeHandler, type: ControllerChangeType) {
@@ -223,7 +228,6 @@ class LibraryController(
 
     override fun onDestroyView(view: View) {
         destroyActionModeIfNeeded()
-        (activity as? MainActivity)?.clearFixViewToBottom(binding.actionToolbar)
         binding.actionToolbar.destroy()
         adapter?.onDestroy()
         adapter = null
@@ -240,12 +244,7 @@ class LibraryController(
         }
         tabsVisibilitySubscription?.unsubscribe()
         tabsVisibilitySubscription = tabsVisibilityRelay.subscribe { visible ->
-            val tabAnimator = (activity as? MainActivity)?.tabAnimator
-            if (visible) {
-                tabAnimator?.expand()
-            } else {
-                tabAnimator?.collapse()
-            }
+            tabs.isVisible = visible
         }
         mangaCountVisibilitySubscription?.unsubscribe()
         mangaCountVisibilitySubscription = mangaCountVisibilityRelay.subscribe {
@@ -276,7 +275,14 @@ class LibraryController(
         if (mangaMap.isNotEmpty()) {
             binding.emptyView.hide()
         } else {
-            binding.emptyView.show(R.string.information_empty_library)
+            binding.emptyView.show(
+                R.string.information_empty_library,
+                listOf(
+                    EmptyView.Action(R.string.getting_started_guide, R.drawable.ic_help_24dp) {
+                        activity?.openInBrowser("https://tachiyomi.org/help/guides/getting-started")
+                    }
+                ),
+            )
             (activity as? MainActivity)?.ready = true
         }
 
@@ -377,7 +383,7 @@ class LibraryController(
                 actionMode!!,
                 R.menu.library_selection
             ) { onActionItemClicked(it!!) }
-            (activity as? MainActivity)?.showBottomNav(visible = false, expand = true)
+            (activity as? MainActivity)?.showBottomNav(false)
         }
     }
 
@@ -417,7 +423,7 @@ class LibraryController(
         // Tint icon if there's a filter active
         if (settingsSheet.filters.hasActiveFilters()) {
             val filterColor = activity!!.getResourceColor(R.attr.colorFilterActive)
-            DrawableCompat.setTint(filterItem.icon, filterColor)
+            filterItem.icon.setTint(filterColor)
         }
     }
 
@@ -486,7 +492,7 @@ class LibraryController(
         selectionRelay.call(LibrarySelectionEvent.Cleared())
 
         binding.actionToolbar.hide()
-        (activity as? MainActivity)?.showBottomNav(visible = true, expand = true)
+        (activity as? MainActivity)?.showBottomNav(true)
 
         actionMode = null
     }
@@ -550,11 +556,17 @@ class LibraryController(
         val categories = presenter.categories.filter { it.id != 0 }
 
         // Get indexes of the common categories to preselect.
-        val commonCategoriesIndexes = presenter.getCommonCategories(mangas)
-            .map { categories.indexOf(it) }
-            .toTypedArray()
-
-        ChangeMangaCategoriesDialog(this, mangas, categories, commonCategoriesIndexes)
+        val common = presenter.getCommonCategories(mangas)
+        // Get indexes of the mix categories to preselect.
+        val mix = presenter.getMixCategories(mangas)
+        var preselected = categories.map {
+            when (it) {
+                in common -> QuadStateTextView.State.CHECKED.ordinal
+                in mix -> QuadStateTextView.State.INDETERMINATE.ordinal
+                else -> QuadStateTextView.State.UNCHECKED.ordinal
+            }
+        }.toTypedArray()
+        ChangeMangaCategoriesDialog(this, mangas, categories, preselected)
             .showDialog(router)
     }
 
@@ -574,8 +586,8 @@ class LibraryController(
         DeleteLibraryMangasDialog(this, selectedMangas.toList()).showDialog(router)
     }
 
-    override fun updateCategoriesForMangas(mangas: List<Manga>, categories: List<Category>) {
-        presenter.moveMangasToCategories(categories, mangas)
+    override fun updateCategoriesForMangas(mangas: List<Manga>, addCategories: List<Category>, removeCategories: List<Category>) {
+        presenter.updateMangasToCategories(mangas, addCategories, removeCategories)
         destroyActionModeIfNeeded()
     }
 

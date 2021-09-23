@@ -3,12 +3,11 @@ package eu.kanade.tachiyomi.util.chapter
 import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Chapter
 import eu.kanade.tachiyomi.data.database.models.Track
-import eu.kanade.tachiyomi.data.preference.PreferenceValues
-import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour.*
+import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.util.lang.launchIO
 import timber.log.Timber
-import kotlin.math.max
+import java.lang.Float.max
 
 /**
  * Helper method for syncing a remote track with the local chapters, and back
@@ -18,33 +17,28 @@ import kotlin.math.max
  * @param remoteTrack the remote Track object.
  * @param service the tracker service.
  */
-fun syncChaptersWithTrackServiceTwoWay(db: DatabaseHelper, chapters: List<Chapter>, remoteTrack: Track, service: TrackService, behaviour: PreferenceValues.MarkReadBehaviour) {
-    // mark local chapters read based on remote
-    if (behaviour != NEVER) {
-        chapters
-                .filter { !it.read }
-                .filter { it.chapter_number <= remoteTrack.last_chapter_read }
-                .filter {
-                    if (behaviour == NOT_SPECIAL) { // only mark read if whole-numbered chapter
-                        it.chapter_number % 1.0 == 0.0
-                    } else { // always mark read
-                        true
-                    }
-                }
-                .forEach { it.read = true }
-        db.updateChaptersProgress(chapters).executeAsBlocking()
-    }
+fun syncChaptersWithTrackServiceTwoWay(db: DatabaseHelper, chapters: List<Chapter>, remoteTrack: Track, service: TrackService, behaviour: MarkReadBehaviour) {
+    val sortedChapters = chapters.sortedBy { it.chapter_number }
+    sortedChapters
+            // Don't modify chapters already marked read
+            .filter { !it.read }
+            // Only modify chapters earlier than what remote says is latest read
+            .filter { it.chapter_number <= remoteTrack.last_chapter_read }
+            // Don't modify if preference set to never
+            .filter { behaviour != MarkReadBehaviour.NEVER }
+            // If preferences set to not mark "special" chapters as read, verify is whole number ch
+            .filter { behaviour != MarkReadBehaviour.NOT_SPECIAL || it.chapter_number % 1.0 == 0.0 }
+            // Update chapter as read
+            .forEach { it.read = true }
 
-    // find the first unread chapter
-    val nextUnreadChapterIndex = chapters
-            .sortedBy { it.chapter_number }
-            .indexOfFirst { !it.read }
+    // commit local update to db
+    db.updateChaptersProgress(sortedChapters).executeAsBlocking()
 
-    // the chapter before the unread one is considered the latest locally read chapter
-    // fallback to the remote tracker value
-    val latestReadChapterNumber = chapters.getOrNull(nextUnreadChapterIndex - 1)
-            ?.chapter_number?.toInt()
-            ?: remoteTrack.last_chapter_read
+    // only take into account continuous reading
+    val latestReadChapterNumber = sortedChapters
+            .takeWhile { it.read }
+            .lastOrNull()?.chapter_number
+            ?: 0F
 
     // update tracker, no backtracking allowed
     remoteTrack.last_chapter_read = max(remoteTrack.last_chapter_read, latestReadChapterNumber)

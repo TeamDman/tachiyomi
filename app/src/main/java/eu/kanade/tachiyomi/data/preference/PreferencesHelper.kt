@@ -9,8 +9,8 @@ import com.tfcporciuncula.flow.FlowSharedPreferences
 import com.tfcporciuncula.flow.Preference
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Manga
-import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour.*
-import eu.kanade.tachiyomi.data.preference.PreferenceValues.ThemeMode.*
+import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour
+import eu.kanade.tachiyomi.data.preference.PreferenceValues.ThemeMode.system
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.data.track.anilist.Anilist
 import eu.kanade.tachiyomi.ui.library.setting.DisplayModeSetting
@@ -18,6 +18,7 @@ import eu.kanade.tachiyomi.ui.library.setting.SortDirectionSetting
 import eu.kanade.tachiyomi.ui.library.setting.SortModeSetting
 import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
+import eu.kanade.tachiyomi.util.system.isTablet
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
@@ -85,9 +86,7 @@ class PreferencesHelper(val context: Context) {
     fun autoUpdateMetadata() = prefs.getBoolean(Keys.autoUpdateMetadata, false)
 
     fun autoUpdateTrackers() = prefs.getBoolean(Keys.autoUpdateTrackers, false)
-    fun autoUpdateTrackersMarkReadBehaviour() = flowPrefs.getEnum(Keys.autoUpdateTrackersMarkReadBehaviour, NEVER)
-
-    fun showLibraryUpdateErrors() = prefs.getBoolean(Keys.showLibraryUpdateErrors, true)
+    fun autoUpdateTrackersMarkReadBehaviour() = flowPrefs.getEnum(Keys.autoUpdateTrackersMarkReadBehaviour, MarkReadBehaviour.NEVER)
 
     fun themeMode() = flowPrefs.getEnum(Keys.themeMode, system)
 
@@ -131,6 +130,8 @@ class PreferencesHelper(val context: Context) {
 
     fun grayscale() = flowPrefs.getBoolean(Keys.grayscale, false)
 
+    fun invertedColors() = flowPrefs.getBoolean(Keys.invertedColors, false)
+
     fun defaultReadingMode() = prefs.getInt(Keys.defaultReadingMode, ReadingModeType.RIGHT_TO_LEFT.flagValue)
 
     fun defaultOrientationType() = prefs.getInt(Keys.defaultOrientationType, OrientationType.FREE.flagValue)
@@ -169,6 +170,8 @@ class PreferencesHelper(val context: Context) {
 
     fun showNavigationOverlayOnStart() = flowPrefs.getBoolean(Keys.showNavigationOverlayOnStart, false)
 
+    fun readerHideTreshold() = flowPrefs.getEnum(Keys.readerHideThreshold, Values.ReaderHideThreshold.LOW)
+
     fun portraitColumns() = flowPrefs.getInt(Keys.portraitColumns, 0)
 
     fun landscapeColumns() = flowPrefs.getInt(Keys.landscapeColumns, 0)
@@ -206,6 +209,8 @@ class PreferencesHelper(val context: Context) {
 
     fun backupsDirectory() = flowPrefs.getString(Keys.backupDirectory, defaultBackupDir.toString())
 
+    fun relativeTime() = flowPrefs.getInt(Keys.relativeTime, 7)
+
     fun dateFormat(format: String = flowPrefs.getString(Keys.dateFormat, "").get()): DateFormat = when (format) {
         "" -> DateFormat.getDateInstance(DateFormat.SHORT)
         else -> SimpleDateFormat(format, Locale.getDefault())
@@ -226,6 +231,8 @@ class PreferencesHelper(val context: Context) {
     fun removeAfterMarkedAsRead() = prefs.getBoolean(Keys.removeAfterMarkedAsRead, false)
 
     fun removeBookmarkedChapters() = prefs.getBoolean(Keys.removeBookmarkedChapters, false)
+
+    fun removeExcludeCategories() = flowPrefs.getStringSet(Keys.removeExcludeCategories, emptySet())
 
     fun libraryUpdateInterval() = flowPrefs.getInt(Keys.libraryUpdateInterval, 24)
 
@@ -264,11 +271,10 @@ class PreferencesHelper(val context: Context) {
     fun automaticExtUpdates() = flowPrefs.getBoolean(Keys.automaticExtUpdates, true)
 
     fun showNsfwSource() = flowPrefs.getBoolean(Keys.showNsfwSource, true)
-    fun showNsfwExtension() = flowPrefs.getBoolean(Keys.showNsfwExtension, true)
-    fun labelNsfwExtension() = prefs.getBoolean(Keys.labelNsfwExtension, true)
 
     fun extensionUpdatesCount() = flowPrefs.getInt("ext_updates_count", 0)
 
+    fun lastAppCheck() = flowPrefs.getLong("last_app_check", 0)
     fun lastExtCheck() = flowPrefs.getLong("last_ext_check", 0)
 
     fun searchPinnedSourcesOnly() = prefs.getBoolean(Keys.searchPinnedSourcesOnly, false)
@@ -281,8 +287,6 @@ class PreferencesHelper(val context: Context) {
 
     fun downloadNewCategories() = flowPrefs.getStringSet(Keys.downloadNewCategories, emptySet())
     fun downloadNewCategoriesExclude() = flowPrefs.getStringSet(Keys.downloadNewCategoriesExclude, emptySet())
-
-    fun lang() = flowPrefs.getString(Keys.lang, "")
 
     fun defaultCategory() = prefs.getInt(Keys.defaultCategory, -1)
 
@@ -313,6 +317,11 @@ class PreferencesHelper(val context: Context) {
     fun sortChapterByAscendingOrDescending() = prefs.getInt(Keys.defaultChapterSortByAscendingOrDescending, Manga.CHAPTER_SORT_DESC)
 
     fun incognitoMode() = flowPrefs.getBoolean(Keys.incognitoMode, false)
+
+    fun tabletUiMode() = flowPrefs.getEnum(
+        Keys.tabletUiMode,
+        if (context.applicationContext.isTablet()) Values.TabletUiMode.ALWAYS else Values.TabletUiMode.NEVER
+    )
 
     fun setChapterSettingsDefault(manga: Manga) {
         prefs.edit {

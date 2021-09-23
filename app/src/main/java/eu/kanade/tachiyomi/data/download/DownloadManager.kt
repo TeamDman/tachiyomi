@@ -4,6 +4,7 @@ import android.content.Context
 import com.hippo.unifile.UniFile
 import com.jakewharton.rxrelay.BehaviorRelay
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Chapter
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.download.model.Download
@@ -15,6 +16,8 @@ import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.util.lang.launchIO
 import rx.Observable
 import timber.log.Timber
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
 
 /**
@@ -24,7 +27,10 @@ import uy.kohesive.injekt.injectLazy
  *
  * @param context the application context.
  */
-class DownloadManager(private val context: Context) {
+class DownloadManager(
+    private val context: Context,
+    private val db: DatabaseHelper = Injekt.get()
+) {
 
     private val sourceManager: SourceManager by injectLazy()
     private val preferences: PreferencesHelper by injectLazy()
@@ -217,7 +223,7 @@ class DownloadManager(private val context: Context) {
      * @param download the download to cancel.
      */
     fun deletePendingDownload(download: Download) {
-        deleteChapters(listOf(download.chapter), download.manga, download.source)
+        deleteChapters(listOf(download.chapter), download.manga, download.source, true)
     }
 
     fun deletePendingDownloads(vararg downloads: Download) {
@@ -225,7 +231,7 @@ class DownloadManager(private val context: Context) {
         downloadsByManga.map { entry ->
             val manga = entry.value.first().manga
             val source = entry.value.first().source
-            deleteChapters(entry.value.map { it.chapter }, manga, source)
+            deleteChapters(entry.value.map { it.chapter }, manga, source, true)
         }
     }
 
@@ -235,9 +241,15 @@ class DownloadManager(private val context: Context) {
      * @param chapters the list of chapters to delete.
      * @param manga the manga of the chapters.
      * @param source the source of the chapters.
+     * @param isCancelling true if it's simply cancelling a download
      */
-    fun deleteChapters(chapters: List<Chapter>, manga: Manga, source: Source): List<Chapter> {
-        val filteredChapters = getChaptersToDelete(chapters)
+    fun deleteChapters(chapters: List<Chapter>, manga: Manga, source: Source, isCancelling: Boolean = false): List<Chapter> {
+        val filteredChapters = if (isCancelling) {
+            chapters
+        } else {
+            getChaptersToDelete(chapters, manga)
+        }
+
         launchIO {
             removeFromDownloadQueue(filteredChapters)
 
@@ -290,7 +302,7 @@ class DownloadManager(private val context: Context) {
      * @param manga the manga of the chapters.
      */
     fun enqueueDeleteChapters(chapters: List<Chapter>, manga: Manga) {
-        pendingDeleter.addChapters(getChaptersToDelete(chapters), manga)
+        pendingDeleter.addChapters(getChaptersToDelete(chapters, manga), manga)
     }
 
     /**
@@ -330,8 +342,17 @@ class DownloadManager(private val context: Context) {
         }
     }
 
-    private fun getChaptersToDelete(chapters: List<Chapter>): List<Chapter> {
-        return if (!preferences.removeBookmarkedChapters()) {
+    private fun getChaptersToDelete(chapters: List<Chapter>, manga: Manga): List<Chapter> {
+        // Retrieve the categories that are set to exclude from being deleted on read
+        val categoriesToExclude = preferences.removeExcludeCategories().get().map(String::toInt)
+        val categoriesForManga = db.getCategoriesForManga(manga).executeAsBlocking()
+            .mapNotNull { it.id }
+            .takeUnless { it.isEmpty() }
+            ?: listOf(0)
+
+        return if (categoriesForManga.intersect(categoriesToExclude).isNotEmpty()) {
+            chapters.filterNot { it.read }
+        } else if (!preferences.removeBookmarkedChapters()) {
             chapters.filterNot { it.bookmark }
         } else {
             chapters

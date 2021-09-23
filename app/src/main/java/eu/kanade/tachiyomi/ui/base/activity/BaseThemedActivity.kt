@@ -3,16 +3,10 @@ package eu.kanade.tachiyomi.ui.base.activity
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferenceValues
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.asImmediateFlow
-import eu.kanade.tachiyomi.util.system.LocaleHelper
-import eu.kanade.tachiyomi.util.view.setSecureScreen
-import kotlinx.coroutines.flow.launchIn
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import eu.kanade.tachiyomi.util.system.prepareTabletUiContext
 import uy.kohesive.injekt.injectLazy
 
 abstract class BaseThemedActivity : AppCompatActivity() {
@@ -20,25 +14,23 @@ abstract class BaseThemedActivity : AppCompatActivity() {
     val preferences: PreferencesHelper by injectLazy()
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.createLocaleWrapper(newBase))
+        super.attachBaseContext(newBase.prepareTabletUiContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         applyAppTheme(preferences)
-
-        Injekt.get<PreferencesHelper>().incognitoMode()
-            .asImmediateFlow {
-                window.setSecureScreen(it)
-            }
-            .launchIn(lifecycleScope)
-
         super.onCreate(savedInstanceState)
     }
 
     companion object {
         fun AppCompatActivity.applyAppTheme(preferences: PreferencesHelper) {
+            getThemeResIds(preferences.appTheme().get(), preferences.themeDarkAmoled().get())
+                .forEach { setTheme(it) }
+        }
+
+        fun getThemeResIds(appTheme: PreferenceValues.AppTheme, isAmoled: Boolean): List<Int> {
             val resIds = mutableListOf<Int>()
-            when (preferences.appTheme().get()) {
+            when (appTheme) {
                 PreferenceValues.AppTheme.MONET -> {
                     resIds += R.style.Theme_Tachiyomi_Monet
                 }
@@ -58,6 +50,9 @@ abstract class BaseThemedActivity : AppCompatActivity() {
                 PreferenceValues.AppTheme.TAKO -> {
                     resIds += R.style.Theme_Tachiyomi_Tako
                 }
+                PreferenceValues.AppTheme.TEALTURQUOISE -> {
+                    resIds += R.style.Theme_Tachiyomi_TealTurquoise
+                }
                 PreferenceValues.AppTheme.YINYANG -> {
                     resIds += R.style.Theme_Tachiyomi_YinYang
                 }
@@ -69,13 +64,11 @@ abstract class BaseThemedActivity : AppCompatActivity() {
                 }
             }
 
-            if (preferences.themeDarkAmoled().get()) {
+            if (isAmoled) {
                 resIds += R.style.ThemeOverlay_Tachiyomi_Amoled
             }
 
-            resIds.forEach {
-                setTheme(it)
-            }
+            return resIds
         }
     }
 }

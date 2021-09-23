@@ -95,7 +95,7 @@
     <string name="pref_enable_automatic_extension_updates">Buscar actualizaciones de extensiones</string>
     <string name="tracking_info">Sincronización unidireccional para actualizar el progreso del capítulo en los servicios de seguimiento. Configure el seguimiento de las entradas de manga individuales desde su botón de seguimiento.</string>
     <string name="services">Servicios</string>
-    <string name="pref_auto_update_manga_sync">Actualizar el progreso del capítulo después de la lectura</string>
+    <string name="pref_auto_update_manga_sync">Actualizar el progreso después de leer</string>
     <string name="pref_download_new">Descargar capítulos nuevos</string>
     <string name="fifth_to_last">Quinto al último capítulo</string>
     <string name="fourth_to_last">Cuarto al último capítulo</string>
@@ -105,7 +105,7 @@
     <string name="disabled">Deshabilitado</string>
     <string name="custom_dir">Directorio personalizado</string>
     <string name="pref_remove_after_read">Despues de leer</string>
-    <string name="pref_remove_after_marked_as_read">Después de marcar manualmente como leído</string>
+    <string name="pref_remove_after_marked_as_read">Después de marcar como leído</string>
     <string name="pref_download_only_over_wifi">Sólo descargar con Wi-Fi</string>
     <string name="pref_download_directory">Ubicación de descargas</string>
     <string name="webtoon_side_padding_25">25%</string>
@@ -145,7 +145,6 @@
     <string name="vertical_viewer">Vertical</string>
     <string name="right_to_left_viewer">Derecha a izquierda</string>
     <string name="left_to_right_viewer">Izquierda a derecha</string>
-    <string name="default_viewer">Por defecto</string>
     <string name="pref_viewer_type">Modo de lectura por defecto</string>
     <string name="black_background">Negro</string>
     <string name="gray_background">Gris</string>
@@ -164,7 +163,6 @@
     <string name="filter_mode_screen">Pantalla</string>
     <string name="filter_mode_multiply">Multiplicar</string>
     <string name="filter_mode_overlay">Superponer</string>
-    <string name="filter_mode_default">Por defecto</string>
     <string name="pref_color_filter_mode">Modo de mezcla del filtro de color</string>
     <string name="pref_custom_color_filter">Filtro de color personalizado</string>
     <string name="pref_custom_brightness">Brillo personalizado</string>
@@ -227,7 +225,6 @@
     <string name="pref_library_update_interval">Frecuencia de actualización</string>
     <string name="pref_category_library_update">Actualizaciones</string>
     <string name="pref_jump_to_chapters">Saltar a los capítulos abiertos</string>
-    <string name="default_columns">Por defecto</string>
     <string name="landscape">Horizontal</string>
     <string name="tapping_inverted_both">Ambos</string>
     <string name="tapping_inverted_vertical">Vertical</string>
@@ -273,16 +270,7 @@
     <string name="pref_manage_notifications">Gestionar notificaciones</string>
     <string name="pref_confirm_exit">Confirmar salir</string>
     <string name="pref_date_format">Formato de fecha</string>
-    <string name="system_default">Predeterminado</string>
-    <string name="pref_language">Idioma</string>
     <string name="pref_start_screen">Pantalla inicial</string>
-    <string name="theme_dark_amoled">AMOLED Negro</string>
-    <string name="theme_dark_blue">Azul oscuro</string>
-    <string name="theme_dark_default">Predeterminado</string>
-    <string name="pref_theme_dark">Tema oscuro</string>
-    <string name="theme_light_blue">Celeste</string>
-    <string name="theme_light_default">Predeterminado</string>
-    <string name="pref_theme_light">Tema claro</string>
     <string name="theme_dark">Encendido</string>
     <string name="theme_light">Apagado</string>
     <string name="theme_system">Usar el del sistema</string>
@@ -526,7 +514,6 @@
     <string name="score">Puntuación</string>
     <string name="repeating">Releyendo</string>
     <string name="want_to_read">Lo quiero leer</string>
-    <string name="pref_category_locale">Local</string>
     <string name="action_global_search_query">Buscar \"%1$s\" Globalmente</string>
     <string name="action_sort_date_added">Fecha de agregado</string>
     <string name="download_insufficient_space">No se pudieron descargar los capítulos debido al poco espacio de almacenamiento</string>
@@ -544,7 +531,7 @@
     <string name="group_backup_restore">Respaldar y restaurar</string>
     <string name="no_pinned_sources">No tienes fuentes fijadas</string>
     <string name="backup_restore_missing_trackers">Páginas de seguimiento donde no has iniciado sesion:</string>
-    <string name="pref_remove_bookmarked_chapters">Eliminar capítulos marcados</string>
+    <string name="pref_remove_bookmarked_chapters">Eliminar capítulos guardados</string>
     <string name="pref_category_delete_chapters">Eliminar capítulos</string>
     <string name="ext_nsfw_warning">Puede contener contenido para mayores de 18 años</string>
     <string name="ext_nsfw_short">18+</string>
@@ -581,7 +568,7 @@
     <string name="pref_show_nsfw_extension">Mostrar en la lista de extensiones</string>
     <string name="pref_show_nsfw_source">Mostrar en la lista de fuentes</string>
     <string name="channel_crash_logs">Registros de accidentes</string>
-    <string name="track_finished_reading_date">Fecha de lectura finalizada</string>
+    <string name="track_finished_reading_date">Fecha de lectura terminada</string>
     <string name="track_started_reading_date">Fecha de inicio de lectura</string>
     <string name="crash_log_saved">Registros de fallos guardados</string>
     <string name="pref_dump_crash_logs_summary">Guarda los registros de errores en un archivo para compartirlos con los desarrolladores</string>
@@ -590,7 +577,6 @@
     <string name="edge_nav">Borde</string>
     <string name="kindlish_nav">Kindle-ish</string>
     <string name="l_nav">En forma de L</string>
-    <string name="default_nav">Por Defecto</string>
     <string name="network_unmetered">Red no medida</string>
     <string name="action_desc">Descendiente</string>
     <string name="action_asc">Ascendiente</string>
@@ -607,7 +593,6 @@
     <string name="rotation_landscape">Horizontal</string>
     <string name="rotation_portrait">Vertical</string>
     <string name="rotation_type">Tipo de rotación</string>
-    <string name="default_rotation_type">Por defecto</string>
     <string name="nav_zone_right">Derecha</string>
     <string name="nav_zone_left">Izquierda</string>
     <string name="pref_create_folder_per_manga_summary">Crea carpetas según el título del manga</string>
@@ -630,10 +615,11 @@
     <string name="pref_dual_page_invert">Invertir la posición de las páginas duales</string>
     <string name="pref_show_navigation_mode">Mostrar el diseño de navegación</string>
     <string name="pref_library_update_categories_details">Los manga en las categorías excluidas no se actualizarán aún cuando estén en las categorías incluidas.</string>
-    <string name="theme_light_yotsuba"></string>
-    <string name="theme_dark_greenapple">Manzana verde</string>
     <string name="unread">No leído</string>
     <string name="source_unsupported">Fuente incompatible</string>
     <string name="action_start_downloading_now">Descargar ahora</string>
     <string name="action_display_local_badge">Íconos locales</string>
+    <string name="action_sort_next_updated">Próxima actualización esperada</string>
+    <string name="label_default">Por defecto</string>
+    <string name="confirm_lock_change">Autentificar para confirmar cambios</string>
 </resources>

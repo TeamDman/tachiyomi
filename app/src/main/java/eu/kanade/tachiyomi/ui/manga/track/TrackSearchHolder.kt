@@ -4,10 +4,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.clear
 import coil.loadAny
-import coil.transform.RoundedCornersTransformation
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.databinding.TrackSearchItemBinding
-import eu.kanade.tachiyomi.util.system.dpToPx
 import java.util.Locale
 
 class TrackSearchHolder(
@@ -15,18 +13,16 @@ class TrackSearchHolder(
     private val adapter: TrackSearchAdapter
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(track: TrackSearch, position: Int) {
-        binding.container.isChecked = position == adapter.selectedItemPosition
-        binding.container.setOnClickListener {
+        binding.root.isChecked = position == adapter.selectedItemPosition
+        binding.root.setOnClickListener {
             adapter.selectedItemPosition = position
-            binding.container.isChecked = true
+            binding.root.isChecked = true
         }
 
         binding.trackSearchTitle.text = track.title
         binding.trackSearchCover.clear()
         if (track.cover_url.isNotEmpty()) {
-            binding.trackSearchCover.loadAny(track.cover_url) {
-                transformations(RoundedCornersTransformation(6.dpToPx.toFloat()))
-            }
+            binding.trackSearchCover.loadAny(track.cover_url)
         }
 
         val hasStatus = track.publishing_status.isNotBlank()
@@ -62,6 +58,6 @@ class TrackSearchHolder(
     }
 
     fun setUnchecked() {
-        binding.container.isChecked = false
+        binding.root.isChecked = false
     }
 }

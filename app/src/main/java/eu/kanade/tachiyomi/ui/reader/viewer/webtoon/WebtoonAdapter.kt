@@ -1,7 +1,6 @@
 package eu.kanade.tachiyomi.ui.reader.viewer.webtoon
 
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -9,7 +8,9 @@ import eu.kanade.tachiyomi.ui.reader.model.ChapterTransition
 import eu.kanade.tachiyomi.ui.reader.model.ReaderChapter
 import eu.kanade.tachiyomi.ui.reader.model.ReaderPage
 import eu.kanade.tachiyomi.ui.reader.model.ViewerChapters
+import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.hasMissingChapters
+import eu.kanade.tachiyomi.util.system.createReaderThemeContext
 
 /**
  * RecyclerView Adapter used by this [viewer] to where [ViewerChapters] updates are posted.
@@ -23,6 +24,12 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
         private set
 
     var currentChapter: ReaderChapter? = null
+
+    /**
+     * Context that has been wrapped to use the correct theme values based on the
+     * current app theme and reader background color
+     */
+    private var readerThemedContext = viewer.activity.createReaderThemeContext()
 
     /**
      * Updates this adapter with the given [chapters]. It handles setting a few pages of the
@@ -77,6 +84,10 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
         result.dispatchUpdatesTo(this)
     }
 
+    fun refresh() {
+        readerThemedContext = viewer.activity.createReaderThemeContext()
+    }
+
     /**
      * Returns the amount of items of the adapter.
      */
@@ -101,11 +112,11 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             PAGE_VIEW -> {
-                val view = FrameLayout(parent.context)
+                val view = ReaderPageImageView(readerThemedContext, isWebtoon = true)
                 WebtoonPageHolder(view, viewer)
             }
             TRANSITION_VIEW -> {
-                val view = LinearLayout(parent.context)
+                val view = LinearLayout(readerThemedContext)
                 WebtoonTransitionHolder(view, viewer)
             }
             else -> error("Unknown view type")
@@ -172,16 +183,14 @@ class WebtoonAdapter(val viewer: WebtoonViewer) : RecyclerView.Adapter<RecyclerV
             return newItems.size
         }
     }
-
-    private companion object {
-        /**
-         * View holder type of a chapter page view.
-         */
-        const val PAGE_VIEW = 0
-
-        /**
-         * View holder type of a chapter transition view.
-         */
-        const val TRANSITION_VIEW = 1
-    }
 }
+
+/**
+ * View holder type of a chapter page view.
+ */
+private const val PAGE_VIEW = 0
+
+/**
+ * View holder type of a chapter transition view.
+ */
+private const val TRANSITION_VIEW = 1

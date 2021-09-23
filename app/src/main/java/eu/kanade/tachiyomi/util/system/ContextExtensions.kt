@@ -15,9 +15,13 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Color
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.PowerManager
+import android.provider.Settings
+import android.util.TypedValue
 import android.view.Display
 import android.view.View
 import android.view.WindowManager
@@ -25,6 +29,7 @@ import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.app.NotificationCompat
@@ -37,10 +42,17 @@ import androidx.core.graphics.red
 import androidx.core.net.toUri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import eu.kanade.tachiyomi.R
+import eu.kanade.tachiyomi.data.preference.PreferenceValues
+import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.ui.base.activity.BaseThemedActivity
 import eu.kanade.tachiyomi.util.lang.truncateCenter
 import timber.log.Timber
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import java.io.File
 import kotlin.math.roundToInt
+
+private const val TABLET_UI_MIN_SCREEN_WIDTH_DP = 720
 
 /**
  * Display a toast in this context.
@@ -94,7 +106,7 @@ fun Context.copyToClipboard(label: String, content: String) {
  */
 fun Context.notificationBuilder(channelId: String, block: (NotificationCompat.Builder.() -> Unit)? = null): NotificationCompat.Builder {
     val builder = NotificationCompat.Builder(this, channelId)
-        .setColor(ContextCompat.getColor(this, R.color.accent_blue))
+        .setColor(getColor(R.color.accent_blue))
     if (block != null) {
         builder.block()
     }
@@ -140,6 +152,19 @@ fun Context.hasPermission(permission: String) = ContextCompat.checkSelfPermissio
     return color
 }
 
+@ColorInt fun Context.getThemeColor(attr: Int): Int {
+    val tv = TypedValue()
+    return if (this.theme.resolveAttribute(attr, tv, true)) {
+        if (tv.resourceId != 0) {
+            getColor(tv.resourceId)
+        } else {
+            tv.data
+        }
+    } else {
+        0
+    }
+}
+
 /**
  * Converts to dp.
  */
@@ -170,6 +195,9 @@ val Context.notificationManager: NotificationManager
 val Context.connectivityManager: ConnectivityManager
     get() = getSystemService()!!
 
+val Context.wifiManager: WifiManager
+    get() = getSystemService()!!
+
 val Context.powerManager: PowerManager
     get() = getSystemService()!!
 
@@ -183,6 +211,12 @@ val Context.displayCompat: Display?
         @Suppress("DEPRECATION")
         getSystemService<WindowManager>()?.defaultDisplay
     }
+
+/** Gets the duration multiplier for general animations on the device
+ * @see Settings.Global.ANIMATOR_DURATION_SCALE
+ */
+val Context.animatorDurationScale: Float
+    get() = Settings.Global.getFloat(this.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
 
 /**
  * Convenience method to acquire a partial wake lock.
@@ -275,7 +309,27 @@ fun Context.createFileInCacheDir(name: String): File {
  * We consider anything with a width of >= 720dp as a tablet, i.e. with layouts in layout-sw720dp.
  */
 fun Context.isTablet(): Boolean {
-    return resources.configuration.smallestScreenWidthDp >= 720
+    return resources.configuration.smallestScreenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP
+}
+
+fun Context.prepareTabletUiContext(): Context {
+    val configuration = resources.configuration
+    val expected = when (Injekt.get<PreferencesHelper>().tabletUiMode().get()) {
+        PreferenceValues.TabletUiMode.ALWAYS -> true
+        PreferenceValues.TabletUiMode.LANDSCAPE -> configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        PreferenceValues.TabletUiMode.NEVER -> false
+    }
+    if (configuration.smallestScreenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP != expected) {
+        val overrideConf = Configuration()
+        overrideConf.setTo(configuration)
+        overrideConf.smallestScreenWidthDp = if (expected) {
+            overrideConf.smallestScreenWidthDp.coerceAtLeast(TABLET_UI_MIN_SCREEN_WIDTH_DP)
+        } else {
+            overrideConf.smallestScreenWidthDp.coerceAtMost(TABLET_UI_MIN_SCREEN_WIDTH_DP - 1)
+        }
+        return createConfigurationContext(overrideConf)
+    }
+    return this
 }
 
 /**
@@ -283,4 +337,43 @@ fun Context.isTablet(): Boolean {
  */
 fun Context.isNightMode(): Boolean {
     return resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+}
+
+/**
+ * Creates night mode Context depending on reader theme/background
+ *
+ * Context wrapping method obtained from AppCompatDelegateImpl
+ * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=348;drc=e28752c96fc3fb4d3354781469a1af3dbded4898
+ */
+fun Context.createReaderThemeContext(): Context {
+    val prefs = Injekt.get<PreferencesHelper>()
+    val isDarkBackground = when (prefs.readerTheme().get()) {
+        1, 2 -> true // Black, Gray
+        3 -> applicationContext.isNightMode() // Automatic bg uses activity background by default
+        else -> false // White
+    }
+    val expected = if (isDarkBackground) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
+    if (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK != expected) {
+        val overrideConf = Configuration()
+        overrideConf.setTo(resources.configuration)
+        overrideConf.uiMode = (overrideConf.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or expected
+
+        val wrappedContext = ContextThemeWrapper(this, R.style.Theme_Tachiyomi)
+        wrappedContext.applyOverrideConfiguration(overrideConf)
+        BaseThemedActivity.getThemeResIds(prefs.appTheme().get(), prefs.themeDarkAmoled().get())
+            .forEach { wrappedContext.theme.applyStyle(it, true) }
+        return wrappedContext
+    }
+    return this
+}
+
+fun Context.isOnline(): Boolean {
+    val networkCapabilities = connectivityManager.activeNetwork ?: return false
+    val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+    val maxTransport = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 -> NetworkCapabilities.TRANSPORT_LOWPAN
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> NetworkCapabilities.TRANSPORT_WIFI_AWARE
+        else -> NetworkCapabilities.TRANSPORT_VPN
+    }
+    return (NetworkCapabilities.TRANSPORT_CELLULAR..maxTransport).any(actNw::hasTransport)
 }

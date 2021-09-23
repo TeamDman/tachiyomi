@@ -27,6 +27,7 @@ import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.getPreferenceKey
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
+import eu.kanade.tachiyomi.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import timber.log.Timber
 
 @SuppressLint("RestrictedApi")
@@ -113,6 +114,13 @@ class SourcePreferencesController(bundle: Bundle? = null) :
                 pref.isIconSpaceReserved = false
                 pref.order = Int.MAX_VALUE // reset to default order
 
+                // Apply incognito IME for EditTextPreference
+                if (pref is EditTextPreference) {
+                    pref.setOnBindEditTextListener {
+                        it.setIncognito(viewScope)
+                    }
+                }
+
                 newScreen.removePreference(pref)
                 screen.addPreference(pref)
             }
@@ -159,9 +167,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
         // [key] isn't useful since there may be duplicates
         return preferenceScreen!!.getPreference(lastOpenPreferencePosition!!) as T
     }
-
-    private companion object {
-        const val SOURCE_ID = "source_id"
-        const val LASTOPENPREFERENCE_KEY = "last_open_preference"
-    }
 }
+
+private const val SOURCE_ID = "source_id"
+private const val LASTOPENPREFERENCE_KEY = "last_open_preference"

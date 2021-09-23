@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.viewbinding.ViewBinding
 import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
 import eu.kanade.tachiyomi.ui.security.SecureActivityDelegate
-import eu.kanade.tachiyomi.util.system.LocaleHelper
+import eu.kanade.tachiyomi.util.system.prepareTabletUiContext
 import nucleus.view.NucleusAppCompatActivity
 
 abstract class BaseRxActivity<VB : ViewBinding, P : BasePresenter<*>> : NucleusAppCompatActivity<P>() {
@@ -16,7 +16,7 @@ abstract class BaseRxActivity<VB : ViewBinding, P : BasePresenter<*>> : NucleusA
     lateinit var binding: VB
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.createLocaleWrapper(newBase))
+        super.attachBaseContext(newBase.prepareTabletUiContext())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -2,10 +2,7 @@ package eu.kanade.tachiyomi.ui.browse.extension.details
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,7 +31,6 @@ import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.getPreferenceKey
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
-import eu.kanade.tachiyomi.ui.base.controller.ToolbarLiftOnScrollController
 import eu.kanade.tachiyomi.ui.base.controller.openInBrowser
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.util.preference.DSL
@@ -49,8 +45,7 @@ import uy.kohesive.injekt.injectLazy
 
 @SuppressLint("RestrictedApi")
 class ExtensionDetailsController(bundle: Bundle? = null) :
-    NucleusController<ExtensionDetailControllerBinding, ExtensionDetailsPresenter>(bundle),
-    ToolbarLiftOnScrollController {
+    NucleusController<ExtensionDetailControllerBinding, ExtensionDetailsPresenter>(bundle) {
 
     private val preferences: PreferencesHelper by injectLazy()
 
@@ -70,7 +65,7 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
     }
 
     override fun createPresenter(): ExtensionDetailsPresenter {
-        return ExtensionDetailsPresenter(args.getString(PKGNAME_KEY)!!)
+        return ExtensionDetailsPresenter(this, args.getString(PKGNAME_KEY)!!)
     }
 
     override fun getTitle(): String? {
@@ -190,7 +185,6 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
             R.id.action_history -> openCommitHistory()
             R.id.action_enable_all -> toggleAllSources(true)
             R.id.action_disable_all -> toggleAllSources(false)
-            R.id.action_open_in_settings -> openInSettings()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -221,13 +215,6 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
         openInBrowser(url)
     }
 
-    private fun openInSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", presenter.pkgName, null)
-        }
-        startActivity(intent)
-    }
-
     private fun Source.isEnabled(): Boolean {
         return id.toString() !in preferences.disabledSources().get()
     }
@@ -237,10 +224,7 @@ class ExtensionDetailsController(bundle: Bundle? = null) :
         activity!!.theme.resolveAttribute(R.attr.preferenceTheme, tv, true)
         return ContextThemeWrapper(activity, tv.resourceId)
     }
-
-    private companion object {
-        const val PKGNAME_KEY = "pkg_name"
-
-        private const val URL_EXTENSION_COMMITS = "https://github.com/tachiyomiorg/tachiyomi-extensions/commits/master"
-    }
 }
+
+private const val PKGNAME_KEY = "pkg_name"
+private const val URL_EXTENSION_COMMITS = "https://github.com/tachiyomiorg/tachiyomi-extensions/commits/master"
