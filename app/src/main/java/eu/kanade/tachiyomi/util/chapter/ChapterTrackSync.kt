@@ -7,7 +7,7 @@ import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.util.lang.launchIO
 import timber.log.Timber
-import java.lang.Float.max
+import kotlin.math.max
 
 /**
  * Helper method for syncing a remote track with the local chapters, and back
