@@ -5,12 +5,10 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
 import androidx.core.view.marginTop
 import eu.kanade.tachiyomi.util.system.animatorDurationScale
 import eu.kanade.tachiyomi.util.view.findChild
-import eu.kanade.tachiyomi.widget.ElevationAppBarLayout
 import kotlin.math.roundToLong
 
 /**
@@ -77,6 +75,10 @@ class HideToolbarOnScrollBehavior : AppBarLayout.Behavior() {
         child: AppBarLayout,
         isVisible: Boolean
     ) {
+        val current = getTopBottomOffsetForScrollingSibling(child)
+        val target = if (isVisible) 0 else -toolbarHeight
+        if (current == target) return
+
         offsetAnimator?.cancel()
         offsetAnimator = ValueAnimator().apply {
             interpolator = DecelerateInterpolator()
@@ -84,19 +86,8 @@ class HideToolbarOnScrollBehavior : AppBarLayout.Behavior() {
             addUpdateListener {
                 setHeaderTopBottomOffset(coordinatorLayout, child, it.animatedValue as Int)
             }
-            doOnEnd {
-                if (!isVisible &&
-                    !child.isLifted &&
-                    (child as? ElevationAppBarLayout)?.isTransparentWhenNotLifted == true
-                ) {
-                    child.isLifted = true
-                }
-            }
+            setIntValues(current, target)
+            start()
         }
-        offsetAnimator?.setIntValues(
-            getTopBottomOffsetForScrollingSibling(child),
-            if (isVisible) 0 else -toolbarHeight
-        )
-        offsetAnimator?.start()
     }
 }

@@ -26,7 +26,6 @@
     <string name="action_display">Выгляд</string>
     <string name="action_display_mode">Рэжым адлюстравання</string>
     <string name="action_migrate">Міграваць</string>
-    <string name="action_open_in_settings">Адкрыць у наладах</string>
     <string name="action_open_in_web_view">Адкрыць у WebView</string>
     <string name="action_open_in_browser">Адкрыць у браўзэры</string>
     <string name="action_resume">Прадоўжыць</string>
@@ -125,7 +124,6 @@
     <string name="categorized_display_settings">Налады для кожнай катэгорыі для сартавання і адлюстравання</string>
     <string name="default_category_summary">Заўсёды пытацца</string>
     <string name="default_category">Катэгорыя па змаўчанні</string>
-    <string name="pref_library_update_error_notification">Паказваць паведамленьні пра памылкі абнаўленьня</string>
     <string name="pref_library_update_refresh_trackers_summary">Абнаўляць адсочванне пры абнаўленні бібліятэкі</string>
     <string name="pref_library_update_refresh_trackers">Аўтаматычна абнаўляць адсочванне</string>
     <string name="pref_library_update_refresh_metadata_summary">Правераць наяўнасць новай вокладкі і дэталяў пры абнаўленні бібліятэкі</string>
@@ -133,7 +131,6 @@
     <string name="pref_update_only_non_completed">Абнаўляць толькі незавершаную мангу</string>
     <string name="restrictions">Абмежаванні: %s</string>
     <string name="charging">Зарадка</string>
-    <string name="network_unmetered">Безлімітная сетка</string>
     <string name="pref_library_update_restriction">Абмежаванні на абнаўленне</string>
     <string name="pref_library_update_prioritization">Парадак абнаўлення</string>
     <string name="update_weekly">Штотыдзень</string>
@@ -153,8 +150,6 @@
     <string name="pref_library_columns">Элементы ў радку</string>
     <string name="pref_category_display">Адлюстраванне</string>
     <string name="parental_controls_info">Гэта не перашкаджае таму, каб неафіцыйныя або патэнцыйна няправільна пазначаныя пашырэння адлюстроўвалі змесціва NSFW (18+) у дадатку.</string>
-    <string name="pref_label_nsfw_extension">Пазнака ў спісе пашырэнняў</string>
-    <string name="pref_show_nsfw_extension">Паказаць у спісе пашырэнняў</string>
     <string name="pref_show_nsfw_source">Паказаць у спісе крыніц</string>
     <string name="pref_category_nsfw_content">Крыніцы NSFW (18+)</string>
     <string name="hide_notification_content">Схаваць змесціва апавяшчэнняў</string>
@@ -354,7 +349,6 @@
     <string name="pref_remove_after_read">Аўтаматычна пасля чытання</string>
     <string name="pref_remove_after_marked_as_read">Пасля таго, як пазначана як \"Прачытанае\"</string>
     <string name="pref_category_delete_chapters">Выдаліць часткі</string>
-    <string name="pref_download_only_over_wifi">Загружаць толькі праз Wi-Fi</string>
     <string name="pref_download_directory">Каталог загрузак</string>
     <string name="pref_lowest">Найнізкая</string>
     <string name="pref_low">Нізкая</string>

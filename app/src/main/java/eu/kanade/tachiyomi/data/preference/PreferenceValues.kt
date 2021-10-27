@@ -2,7 +2,7 @@ package eu.kanade.tachiyomi.data.preference
 
 import eu.kanade.tachiyomi.R
 
-const val UNMETERED_NETWORK = "wifi"
+const val ONLY_ON_WIFI = "wifi"
 const val CHARGING = "ac"
 
 /**
@@ -62,5 +62,11 @@ object PreferenceValues {
         ALWAYS,
         LANDSCAPE,
         NEVER,
+    }
+
+    enum class ExtensionInstaller {
+        LEGACY,
+        PACKAGEINSTALLER,
+        SHIZUKU
     }
 }

@@ -5,9 +5,10 @@ import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.data.download.model.DownloadQueue
 import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
+import eu.kanade.tachiyomi.util.system.logcat
+import logcat.LogPriority
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import timber.log.Timber
 import uy.kohesive.injekt.injectLazy
 
 /**
@@ -28,9 +29,17 @@ class DownloadPresenter : BasePresenter<DownloadController>() {
 
         downloadQueue.getUpdatedObservable()
             .observeOn(AndroidSchedulers.mainThread())
-            .map { it.map(::DownloadItem) }
+            .map { downloads ->
+                downloads
+                    .groupBy { it.source }
+                    .map { entry ->
+                        DownloadHeaderItem(entry.key.name, entry.value.size).apply {
+                            addSubItems(0, entry.value.map { DownloadItem(it, this) })
+                        }
+                    }
+            }
             .subscribeLatestCache(DownloadController::onNextDownloads) { _, error ->
-                Timber.e(error)
+                logcat(LogPriority.ERROR, error)
             }
     }
 

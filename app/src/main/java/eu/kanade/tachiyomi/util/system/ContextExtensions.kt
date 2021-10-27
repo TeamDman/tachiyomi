@@ -41,12 +41,13 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.core.net.toUri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.hippo.unifile.UniFile
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferenceValues
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.ui.base.activity.BaseThemedActivity
 import eu.kanade.tachiyomi.util.lang.truncateCenter
-import timber.log.Timber
+import logcat.LogPriority
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -92,7 +93,7 @@ fun Context.copyToClipboard(label: String, content: String) {
 
         toast(getString(R.string.copied_to_clipboard, content.truncateCenter(50)))
     } catch (e: Throwable) {
-        Timber.e(e)
+        logcat(LogPriority.ERROR, e)
         toast(R.string.clipboard_copy_error)
     }
 }
@@ -306,10 +307,10 @@ fun Context.createFileInCacheDir(name: String): File {
 }
 
 /**
- * We consider anything with a width of >= 720dp as a tablet, i.e. with layouts in layout-sw720dp.
+ * We consider anything with a width of >= 720dp as a tablet, i.e. with layouts in layout-w720dp.
  */
 fun Context.isTablet(): Boolean {
-    return resources.configuration.smallestScreenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP
+    return resources.configuration.screenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP
 }
 
 fun Context.prepareTabletUiContext(): Context {
@@ -319,13 +320,13 @@ fun Context.prepareTabletUiContext(): Context {
         PreferenceValues.TabletUiMode.LANDSCAPE -> configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         PreferenceValues.TabletUiMode.NEVER -> false
     }
-    if (configuration.smallestScreenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP != expected) {
+    if (configuration.screenWidthDp >= TABLET_UI_MIN_SCREEN_WIDTH_DP != expected) {
         val overrideConf = Configuration()
         overrideConf.setTo(configuration)
-        overrideConf.smallestScreenWidthDp = if (expected) {
-            overrideConf.smallestScreenWidthDp.coerceAtLeast(TABLET_UI_MIN_SCREEN_WIDTH_DP)
+        overrideConf.screenWidthDp = if (expected) {
+            overrideConf.screenWidthDp.coerceAtLeast(TABLET_UI_MIN_SCREEN_WIDTH_DP)
         } else {
-            overrideConf.smallestScreenWidthDp.coerceAtMost(TABLET_UI_MIN_SCREEN_WIDTH_DP - 1)
+            overrideConf.screenWidthDp.coerceAtMost(TABLET_UI_MIN_SCREEN_WIDTH_DP - 1)
         }
         return createConfigurationContext(overrideConf)
     }
@@ -368,12 +369,51 @@ fun Context.createReaderThemeContext(): Context {
 }
 
 fun Context.isOnline(): Boolean {
-    val networkCapabilities = connectivityManager.activeNetwork ?: return false
-    val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+    val activeNetwork = connectivityManager.activeNetwork ?: return false
+    val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
     val maxTransport = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 -> NetworkCapabilities.TRANSPORT_LOWPAN
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> NetworkCapabilities.TRANSPORT_WIFI_AWARE
         else -> NetworkCapabilities.TRANSPORT_VPN
     }
-    return (NetworkCapabilities.TRANSPORT_CELLULAR..maxTransport).any(actNw::hasTransport)
+    return (NetworkCapabilities.TRANSPORT_CELLULAR..maxTransport).any(networkCapabilities::hasTransport)
+}
+
+/**
+ * Returns true if device is connected to Wifi.
+ */
+fun Context.isConnectedToWifi(): Boolean {
+    if (!wifiManager.isWifiEnabled) return false
+
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) &&
+            networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    } else {
+        @Suppress("DEPRECATION")
+        wifiManager.connectionInfo.bssid != null
+    }
+}
+
+/**
+ * Gets document size of provided [Uri]
+ *
+ * @return document size of [uri] or null if size can't be obtained
+ */
+fun Context.getUriSize(uri: Uri): Long? {
+    return UniFile.fromUri(this, uri).length().takeIf { it >= 0 }
+}
+
+/**
+ * Returns true if [packageName] is installed.
+ */
+fun Context.isPackageInstalled(packageName: String): Boolean {
+    return try {
+        packageManager.getApplicationInfo(packageName, 0)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
 }

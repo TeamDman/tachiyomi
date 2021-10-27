@@ -55,7 +55,7 @@
     <string name="action_display">Visa</string>
     <string name="action_display_grid">Kompakt rutnät</string>
     <string name="action_display_list">Lista</string>
-    <string name="action_display_download_badge">Nedladdningsmärken</string>
+    <string name="action_display_download_badge">Nedladdade kapitel</string>
     <string name="action_cancel">Avbryt</string>
     <string name="action_sort">Sortera</string>
     <string name="action_install">Installera</string>
@@ -158,7 +158,6 @@
     <string name="color_filter_b_value">B</string>
     <string name="color_filter_a_value">A</string>
     <string name="pref_download_directory">Nedladdningsplats</string>
-    <string name="pref_download_only_over_wifi">Ladda bara ner över WiFi</string>
     <string name="pref_remove_after_marked_as_read">Efter markerad som läst</string>
     <string name="pref_remove_after_read">Automatiskt efter läsning</string>
     <string name="custom_dir">Anpassad plats</string>
@@ -314,7 +313,6 @@
     <string name="download_notifier_no_network">Ingen nätverksanslutning tillgänglig</string>
     <string name="download_notifier_download_paused">Nedladdning pausad</string>
     <string name="channel_common">Vanlig</string>
-    <string name="channel_library">Bibliotek</string>
     <string name="action_open_in_web_view">Öppna i WebView</string>
     <string name="pref_true_color">32-bitars färg</string>
     <string name="pref_skip_read_chapters">Skippa lästa kapitel</string>
@@ -463,7 +461,7 @@
         <item quantity="other">Klar på %1$s med %2$s fel</item>
     </plurals>
     <string name="battery_optimization_setting_activity_not_found">Det gick inte att öppna enhetsinställningarna</string>
-    <string name="action_display_unread_badge">Olästa märken</string>
+    <string name="action_display_unread_badge">Olästa kapitel</string>
     <string name="pref_refresh_library_covers">Uppdatera bibliotekets manga omslag</string>
     <string name="tracking_info">Envägssynkronisering för att uppdatera kapitelförloppet i spårningstjänster. Ställ in spårning för enskilda manga från spårningsknappen under manga info.</string>
     <plurals name="notification_update_error">
@@ -480,7 +478,6 @@
     <string name="source_not_found_name">Källan hittades inte: %1$s</string>
     <string name="unofficial_extension_message">Detta tillägg kommer inte från den officiella Tachiyomi-tilläggslistan.</string>
     <string name="ext_unofficial">Inofficiell</string>
-    <string name="pref_library_update_error_notification">Visa aviseringar om uppdateringsfel</string>
     <string name="pref_library_update_refresh_metadata_summary">Sök efter nytt omslag och detaljer när du uppdaterar biblioteket</string>
     <string name="pref_library_update_refresh_metadata">Uppdatera metadata automatiskt</string>
     <string name="action_migrate">Migrera</string>
@@ -510,7 +507,6 @@
     <string name="label_network">Nätverk</string>
     <string name="pref_jump_to_chapters">Hoppa till kapitel vid öppning</string>
     <string name="action_disable">Inaktivera</string>
-    <string name="action_open_in_settings">Öppna i Inställningar</string>
     <string name="download_insufficient_space">Det gick inte att ladda ner kapitelt på grund av lågt lagringsutrymme</string>
     <string name="action_global_search_query">Sök efter \"%1$s\" globalt</string>
     <string name="updated_version">Uppdaterad till v%1$s</string>
@@ -519,8 +515,6 @@
     <string name="pref_category_theme">Tema</string>
     <string name="action_download_unread">Ladda ner olästa kapitel</string>
     <string name="action_sort_date_added">Datum tillagd</string>
-    <string name="group_backup_restore">Säkerhetskopiering och återställning</string>
-    <string name="group_downloader">Nedladdningar</string>
     <string name="channel_complete">Färdig</string>
     <string name="channel_progress">Förlopp</string>
     <string name="download_notifier_download_finish">Nedladdningen slutförd</string>
@@ -539,8 +533,8 @@
     <string name="chapter_settings_updated">Uppdaterade standardinställningar för kapitel</string>
     <string name="confirm_set_chapter_settings">Vill du spara de här inställningarna som standard\?</string>
     <plurals name="missing_chapters_warning">
-        <item quantity="one">Det saknas 1 kapitel</item>
-        <item quantity="other">Det saknas %d kapitel</item>
+        <item quantity="one">Hoppar över ett kapitel, antingen saknar källan det eller så har det filtrerats bort</item>
+        <item quantity="other">Hoppar över %d kapitel, antingen saknar källan det eller så har det filtrerats bort</item>
     </plurals>
     <string name="share_page_info">%1$s: %2$s, sida %3$d</string>
     <string name="no_chapters_error">Inga kapitel hittades</string>
@@ -562,9 +556,7 @@
     <string name="invalid_backup_file_type">Ogiltig säkerhetskopia: %1$s
 \nDet bör sluta med .proto.gz eller .json.</string>
     <string name="pref_category_nsfw_content">NSFW (18+) källor</string>
-    <string name="pref_label_nsfw_extension">Etikett i tilläggslistan</string>
-    <string name="pref_show_nsfw_extension">Visa i tilläggslistan</string>
-    <string name="pref_show_nsfw_source">Visa i källistan</string>
+    <string name="pref_show_nsfw_source">Visa i källor och tilläggslistor</string>
     <string name="file_picker_error">Ingen filväljare-app hittades</string>
     <string name="myanimelist_relogin">Vänligen logga in på MAL igen</string>
     <string name="channel_crash_logs">Kraschloggar</string>
@@ -581,7 +573,6 @@
     <string name="edge_nav">Kant</string>
     <string name="kindlish_nav">Kindle-ish</string>
     <string name="l_nav">L-formad</string>
-    <string name="network_unmetered">Ouppmätt nätverk</string>
     <string name="action_filter_tracked">Spåras</string>
     <string name="right_and_left_nav">Höger och Vänster</string>
     <string name="action_display_show_number_of_items">Visa antal objekt</string>
@@ -630,7 +621,7 @@
     <string name="pref_library_update_refresh_trackers_summary">Uppdatera spårare när du uppdaterar biblioteket</string>
     <string name="pref_library_update_refresh_trackers">Uppdatera spårare automatiskt</string>
     <string name="restrictions">Begränsningar: %s</string>
-    <string name="action_display_local_badge">Lokala märken</string>
+    <string name="action_display_local_badge">Lokal manga</string>
     <string name="off">Av</string>
     <string name="on">På</string>
     <string name="error_sharing_cover">Fel vid delning av omslag</string>
@@ -689,4 +680,16 @@
     <string name="pref_tablet_ui_mode">Tvinga tablettgränssnitt</string>
     <string name="help_translate">Hjälp till med översättning</string>
     <string name="pref_remove_exclude_categories">Uteslutna kategorier</string>
+    <string name="ext_app_info">Appinformation</string>
+    <string name="ext_installer_shizuku_stopped">Shizuku körs inte</string>
+    <string name="ext_installer_legacy">Äldre</string>
+    <string name="ext_installer_pref">Installatör</string>
+    <string name="ext_install_service_notif">Installerar tillägg…</string>
+    <string name="action_sort_count">Total manga</string>
+    <string name="ext_installer_shizuku_unavailable_dialog">Installera och starta Shizuku för att använda Shizuku som tilläggsinstallationsprogram.</string>
+    <string name="pref_verbose_logging_summary">Skriv ut utförliga loggar till systemloggen (minskar appprestanda)</string>
+    <string name="backup_info">Automatisk säkerhetskopiering rekommenderas starkt. Du bör också förvara kopior på andra ställen.</string>
+    <string name="pref_verbose_logging">Omfattande loggning</string>
+    <string name="label_warning">Varning</string>
+    <string name="action_display_language_badge">Språk</string>
 </resources>

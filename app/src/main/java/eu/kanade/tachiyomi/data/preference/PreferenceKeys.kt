@@ -151,6 +151,9 @@ object PreferenceKeys {
     const val librarySortingMode = "library_sorting_mode"
     const val librarySortingDirection = "library_sorting_ascending"
 
+    const val migrationSortingMode = "pref_migration_sorting"
+    const val migrationSortingDirection = "pref_migration_direction"
+
     const val automaticExtUpdates = "automatic_ext_updates"
 
     const val showNsfwSource = "show_nsfw_source"
@@ -196,6 +199,8 @@ object PreferenceKeys {
 
     const val unreadBadge = "display_unread_badge"
 
+    const val languageBadge = "display_language_badge"
+
     const val localBadge = "display_local_badge"
 
     const val categoryTabs = "display_category_tabs"
@@ -223,6 +228,10 @@ object PreferenceKeys {
     const val incognitoMode = "incognito_mode"
 
     const val tabletUiMode = "tablet_ui_mode"
+
+    const val extensionInstaller = "extension_installer"
+
+    const val verboseLogging = "verbose_logging"
 
     fun trackUsername(syncId: Int) = "pref_mangasync_username_$syncId"
 

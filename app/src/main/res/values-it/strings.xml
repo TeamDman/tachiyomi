@@ -118,7 +118,6 @@
     <string name="color_filter_a_value">A</string>
     <!-- Downloads section -->
     <string name="pref_download_directory">Posizione degli scaricamenti</string>
-    <string name="pref_download_only_over_wifi">Scarica solo tramite Wi-Fi</string>
     <string name="pref_remove_after_marked_as_read">Dopo averli contrassegnati come letti</string>
     <string name="pref_remove_after_read">Automaticamente dopo la lettura</string>
     <string name="custom_dir">Posizione personalizzata</string>
@@ -289,7 +288,7 @@
     <string name="label_extensions">Estensioni</string>
     <string name="label_extension_info">Informazioni estensione</string>
     <string name="action_global_search">Ricerca globale</string>
-    <string name="action_display_download_badge">Indicatore scaricati</string>
+    <string name="action_display_download_badge">Capitoli scaricati</string>
     <string name="action_reset">Reimposta</string>
     <string name="all_lang">Tutto</string>
     <string name="ext_update">Aggiorna</string>
@@ -339,7 +338,6 @@
     <string name="copy">Copia</string>
     <string name="information_empty_category">Non hai categorie. Tocca il pulsante più per crearne una e organizzare la tua libreria.</string>
     <string name="channel_common">Comune</string>
-    <string name="channel_library">Libreria</string>
     <string name="transition_finished">Finito:</string>
     <string name="transition_current">Corrente:</string>
     <string name="transition_next">Prossimo:</string>
@@ -387,7 +385,7 @@
     <string name="theme_system">Segui l\'impostazione di sistema</string>
     <string name="pref_manage_notifications">Gestisci le notifiche</string>
     <string name="pref_category_security">Sicurezza</string>
-    <string name="lock_with_biometrics">Sblocco richiesto</string>
+    <string name="lock_with_biometrics">Richiede sblocco</string>
     <string name="lock_when_idle">Blocca quando inattivo</string>
     <string name="lock_always">Sempre</string>
     <string name="lock_never">Mai</string>
@@ -497,7 +495,7 @@
         <item quantity="one">%d categoria</item>
         <item quantity="other">%d categorie</item>
     </plurals>
-    <string name="action_display_unread_badge">Indicatore non letti</string>
+    <string name="action_display_unread_badge">Capitoli non letti</string>
     <string name="gray_background">Grigio</string>
     <plurals name="notification_update_error">
         <item quantity="one">Un aggiornamento fallito</item>
@@ -516,7 +514,6 @@
     <string name="source_not_found_name">Fonte non trovata: %1$s</string>
     <string name="unofficial_extension_message">Questa estensione non è presente nella lista ufficiale delle estensioni di Tachiyomi.</string>
     <string name="ext_unofficial">Non ufficiale</string>
-    <string name="pref_library_update_error_notification">Mostra notifiche per gli errori degli aggiornamenti</string>
     <string name="pref_library_update_refresh_metadata_summary">Controlla nuove cover e descrizioni durante l\'aggiornamento della libreria</string>
     <string name="pref_library_update_refresh_metadata">Ricarica metadati automaticamente</string>
     <string name="action_display_show_tabs">Mostra schede delle categorie</string>
@@ -544,7 +541,6 @@
     <string name="pref_show_reading_mode">Mostra modalità di lettura</string>
     <string name="pref_jump_to_chapters">Vai ai capitoli all\'apertura</string>
     <string name="action_disable">Disabilita</string>
-    <string name="action_open_in_settings">Apri nelle impostazioni</string>
     <string name="action_start">Inizia</string>
     <string name="action_download_unread">Scarica capitoli non letti</string>
     <string name="action_global_search_query">Ricerca \"%1$s\" globalmente</string>
@@ -557,8 +553,6 @@
         <item quantity="other">%d tracciatori</item>
     </plurals>
     <string name="channel_progress">Progresso</string>
-    <string name="group_backup_restore">Backup e ripristino</string>
-    <string name="group_downloader">Scaricamenti</string>
     <string name="channel_errors">Errori</string>
     <string name="channel_complete">Completo</string>
     <string name="download_notifier_download_finish">Scaricamento completato</string>
@@ -568,8 +562,8 @@
     <string name="ext_nsfw_warning">Potrebbe contenere materiale NSFW (18+)</string>
     <string name="ext_nsfw_short">18+</string>
     <plurals name="missing_chapters_warning">
-        <item quantity="one">C\'è un capitolo mancante</item>
-        <item quantity="other">Ci sono %d capitoli mancanti</item>
+        <item quantity="one">1 capitolo saltato, o la fonte non ce l\'ha o è stato filtrato</item>
+        <item quantity="other">%d capitoli saltati, o la fonte non ce li ha o sono stati filtrati</item>
     </plurals>
     <string name="backup_restore_missing_trackers">Tracciatori non collegati:</string>
     <string name="no_chapters_error">Nessun capitolo trovato</string>
@@ -595,9 +589,7 @@
     <string name="invalid_backup_file_type">File di backup invalido: %1$s
 \nDovrebbe terminare con .proto.gz oppure .json.</string>
     <string name="pref_category_nsfw_content">Fonti NSFW (18+)</string>
-    <string name="pref_label_nsfw_extension">Etichetta nella lista delle estensioni</string>
-    <string name="pref_show_nsfw_extension">Mostra nella lista delle estensioni</string>
-    <string name="pref_show_nsfw_source">Mostra nella lista delle fonti</string>
+    <string name="pref_show_nsfw_source">Mostra nelle liste delle fonti e delle estensioni</string>
     <string name="myanimelist_relogin">Per favore accedi di nuovo a MAL</string>
     <string name="file_picker_error">Nessuna app per la selezione dei file trovata</string>
     <string name="pref_viewer_nav">Layout della navigazione</string>
@@ -610,7 +602,6 @@
     <string name="crash_log_saved">Registro dei crash salvato</string>
     <string name="pref_dump_crash_logs_summary">Salva un registro degli errori su un file per condividerlo con gli sviluppatori</string>
     <string name="pref_dump_crash_logs">Salva un registro dei crash</string>
-    <string name="network_unmetered">Connessione senza restrizioni</string>
     <string name="action_desc">Decrescente</string>
     <string name="action_asc">Crescente</string>
     <string name="action_order_by_chapter_number">Per numero di capitolo</string>
@@ -658,7 +649,7 @@
     <string name="chapter_not_found">Capitolo non trovato</string>
     <string name="source_unsupported">Fonte non supportata</string>
     <string name="date">Data</string>
-    <string name="off">Diattivato</string>
+    <string name="off">Disattivato</string>
     <string name="alignment_center">Al centro</string>
     <string name="error_sharing_cover">Errore nella condivisione della copertina</string>
     <string name="error_saving_cover">Errore nel salvataggio della copertina</string>
@@ -671,7 +662,7 @@
     <string name="alignment_bottom">In fondo</string>
     <string name="alignment_top">In cima</string>
     <string name="pref_side_nav_icon_alignment">Allineamento delle icone di navigazione laterali</string>
-    <string name="action_display_local_badge">Indicatori locali</string>
+    <string name="action_display_local_badge">Manga locali</string>
     <string name="manga_cover">Copertina</string>
     <string name="local_invalid_format">Formato capitolo non valido</string>
     <string name="tracking_guide">Guida al tracciamento</string>
@@ -722,4 +713,19 @@
     <string name="pref_tablet_ui_mode">Forza interfaccia tablet</string>
     <string name="pref_remove_exclude_categories">Categorie escluse</string>
     <string name="help_translate">Aiuta a tradurre</string>
+    <string name="ext_app_info">Informazioni app</string>
+    <string name="ext_installer_packageinstaller">PackageInstaller</string>
+    <string name="ext_installer_shizuku_unavailable_dialog">Installa e avvia Shizuku per usarlo come installatore delle estensioni.</string>
+    <string name="ext_installer_shizuku_stopped">Shizuku non è in esecuzione</string>
+    <string name="ext_installer_shizuku">Shizuku</string>
+    <string name="ext_installer_legacy">Legacy</string>
+    <string name="ext_installer_pref">Installatore</string>
+    <string name="ext_install_service_notif">Installazione dell\'estensione…</string>
+    <string name="action_sort_count">Manga totali</string>
+    <string name="pref_verbose_logging_summary">Stampa i registri dettagliati nel registro di sistema (riduce le prestazioni dell\'app)</string>
+    <string name="pref_verbose_logging">Registrazione dettagliata</string>
+    <string name="action_display_language_badge">Lingua</string>
+    <string name="label_warning">Attenzione</string>
+    <string name="backup_info">I backup automatici sono altamente consigliati. Dovresti tenere delle copie anche in altri posti.</string>
+    <string name="notification_size_warning">Grossi aggiornamenti possono portare a un maggiore utilizzo della batteria e a un rallentamento delle fonti</string>
 </resources>

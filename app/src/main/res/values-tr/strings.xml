@@ -55,7 +55,7 @@
     <string name="action_display">Görüntüleme</string>
     <string name="action_display_grid">Kompakt ızgara</string>
     <string name="action_display_list">Liste</string>
-    <string name="action_display_download_badge">Rozetleri indir</string>
+    <string name="action_display_download_badge">İndirilen bölümler</string>
     <string name="action_cancel">İptal</string>
     <string name="action_sort">Sırala</string>
     <string name="action_install">Kur</string>
@@ -158,7 +158,6 @@
     <string name="color_filter_b_value">M</string>
     <string name="color_filter_a_value">A</string>
     <string name="pref_download_directory">İndirme konumu</string>
-    <string name="pref_download_only_over_wifi">Yalnızca Wi-Fi ile indir</string>
     <string name="pref_remove_after_marked_as_read">Okundu olarak işaretlenince</string>
     <string name="pref_remove_after_read">Okuduktan sonra otomatik olarak</string>
     <string name="custom_dir">Özel konum</string>
@@ -306,7 +305,6 @@
     <string name="download_notifier_no_network">Ağ bağlantısı yok</string>
     <string name="download_notifier_download_paused">İndirme duraklatıldı</string>
     <string name="channel_common">Genel</string>
-    <string name="channel_library">Kitaplık</string>
     <string name="transition_finished">Biten:</string>
     <string name="transition_current">Şu anki:</string>
     <string name="transition_next">Sonraki:</string>
@@ -463,7 +461,7 @@
         <item quantity="one">%1$s içinde %2$s hatayla tamamlandı</item>
         <item quantity="other">%1$s içinde %2$s hatayla tamamlandı</item>
     </plurals>
-    <string name="action_display_unread_badge">Okunmayan rozetler</string>
+    <string name="action_display_unread_badge">Okunmamış bölümler</string>
     <string name="tracking_info">Bölüm ilerlemesini, izleme hizmetlerinde güncellemek için tek yönlü eşitleme. Her manga girdisinin izleme düğmesinden, izlemeyi ayarlayın.</string>
     <string name="pref_refresh_library_covers">Kitaplık manga kapaklarını yenile</string>
     <plurals name="notification_update_error">
@@ -480,7 +478,6 @@
     <string name="invalid_backup_file">Geçersiz yedekleme dosyası</string>
     <string name="tracker_not_logged_in">Giriş yapılmadı: %1$s</string>
     <string name="source_not_found_name">Kaynak bulunamadı: %1$s</string>
-    <string name="pref_library_update_error_notification">Güncelleme hataları bildirimlerini göster</string>
     <string name="pref_library_update_refresh_metadata_summary">Kitaplığı güncellerken yeni kapağı ve ayrıntıları denetle</string>
     <string name="pref_library_update_refresh_metadata">Üst veriyi kendiliğinden yenile</string>
     <string name="action_migrate">Taşın</string>
@@ -500,7 +497,6 @@
         <item quantity="one">1 bölüm</item>
         <item quantity="other">%1$s bölüm</item>
     </plurals>
-    <string name="action_open_in_settings">Ayarlarda aç</string>
     <string name="requires_app_restart">Etkili olması için uygulamanın yeniden başlatılmasını gerektirir</string>
     <string name="label_network">Ağ</string>
     <string name="pref_jump_to_chapters">Açınca bölümlere git</string>
@@ -524,8 +520,6 @@
         <item quantity="other">%d izleyici</item>
     </plurals>
     <string name="no_pinned_sources">Sabitlenmiş kaynağınız yok</string>
-    <string name="group_backup_restore">Yedekle ve geri yükle</string>
-    <string name="group_downloader">İndirilenler</string>
     <string name="channel_complete">Tamamlandı</string>
     <string name="channel_progress">İlerleme</string>
     <string name="download_notifier_download_finish">İndirme tamamlandı</string>
@@ -537,8 +531,8 @@
     <string name="ext_nsfw_short">18+</string>
     <string name="parental_controls_info">Bu, resmi olmayan veya yanlış işaretlenmiş uzantıların, uygulama içinde yetişkin (18+) içeriği göstermesini engellemez.</string>
     <plurals name="missing_chapters_warning">
-        <item quantity="one">1 eksik bölüm var</item>
-        <item quantity="other">%d eksik bölüm var</item>
+        <item quantity="one">Bir bölüm atlanıyor, bunun nedeni bunların kaynakta olmaması veya onları filtreliyor olmanız olabilir</item>
+        <item quantity="other">%d bölüm atlanıyor, bunun nedeni bunların kaynakta olmaması veya onları filtreliyor olmanız olabilir</item>
     </plurals>
     <string name="no_chapters_error">Bölüm bulunamadı</string>
     <string name="chapter_settings_updated">Öntanımlı bölüm ayarları güncellendi</string>
@@ -562,9 +556,7 @@
     <string name="invalid_backup_file_type">Geçersiz yedekleme dosyası türü: %1$s
 \n.proto.gz veya .json ile bitmelidir.</string>
     <string name="pref_category_nsfw_content">Yetişkin içerik (18+) kaynakları</string>
-    <string name="pref_label_nsfw_extension">Uzantılar listesinde etiketle</string>
-    <string name="pref_show_nsfw_extension">Uzantılar listesinde göster</string>
-    <string name="pref_show_nsfw_source">Kaynaklar listesinde göster</string>
+    <string name="pref_show_nsfw_source">Kaynaklar ve uzantılar listesinde göster</string>
     <string name="file_picker_error">Dosya seçme uygulaması bulunamadı</string>
     <string name="myanimelist_relogin">Lütfen MAL\'ye tekrar giriş yapın</string>
     <string name="pref_viewer_nav">Gezinme düzeni</string>
@@ -577,7 +569,6 @@
     <string name="crash_log_saved">Çökme günlükleri kaydedildi</string>
     <string name="pref_dump_crash_logs_summary">Geliştiricilerle paylaşmak için hata günlüklerini bir dosyaya kaydeder</string>
     <string name="pref_dump_crash_logs">Çökme günlüklerini kaydet</string>
-    <string name="network_unmetered">Veri sınırı olmayan ağ</string>
     <string name="action_desc">Azalan</string>
     <string name="action_asc">Artan</string>
     <string name="action_order_by_chapter_number">Bölüm numarasına göre</string>
@@ -630,7 +621,7 @@
     <string name="pref_library_update_refresh_trackers_summary">Kitaplığı güncellerken izleyicileri güncelle</string>
     <string name="pref_library_update_refresh_trackers">İzleyicileri otomatik olarak yenile</string>
     <string name="restrictions">Kısıtlamalar: %s</string>
-    <string name="action_display_local_badge">Yerel rozetler</string>
+    <string name="action_display_local_badge">Yerel manga</string>
     <string name="on">Açık</string>
     <string name="off">Kapalı</string>
     <string name="error_sharing_cover">Kapak paylaşılamadı</string>
@@ -687,4 +678,19 @@
     <string name="pref_category_navigation">Gezinme</string>
     <string name="getting_started_guide">Başlangıç kılavuzu</string>
     <string name="pref_tablet_ui_mode">Tablet arayüzü kullan</string>
+    <string name="pref_remove_exclude_categories">İstenmeyen kategoriler</string>
+    <string name="help_translate">Çeviriye yardım edin</string>
+    <string name="ext_app_info">Uygulama bilgisi</string>
+    <string name="ext_installer_shizuku_unavailable_dialog">Uzantı kurucusu olarak kullanmak için Shizuku\'yu kurun ve başlatın.</string>
+    <string name="ext_installer_shizuku_stopped">Shizuku çalışmıyor</string>
+    <string name="ext_installer_legacy">Eski</string>
+    <string name="ext_installer_pref">Kurucu</string>
+    <string name="ext_install_service_notif">Uzantı kuruluyor…</string>
+    <string name="action_sort_count">Toplam manga</string>
+    <string name="label_warning">Uyarı</string>
+    <string name="action_display_language_badge">Dil</string>
+    <string name="backup_info">Otomatik yedeklemeler şiddetle tavsiye edilir. Kopyaları başka yerlerde de tutmalısınız.</string>
+    <string name="notification_size_warning">Büyük güncellemeler pil kullanımının artmasına ve kaynakların yavaşlamasına neden olabilir</string>
+    <string name="pref_verbose_logging">Ayrıntılı günlük kaydı</string>
+    <string name="pref_verbose_logging_summary">Ayrıntılı günlükleri sistem günlüğüne yaz (uygulama performansını düşürür)</string>
 </resources>

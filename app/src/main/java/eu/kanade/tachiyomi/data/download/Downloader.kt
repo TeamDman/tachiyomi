@@ -2,6 +2,7 @@ package eu.kanade.tachiyomi.data.download
 
 import android.content.Context
 import android.webkit.MimeTypeMap
+import android.widget.Toast
 import com.hippo.unifile.UniFile
 import com.jakewharton.rxrelay.BehaviorRelay
 import com.jakewharton.rxrelay.PublishRelay
@@ -19,16 +20,19 @@ import eu.kanade.tachiyomi.util.lang.RetryWithDelay
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchNow
 import eu.kanade.tachiyomi.util.lang.plusAssign
+import eu.kanade.tachiyomi.util.lang.withUIContext
 import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.saveTo
 import eu.kanade.tachiyomi.util.system.ImageUtil
+import eu.kanade.tachiyomi.util.system.logcat
+import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.coroutines.async
+import logcat.LogPriority
 import okhttp3.Response
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.subscriptions.CompositeSubscription
-import timber.log.Timber
 import uy.kohesive.injekt.injectLazy
 import java.io.File
 
@@ -209,7 +213,7 @@ class Downloader(
                 },
                 { error ->
                     DownloadService.stop(context)
-                    Timber.e(error)
+                    logcat(LogPriority.ERROR, error)
                     notifier.onError(error.message)
                 }
             )
@@ -262,7 +266,13 @@ class Downloader(
 
             // Start downloader if needed
             if (autoStart && wasEmpty) {
-                DownloadService.start(this@Downloader.context)
+                val maxDownloadsFromSource = queue.groupBy { it.source }.maxOf { it.value.size }
+                if (maxDownloadsFromSource > CHAPTERS_PER_SOURCE_QUEUE_WARNING_THRESHOLD) {
+                    withUIContext {
+                        context.toast(R.string.download_queue_size_warning, Toast.LENGTH_LONG)
+                    }
+                }
+                DownloadService.start(context)
             }
         }
     }
@@ -500,8 +510,10 @@ class Downloader(
 
     companion object {
         const val TMP_DIR_SUFFIX = "_tmp"
-
-        // Arbitrary minimum required space to start a download: 50 MB
-        const val MIN_DISK_SPACE = 50 * 1024 * 1024
     }
 }
+
+private const val CHAPTERS_PER_SOURCE_QUEUE_WARNING_THRESHOLD = 15
+
+// Arbitrary minimum required space to start a download: 50 MB
+private const val MIN_DISK_SPACE = 50 * 1024 * 1024

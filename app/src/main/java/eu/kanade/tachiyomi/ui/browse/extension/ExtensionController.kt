@@ -119,6 +119,11 @@ open class ExtensionController :
         }
     }
 
+    override fun onCancelButtonClick(position: Int) {
+        val extension = (adapter?.getItem(position) as? ExtensionItem)?.extension ?: return
+        presenter.cancelInstallUpdateExtension(extension)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.browse_extensions, menu)
 
@@ -139,7 +144,7 @@ open class ExtensionController :
             .filter { router.backstack.lastOrNull()?.controller == this }
             .onEach {
                 query = it.toString()
-                drawExtensions()
+                updateExtensionsList()
             }
             .launchIn(viewScope)
     }
@@ -174,7 +179,7 @@ open class ExtensionController :
     fun setExtensions(extensions: List<ExtensionItem>) {
         binding.swipeRefresh.isRefreshing = false
         this.extensions = extensions
-        drawExtensions()
+        updateExtensionsList()
 
         // Update badge on parent controller tab
         val ctrl = parentController as BrowseController
@@ -182,11 +187,14 @@ open class ExtensionController :
         ctrl.extensionListUpdateRelay.call(true)
     }
 
-    private fun drawExtensions() {
+    private fun updateExtensionsList() {
         if (query.isNotBlank()) {
+            val extensionNames = query.split(",")
             adapter?.updateDataSet(
                 extensions.filter {
-                    it.extension.name.contains(query, ignoreCase = true)
+                    extensionNames.any { queriedName ->
+                        it.extension.name.contains(queriedName, ignoreCase = true)
+                    }
                 }
             )
         } else {

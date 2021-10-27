@@ -195,7 +195,6 @@
     <string name="webtoon_side_padding_20">20%</string>
     <string name="webtoon_side_padding_25">25%</string>
     <string name="pref_download_directory">გადმოწერის ადგილი დისკზე</string>
-    <string name="pref_download_only_over_wifi">გადმოწერე მხოლოდ Wi-Fi -ს მეშვეობით</string>
     <string name="pref_remove_after_marked_as_read">წაშალე წაკითხულად მონიშვნის შემდეგ</string>
     <string name="pref_remove_after_read">წაკკითხვის შემდეგ წაშალე</string>
     <string name="custom_dir">ინდივიდუალური ადგილმდებარეობა</string>
@@ -389,7 +388,6 @@
     <string name="download_notifier_no_network">ინტერნეტთან კავშირი არ არის ხელმისაწვდომი</string>
     <string name="download_notifier_download_paused">გადმოწერა დაპაუზებულია</string>
     <string name="channel_common">საერთო</string>
-    <string name="channel_library">ბიბლიოთეკა</string>
     <string name="channel_new_chapters">თავების განახლებები</string>
     <string name="channel_ext_updates">გავრცობის განახლებები</string>
     <string name="chapters">თავები</string>
@@ -408,7 +406,6 @@
     <string name="action_unpin">მიმაგრების მოხსნა</string>
     <string name="pref_start_screen">საწყისი გვერდი</string>
     <string name="pref_library_update_refresh_metadata_summary">ბიბლიოთეკის განახლებისას მოძებნე ახალი ყდები და დეტალები</string>
-    <string name="pref_library_update_error_notification">შეცდომის შეტყობინებების განახლებების ჩვენება</string>
     <string name="ext_updates_pending">განახლებები მოლოდინის რეჟიმშია</string>
     <string name="ext_obsolete">მოძველებული</string>
     <string name="ext_trust">ნდობა</string>
@@ -515,7 +512,6 @@
     </plurals>
     <string name="pref_category_theme">თემა</string>
     <string name="action_disable">გამორთვა</string>
-    <string name="action_open_in_settings">პარამეტრებში გახსნა</string>
     <string name="action_start">დაწყება</string>
     <string name="action_sort_date_added">დამატების თარიღი</string>
     <string name="action_download_unread">გადმოიწეროს წაუკითხავი თავები</string>

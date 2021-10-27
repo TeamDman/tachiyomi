@@ -42,6 +42,7 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.getPicturesDir
 import eu.kanade.tachiyomi.util.storage.getTempShareDir
 import eu.kanade.tachiyomi.util.system.ImageUtil
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.updateCoverLastModified
 import eu.kanade.tachiyomi.widget.ExtendedNavigationView.Item.TriStateGroup.State
@@ -49,11 +50,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
+import logcat.LogPriority
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -127,7 +128,9 @@ class MangaPresenter(
 
         getTrackingObservable()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeLatestCache(MangaController::onTrackingCount) { _, error -> Timber.e(error) }
+            .subscribeLatestCache(MangaController::onTrackingCount) { _, error ->
+                logcat(LogPriority.ERROR, error)
+            }
 
         // Prepare the relay.
         chaptersRelay.flatMap { applyChapterFilters(it) }
@@ -137,7 +140,7 @@ class MangaPresenter(
                     filteredAndSortedChapters = chapters
                     view?.onNextChapters(chapters)
                 },
-                { _, error -> Timber.e(error) }
+                { _, error -> logcat(LogPriority.ERROR, error) }
             )
 
         // Manga info - end
@@ -427,7 +430,7 @@ class MangaPresenter(
                     view.onChapterDownloadUpdate(it)
                 },
                 { _, error ->
-                    Timber.e(error)
+                    logcat(LogPriority.ERROR, error)
                 }
             )
 
@@ -438,7 +441,7 @@ class MangaPresenter(
             .filter { download -> download.manga.id == manga.id }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeLatestCache(MangaController::onChapterDownloadUpdate) { _, error ->
-                Timber.e(error)
+                logcat(LogPriority.ERROR, error)
             }
     }
 
@@ -714,6 +717,7 @@ class MangaPresenter(
     fun setDisplayMode(mode: Int) {
         manga.displayMode = mode
         db.updateChapterFlags(manga).executeAsBlocking()
+        refreshChapters()
     }
 
     /**

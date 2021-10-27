@@ -158,7 +158,6 @@
     <string name="color_filter_b_value">B</string>
     <string name="color_filter_a_value">A</string>
     <string name="pref_download_directory">Lokacija preuzimanja</string>
-    <string name="pref_download_only_over_wifi">Preuzimaj samo putem Wi-Fi -a</string>
     <string name="pref_remove_after_marked_as_read">Obriši kada je označeno kao pročitano</string>
     <string name="pref_remove_after_read">Obriši nakon čitanja</string>
     <string name="custom_dir">Posebna lokacija</string>
@@ -438,7 +437,6 @@
     <string name="action_display_unread_badge">Oznaka za nepročitano</string>
     <string name="action_display_comfortable_grid">Šira mreža</string>
     <string name="action_migrate">Migriraj</string>
-    <string name="action_open_in_settings">Otvori u Podešavanjima</string>
     <string name="action_start">Počni</string>
     <string name="action_disable_all">Onemogući sve</string>
     <string name="action_enable_all">Omogući sve</string>
@@ -455,7 +453,6 @@
         <item quantity="few">%d kategorije</item>
         <item quantity="other"/>
     </plurals>
-    <string name="pref_library_update_error_notification">Prikaži greške pri ažuriranju u obavještenju</string>
     <string name="pref_library_update_refresh_metadata_summary">Provjeri da li postoje nove pozadine kada ažuriraš biblioteku</string>
     <string name="pref_library_update_refresh_metadata">Automatski osvježi metadata</string>
     <string name="pref_jump_to_chapters">Idi na poglevlje sa otvaranjem</string>

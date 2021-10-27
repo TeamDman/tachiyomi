@@ -24,6 +24,7 @@
     <string name="label_extension_info">Extension info</string>
     <string name="label_help">Help</string>
     <string name="label_default">Default</string>
+    <string name="label_warning">Warning</string>
 
     <string name="unlock_app">Unlock Tachiyomi</string>
     <string name="confirm_lock_change">Authenticate to confirm change</string>
@@ -39,6 +40,7 @@
     <string name="action_filter_unread">Unread</string>
     <string name="action_filter_empty">Remove filter</string>
     <string name="action_sort_alpha">Alphabetically</string>
+    <string name="action_sort_count">Total manga</string>
     <string name="action_sort_total">Total chapters</string>
     <string name="action_sort_last_read">Last read</string>
     <string name="action_sort_last_checked">Last checked</string>
@@ -89,9 +91,10 @@
     <string name="action_display_grid">Compact grid</string>
     <string name="action_display_comfortable_grid">Comfortable grid</string>
     <string name="action_display_list">List</string>
-    <string name="action_display_download_badge">Download badges</string>
-    <string name="action_display_unread_badge">Unread badges</string>
-    <string name="action_display_local_badge">Local badges</string>
+    <string name="action_display_download_badge">Downloaded chapters</string>
+    <string name="action_display_unread_badge">Unread chapters</string>
+    <string name="action_display_local_badge">Local manga</string>
+    <string name="action_display_language_badge">Language</string>
     <string name="action_display_show_tabs">Show category tabs</string>
     <string name="action_display_show_number_of_items">Show number of items</string>
     <string name="action_disable">Disable</string>
@@ -116,7 +119,7 @@
     <string name="action_reset">Reset</string>
     <string name="action_undo">Undo</string>
     <string name="action_open_log">Open log</string>
-    <string name="action_show_errors">Show errors</string>
+    <string name="action_show_errors">See full error details</string>
     <string name="action_create">Create</string>
     <string name="action_restore">Restore</string>
     <string name="action_webview_back">Back</string>
@@ -208,17 +211,15 @@
     <string name="pref_category_library_update">Global update</string>
     <string name="pref_library_update_interval">Update frequency</string>
     <string name="update_never">Manual</string>
-    <string name="update_3hour">Every 3 hours</string>
-    <string name="update_4hour">Every 4 hours</string>
     <string name="update_6hour">Every 6 hours</string>
-    <string name="update_8hour">Every 8 hours</string>
     <string name="update_12hour">Every 12 hours</string>
     <string name="update_24hour">Daily</string>
     <string name="update_48hour">Every 2 days</string>
+    <string name="update_72hour">Every 3 days</string>
     <string name="update_weekly">Weekly</string>
     <string name="pref_library_update_prioritization">Update order</string>
     <string name="pref_library_update_restriction">Update restrictions</string>
-    <string name="network_unmetered">Unmetered network</string>
+    <string name="connected_to_wifi">Only on Wi-Fi</string>
     <string name="charging">Charging</string>
     <string name="restrictions">Restrictions: %s</string>
     <string name="pref_update_only_non_completed">Only update ongoing manga</string>
@@ -268,6 +269,13 @@
     <string name="ext_language_info">Language: %1$s</string>
     <string name="ext_nsfw_short">18+</string>
     <string name="ext_nsfw_warning">May contain NSFW (18+) content</string>
+    <string name="ext_install_service_notif">Installing extension…</string>
+    <string name="ext_installer_pref">Installer</string>
+    <string name="ext_installer_legacy">Legacy</string>
+    <string name="ext_installer_packageinstaller" translatable="false">PackageInstaller</string>
+    <string name="ext_installer_shizuku" translatable="false">Shizuku</string>
+    <string name="ext_installer_shizuku_stopped">Shizuku is not running</string>
+    <string name="ext_installer_shizuku_unavailable_dialog">Install and start Shizuku to use Shizuku as extension installer.</string>
 
       <!-- Reader section -->
     <string name="pref_fullscreen">Fullscreen</string>
@@ -370,7 +378,7 @@
     <string name="webtoon_side_padding_15">15%</string>
     <string name="webtoon_side_padding_20">20%</string>
     <string name="webtoon_side_padding_25">25%</string>
-    <string name="pref_hide_threshold">Auto hide menu on scroll sensitivity</string>
+    <string name="pref_hide_threshold">Sensitivity for hiding menu on scroll</string>
     <string name="pref_highest">Highest</string>
     <string name="pref_high">High</string>
     <string name="pref_low">Low</string>
@@ -378,7 +386,6 @@
 
       <!-- Downloads section -->
     <string name="pref_download_directory">Download location</string>
-    <string name="pref_download_only_over_wifi">Only download over Wi-Fi</string>
     <string name="pref_category_delete_chapters">Delete chapters</string>
     <string name="pref_remove_after_marked_as_read">After marked as read</string>
     <string name="pref_remove_after_read">Automatically after reading</string>
@@ -443,6 +450,7 @@
     <string name="restoring_backup">Restoring backup</string>
     <string name="restoring_backup_error">Restoring backup failed</string>
     <string name="restoring_backup_canceled">Canceled restore</string>
+    <string name="backup_info">Automatic backups are highly recommended. You should keep copies in other places as well.</string>
 
       <!-- Advanced section -->
     <string name="label_network">Network</string>
@@ -472,6 +480,8 @@
     <string name="battery_optimization_setting_activity_not_found">Couldn\'t open device settings</string>
     <string name="about_dont_kill_my_app">Some manufacturers have additional app restrictions that kill background services. This website has more info on how to fix it.</string>
     <string name="pref_tablet_ui_mode">Force tablet UI</string>
+    <string name="pref_verbose_logging">Verbose logging</string>
+    <string name="pref_verbose_logging_summary">Print verbose logs to system log (reduces app performance)</string>
 
       <!-- About section -->
     <string name="website">Website</string>
@@ -672,8 +682,8 @@
     <string name="page_list_empty_error">No pages found</string>
     <string name="loader_not_implemented_error">Source not found</string>
     <plurals name="missing_chapters_warning">
-        <item quantity="one">There is 1 missing chapter</item>
-        <item quantity="other">There are %d missing chapters</item>
+        <item quantity="one">Skipping 1 chapter, either the source is missing it or it has been filtered out</item>
+        <item quantity="other">Skipping %d chapters, either the source is missing them or they have been filtered out</item>
     </plurals>
 
     <!-- Updates fragment -->
@@ -695,10 +705,12 @@
     <!-- Downloads activity and service -->
     <string name="download_queue_error">Couldn\'t download chapters. You can try again in the downloads section</string>
     <string name="download_insufficient_space">Couldn\'t download chapters due to low storage space</string>
+    <string name="download_queue_size_warning">Warning: large bulk downloads may lead to sources becoming slower and/or blocking Tachiyomi</string>
 
     <!-- Library update service notifications -->
     <string name="notification_check_updates">Checking for new chapters</string>
     <string name="notification_updating">Updating library… (%1$d/%2$d)</string>
+    <string name="notification_size_warning">Warning: large updates harm sources and may lead to slower updates and also increased battery usage</string>
     <string name="notification_new_chapters">New chapters found</string>
     <plurals name="notification_new_chapters_summary">
         <item quantity="one">For 1 title</item>

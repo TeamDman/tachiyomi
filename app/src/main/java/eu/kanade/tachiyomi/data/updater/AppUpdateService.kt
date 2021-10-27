@@ -20,11 +20,12 @@ import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.storage.saveTo
 import eu.kanade.tachiyomi.util.system.acquireWakeLock
 import eu.kanade.tachiyomi.util.system.isServiceRunning
-import timber.log.Timber
+import eu.kanade.tachiyomi.util.system.logcat
+import logcat.LogPriority
 import uy.kohesive.injekt.injectLazy
 import java.io.File
 
-class UpdaterService : Service() {
+class AppUpdateService : Service() {
 
     private val network: NetworkHelper by injectLazy()
 
@@ -33,12 +34,12 @@ class UpdaterService : Service() {
      */
     private lateinit var wakeLock: PowerManager.WakeLock
 
-    private lateinit var notifier: UpdaterNotifier
+    private lateinit var notifier: AppUpdateNotifier
 
     override fun onCreate() {
         super.onCreate()
 
-        notifier = UpdaterNotifier(this)
+        notifier = AppUpdateNotifier(this)
         wakeLock = acquireWakeLock(javaClass.name)
 
         startForeground(Notifications.ID_UPDATER, notifier.onDownloadStarted().build())
@@ -121,7 +122,7 @@ class UpdaterService : Service() {
             }
             notifier.onDownloadFinished(apkFile.getUriCompat(this))
         } catch (error: Exception) {
-            Timber.e(error)
+            logcat(LogPriority.ERROR, error)
             notifier.onDownloadError(url)
         }
     }
@@ -138,7 +139,7 @@ class UpdaterService : Service() {
          * @return true if the service is running, false otherwise.
          */
         private fun isRunning(context: Context): Boolean =
-            context.isServiceRunning(UpdaterService::class.java)
+            context.isServiceRunning(AppUpdateService::class.java)
 
         /**
          * Downloads a new update and let the user install the new version from a notification.
@@ -148,7 +149,7 @@ class UpdaterService : Service() {
          */
         fun start(context: Context, url: String, title: String = context.getString(R.string.app_name)) {
             if (!isRunning(context)) {
-                val intent = Intent(context, UpdaterService::class.java).apply {
+                val intent = Intent(context, AppUpdateService::class.java).apply {
                     putExtra(EXTRA_DOWNLOAD_TITLE, title)
                     putExtra(EXTRA_DOWNLOAD_URL, url)
                 }
@@ -163,7 +164,7 @@ class UpdaterService : Service() {
          * @return [PendingIntent]
          */
         internal fun downloadApkPendingService(context: Context, url: String): PendingIntent {
-            val intent = Intent(context, UpdaterService::class.java).apply {
+            val intent = Intent(context, AppUpdateService::class.java).apply {
                 putExtra(EXTRA_DOWNLOAD_URL, url)
             }
             return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)

@@ -7,8 +7,9 @@ import eu.kanade.tachiyomi.data.backup.BackupCreatorJob
 import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
 import eu.kanade.tachiyomi.data.preference.PreferenceKeys
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.data.preference.plusAssign
 import eu.kanade.tachiyomi.data.track.TrackManager
-import eu.kanade.tachiyomi.data.updater.UpdaterJob
+import eu.kanade.tachiyomi.data.updater.AppUpdateJob
 import eu.kanade.tachiyomi.extension.ExtensionUpdateJob
 import eu.kanade.tachiyomi.network.PREF_DOH_CLOUDFLARE
 import eu.kanade.tachiyomi.ui.library.LibrarySort
@@ -38,7 +39,7 @@ object Migrations {
 
             // Always set up background tasks to ensure they're running
             if (BuildConfig.INCLUDE_UPDATER) {
-                UpdaterJob.setupTask(context)
+                AppUpdateJob.setupTask(context)
             }
             ExtensionUpdateJob.setupTask(context)
             LibraryUpdateJob.setupTask(context)
@@ -52,7 +53,7 @@ object Migrations {
             if (oldVersion < 14) {
                 // Restore jobs after upgrading to Evernote's job scheduler.
                 if (BuildConfig.INCLUDE_UPDATER) {
-                    UpdaterJob.setupTask(context)
+                    AppUpdateJob.setupTask(context)
                 }
                 LibraryUpdateJob.setupTask(context)
             }
@@ -85,7 +86,7 @@ object Migrations {
             if (oldVersion < 43) {
                 // Restore jobs after migrating from Evernote's job scheduler to WorkManager.
                 if (BuildConfig.INCLUDE_UPDATER) {
-                    UpdaterJob.setupTask(context)
+                    AppUpdateJob.setupTask(context)
                 }
                 LibraryUpdateJob.setupTask(context)
                 BackupCreatorJob.setupTask(context)
@@ -157,13 +158,13 @@ object Migrations {
 
                 // Disable update check for Android 5.x users
                 if (BuildConfig.INCLUDE_UPDATER && Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
-                    UpdaterJob.cancelTask(context)
+                    AppUpdateJob.cancelTask(context)
                 }
             }
             if (oldVersion < 60) {
                 // Re-enable update check that was prevously accidentally disabled for M
                 if (BuildConfig.INCLUDE_UPDATER && Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
-                    UpdaterJob.setupTask(context)
+                    AppUpdateJob.setupTask(context)
                 }
 
                 // Migrate Rotation and Viewer values to default values for viewer_flags
@@ -227,6 +228,19 @@ object Migrations {
                 prefs.edit {
                     putString(PreferenceKeys.librarySortingMode, newSortingMode.name)
                     putString(PreferenceKeys.librarySortingDirection, newSortingDirection.name)
+                }
+            }
+            if (oldVersion < 70) {
+                if (preferences.enabledLanguages().isSet()) {
+                    preferences.enabledLanguages() += "all"
+                }
+            }
+            if (oldVersion < 71) {
+                // Handle removed every 3, 4, 6, and 8 hour library updates
+                val updateInterval = preferences.libraryUpdateInterval().get()
+                if (updateInterval in listOf(3, 4, 6, 8)) {
+                    preferences.libraryUpdateInterval().set(12)
+                    LibraryUpdateJob.setupTask(context, 12)
                 }
             }
 

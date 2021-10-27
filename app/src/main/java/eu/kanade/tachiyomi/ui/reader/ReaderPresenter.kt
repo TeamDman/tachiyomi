@@ -34,14 +34,15 @@ import eu.kanade.tachiyomi.util.storage.getPicturesDir
 import eu.kanade.tachiyomi.util.storage.getTempShareDir
 import eu.kanade.tachiyomi.util.system.ImageUtil
 import eu.kanade.tachiyomi.util.system.isOnline
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.updateCoverLastModified
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import logcat.LogPriority
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -104,7 +105,7 @@ class ReaderPresenter(
 
         val chaptersForReader = when {
             (preferences.skipRead() || preferences.skipFiltered()) -> {
-                val list = dbChapters.filterNot {
+                val filteredChapters = dbChapters.filterNot {
                     when {
                         preferences.skipRead() && it.read -> true
                         preferences.skipFiltered() -> {
@@ -118,13 +119,12 @@ class ReaderPresenter(
                         else -> false
                     }
                 }
-                    .toMutableList()
 
-                val find = list.find { it.id == chapterId }
-                if (find == null) {
-                    list.add(selectedChapter)
+                if (filteredChapters.any { it.id == chapterId }) {
+                    filteredChapters
+                } else {
+                    filteredChapters + listOf(selectedChapter)
                 }
-                list
             }
             else -> dbChapters
         }
@@ -301,7 +301,7 @@ class ReaderPresenter(
     private fun loadNewChapter(chapter: ReaderChapter) {
         val loader = loader ?: return
 
-        Timber.d("Loading ${chapter.chapter.url}")
+        logcat { "Loading ${chapter.chapter.url}" }
 
         activeChapterSubscription?.unsubscribe()
         activeChapterSubscription = getLoadObservable(loader, chapter)
@@ -319,7 +319,7 @@ class ReaderPresenter(
     private fun loadAdjacent(chapter: ReaderChapter) {
         val loader = loader ?: return
 
-        Timber.d("Loading adjacent ${chapter.chapter.url}")
+        logcat { "Loading adjacent ${chapter.chapter.url}" }
 
         activeChapterSubscription?.unsubscribe()
         activeChapterSubscription = getLoadObservable(loader, chapter)
@@ -344,7 +344,7 @@ class ReaderPresenter(
             return
         }
 
-        Timber.d("Preloading ${chapter.chapter.url}")
+        logcat { "Preloading ${chapter.chapter.url}" }
 
         val loader = loader ?: return
 
@@ -383,7 +383,7 @@ class ReaderPresenter(
         }
 
         if (selectedChapter != currentChapters.currChapter) {
-            Timber.d("Setting ${selectedChapter.chapter.url} as active")
+            logcat { "Setting ${selectedChapter.chapter.url} as active" }
             onChapterChanged(currentChapters.currChapter)
             loadNewChapter(selectedChapter)
         }
@@ -549,7 +549,7 @@ class ReaderPresenter(
         manga.orientationType = rotationType
         db.updateViewerFlags(manga).executeAsBlocking()
 
-        Timber.i("Manga orientation is ${manga.orientationType}")
+        logcat(LogPriority.INFO) { "Manga orientation is ${manga.orientationType}" }
 
         Observable.timer(250, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
             .subscribeFirst({ view, _ ->
@@ -734,7 +734,7 @@ class ReaderPresenter(
                 }
                 .awaitAll()
                 .mapNotNull { it.exceptionOrNull() }
-                .forEach { Timber.w(it) }
+                .forEach { logcat(LogPriority.INFO, it) }
         }
     }
 

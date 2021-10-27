@@ -53,6 +53,7 @@ import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.online.HttpSource
+import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.ui.base.controller.FabController
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
 import eu.kanade.tachiyomi.ui.base.controller.getMainAppBarHeight
@@ -84,8 +85,8 @@ import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.util.chapter.NoChaptersException
 import eu.kanade.tachiyomi.util.hasCustomCover
 import eu.kanade.tachiyomi.util.lang.launchIO
-import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.storage.getUriCompat
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toShareIntent
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.getCoordinates
@@ -94,9 +95,9 @@ import eu.kanade.tachiyomi.util.view.snack
 import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority
 import reactivecircus.flowbinding.recyclerview.scrollStateChanges
 import reactivecircus.flowbinding.swiperefreshlayout.refreshes
-import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
@@ -177,7 +178,7 @@ class MangaController :
 
     private var trackSheet: TrackSheet? = null
 
-    private var dialog: MangaFullCoverDialog? = null
+    private var dialog: DialogController? = null
 
     /**
      * For [recyclerViewUpdatesToolbarTitleAlpha]
@@ -247,13 +248,21 @@ class MangaController :
         if (manga == null || source == null) return
 
         // Init RecyclerView and adapter
-        mangaInfoAdapter = MangaInfoHeaderAdapter(this, fromSource, binding.infoRecycler != null)
-        chaptersHeaderAdapter = MangaChaptersHeaderAdapter(this)
+        mangaInfoAdapter = MangaInfoHeaderAdapter(this, fromSource, binding.infoRecycler != null).apply {
+            setHasStableIds(true)
+        }
+        chaptersHeaderAdapter = MangaChaptersHeaderAdapter(this).apply {
+            setHasStableIds(true)
+        }
         chaptersAdapter = ChaptersAdapter(this, view.context)
 
         // Phone layout
         binding.fullRecycler?.let {
-            it.adapter = ConcatAdapter(mangaInfoAdapter, chaptersHeaderAdapter, chaptersAdapter)
+            val config = ConcatAdapter.Config.Builder()
+                .setIsolateViewTypes(true)
+                .setStableIdMode(ConcatAdapter.Config.StableIdMode.SHARED_STABLE_IDS)
+                .build()
+            it.adapter = ConcatAdapter(config, mangaInfoAdapter, chaptersHeaderAdapter, chaptersAdapter)
 
             // Skips directly to chapters list if navigated to from the library
             it.post {
@@ -278,12 +287,7 @@ class MangaController :
 
             binding.fastScroller.doOnLayout { scroller ->
                 scroller.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    topMargin = getMainAppBarHeight()
-                }
-                scroller.applyInsetter {
-                    type(navigationBars = true) {
-                        margin()
-                    }
+                    topMargin += getMainAppBarHeight()
                 }
             }
 
@@ -321,7 +325,6 @@ class MangaController :
         settingsSheet = ChaptersSettingsSheet(router, presenter) { group ->
             if (group is ChaptersSettingsSheet.Filter.FilterGroup) {
                 updateFilterIconState()
-                chaptersAdapter?.notifyDataSetChanged()
             }
         }
 
@@ -583,8 +586,7 @@ class MangaController :
                     }
                 }.toTypedArray()
 
-                ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
-                    .showDialog(router)
+                showChangeCategoryDialog(manga, categories, preselected)
             }
         }
 
@@ -600,7 +602,9 @@ class MangaController :
                                 presenter.registerTracking(track, service as TrackService)
                             }
                         } catch (e: Exception) {
-                            Timber.w(e, "Could not match manga: ${manga.title} with service $service")
+                            logcat(LogPriority.WARN, e) {
+                                "Could not match manga: ${manga.title} with service $service"
+                            }
                         }
                     }
                 }
@@ -622,7 +626,7 @@ class MangaController :
                 }
             }
         }
-        mangaInfoAdapter?.notifyDataSetChanged()
+        mangaInfoAdapter?.update()
     }
 
     fun onCategoriesClick() {
@@ -637,8 +641,21 @@ class MangaController :
                 QuadStateTextView.State.UNCHECKED.ordinal
             }
         }.toTypedArray()
-        ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
-            .showDialog(router)
+        showChangeCategoryDialog(manga, categories, preselected)
+    }
+
+    private fun showChangeCategoryDialog(manga: Manga, categories: List<Category>, preselected: Array<Int>) {
+        if (dialog != null) return
+        dialog = ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
+        dialog?.addLifecycleListener(
+            object : LifecycleListener() {
+                override fun postDestroy(controller: Controller) {
+                    super.postDestroy(controller)
+                    dialog = null
+                }
+            }
+        )
+        dialog?.showDialog(router)
     }
 
     override fun updateCategoriesForMangas(mangas: List<Manga>, addCategories: List<Category>, removeCategories: List<Category>) {
@@ -759,7 +776,7 @@ class MangaController :
                 startActivity(uri.toShareIntent(activity))
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            logcat(LogPriority.ERROR, e)
             activity?.toast(R.string.error_sharing_cover)
         }
     }
@@ -772,7 +789,7 @@ class MangaController :
                 activity.toast(R.string.cover_saved)
             }
         } catch (e: Exception) {
-            Timber.e(e)
+            logcat(LogPriority.ERROR, e)
             activity?.toast(R.string.error_saving_cover)
         }
     }
@@ -807,7 +824,7 @@ class MangaController :
 
     override fun deleteMangaCover(manga: Manga) {
         presenter.deleteCustomCover(manga)
-        mangaInfoAdapter?.notifyDataSetChanged()
+        mangaInfoAdapter?.notifyItemChanged(0, manga)
         destroyActionModeIfNeeded()
     }
 
@@ -821,14 +838,14 @@ class MangaController :
     }
 
     fun onSetCoverSuccess() {
-        mangaInfoAdapter?.notifyDataSetChanged()
-        dialog?.setImage(manga)
+        mangaInfoAdapter?.notifyItemChanged(0, this)
+        (dialog as? MangaFullCoverDialog)?.setImage(manga)
         activity?.toast(R.string.cover_updated)
     }
 
     fun onSetCoverError(error: Throwable) {
         activity?.toast(R.string.notification_cover_update_failed)
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
     }
 
     /**
@@ -932,19 +949,20 @@ class MangaController :
         val lastClickPosition = lastClickPositionStack.peek()!!
         when {
             lastClickPosition == -1 -> setSelection(position)
-            lastClickPosition > position ->
-                for (i in position until lastClickPosition)
-                    setSelection(i)
-            lastClickPosition < position ->
-                for (i in lastClickPosition + 1..position)
-                    setSelection(i)
+            lastClickPosition > position -> {
+                for (i in position until lastClickPosition) setSelection(i)
+                chaptersAdapter?.notifyItemRangeChanged(position, lastClickPosition, position)
+            }
+            lastClickPosition < position -> {
+                for (i in lastClickPosition + 1..position) setSelection(i)
+                chaptersAdapter?.notifyItemRangeChanged(lastClickPosition + 1, position, position)
+            }
             else -> setSelection(position)
         }
         if (lastClickPosition != position) {
             lastClickPositionStack.remove(position) // move to top if already exists
             lastClickPositionStack.push(position)
         }
-        chaptersAdapter?.notifyDataSetChanged()
     }
 
     fun showSettingsSheet() {
@@ -957,7 +975,6 @@ class MangaController :
         val adapter = chaptersAdapter ?: return
         val item = adapter.getItem(position) ?: return
         adapter.toggleSelection(position)
-        adapter.notifyDataSetChanged()
         if (adapter.isSelected(position)) {
             selectedChapters.add(item)
         } else {
@@ -1090,11 +1107,11 @@ class MangaController :
         selectedChapters.clear()
         for (i in 0..adapter.itemCount) {
             adapter.toggleSelection(i)
+            adapter.notifyItemChanged(i, i)
         }
         selectedChapters.addAll(adapter.selectedPositions.mapNotNull { adapter.getItem(it) })
 
         actionMode?.invalidate()
-        adapter.notifyDataSetChanged()
     }
 
     private fun markAsRead(chapters: List<ChapterItem>) {
@@ -1161,15 +1178,12 @@ class MangaController :
     fun onChaptersDeleted(chapters: List<ChapterItem>) {
         // this is needed so the downloaded text gets removed from the item
         chapters.forEach {
-            chaptersAdapter?.updateItem(it)
-        }
-        launchUI {
-            chaptersAdapter?.notifyDataSetChanged()
+            chaptersAdapter?.updateItem(it, it)
         }
     }
 
     fun onChaptersDeletedError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
     }
 
     override fun startDownloadNow(position: Int) {
@@ -1223,7 +1237,7 @@ class MangaController :
     }
 
     fun onTrackingRefreshError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
         activity?.toast(error.message)
     }
 
@@ -1232,7 +1246,7 @@ class MangaController :
     }
 
     fun onTrackingSearchResultsError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
         getTrackingSearchDialog()?.onSearchResultsError(error.message)
     }
 

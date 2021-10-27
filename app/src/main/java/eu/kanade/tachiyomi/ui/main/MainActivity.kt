@@ -45,6 +45,7 @@ import eu.kanade.tachiyomi.ui.base.controller.FabController
 import eu.kanade.tachiyomi.ui.base.controller.NoAppBarElevationController
 import eu.kanade.tachiyomi.ui.base.controller.RootController
 import eu.kanade.tachiyomi.ui.base.controller.TabbedController
+import eu.kanade.tachiyomi.ui.base.controller.setRoot
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.ui.browse.BrowseController
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceController
@@ -61,15 +62,14 @@ import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.system.dpToPx
 import eu.kanade.tachiyomi.util.system.isTablet
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.setNavigationBarTransparentCompat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import logcat.LogPriority
 
 class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
 
@@ -152,11 +152,11 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
             val currentRoot = router.backstack.firstOrNull()
             if (currentRoot?.tag()?.toIntOrNull() != id) {
                 when (id) {
-                    R.id.nav_library -> setRoot(LibraryController(), id)
-                    R.id.nav_updates -> setRoot(UpdatesController(), id)
-                    R.id.nav_history -> setRoot(HistoryController(), id)
-                    R.id.nav_browse -> setRoot(BrowseController(), id)
-                    R.id.nav_more -> setRoot(MoreController(), id)
+                    R.id.nav_library -> router.setRoot(LibraryController(), id)
+                    R.id.nav_updates -> router.setRoot(UpdatesController(), id)
+                    R.id.nav_history -> router.setRoot(HistoryController(), id)
+                    R.id.nav_browse -> router.setRoot(BrowseController(), id)
+                    R.id.nav_more -> router.setRoot(MoreController(), id)
                 }
             } else if (!isHandlingShortcut) {
                 when (id) {
@@ -215,7 +215,7 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
             }
         )
 
-        syncActivityViewWithController(router.backstack.lastOrNull()?.controller)
+        syncActivityViewWithController()
 
         if (savedInstanceState == null) {
             // Reset Incognito Mode on relaunch
@@ -320,43 +320,31 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
 
     override fun onResume() {
         super.onResume()
+        syncActivityViewWithController()
 
-        checkForExtensionUpdates()
-        if (BuildConfig.INCLUDE_UPDATER) {
-            checkForAppUpdates()
-        }
+        checkForUpdates()
     }
 
-    private fun checkForAppUpdates() {
-        // Limit checks to once a day at most
-        if (Date().time < preferences.lastAppCheck().get() + TimeUnit.DAYS.toMillis(1)) {
-            return
-        }
-
+    private fun checkForUpdates() {
         lifecycleScope.launchIO {
-            try {
-                val result = AppUpdateChecker().checkForUpdate()
-                if (result is AppUpdateResult.NewUpdate) {
-                    NewUpdateDialogController(result).showDialog(router)
+            // App updates
+            if (BuildConfig.INCLUDE_UPDATER) {
+                try {
+                    val result = AppUpdateChecker().checkForUpdate(this@MainActivity)
+                    if (result is AppUpdateResult.NewUpdate) {
+                        NewUpdateDialogController(result).showDialog(router)
+                    }
+                } catch (e: Exception) {
+                    logcat(LogPriority.ERROR, e)
                 }
-            } catch (e: Exception) {
-                Timber.e(e)
             }
-        }
-    }
 
-    private fun checkForExtensionUpdates() {
-        // Limit checks to once a day at most
-        if (Date().time < preferences.lastExtCheck().get() + TimeUnit.DAYS.toMillis(1)) {
-            return
-        }
-
-        lifecycleScope.launchIO {
+            // Extension updates
             try {
                 val pendingUpdates = ExtensionGithubApi().checkForUpdates(this@MainActivity)
                 preferences.extensionUpdatesCount().set(pendingUpdates.size)
             } catch (e: Exception) {
-                Timber.e(e)
+                logcat(LogPriority.ERROR, e)
             }
         }
     }
@@ -501,11 +489,11 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         }
     }
 
-    private fun setRoot(controller: Controller, id: Int) {
-        router.setRoot(controller.withFadeTransaction().tag(id.toString()))
-    }
-
-    private fun syncActivityViewWithController(to: Controller?, from: Controller? = null, isPush: Boolean = true) {
+    private fun syncActivityViewWithController(
+        to: Controller? = router.backstack.lastOrNull()?.controller,
+        from: Controller? = null,
+        isPush: Boolean = true,
+    ) {
         if (from is DialogController || to is DialogController) {
             return
         }

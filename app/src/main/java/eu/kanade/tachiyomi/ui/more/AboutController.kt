@@ -5,6 +5,7 @@ import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
 import eu.kanade.tachiyomi.data.updater.AppUpdateResult
+import eu.kanade.tachiyomi.data.updater.RELEASE_URL
 import eu.kanade.tachiyomi.ui.base.controller.NoAppBarElevationController
 import eu.kanade.tachiyomi.ui.base.controller.openInBrowser
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
@@ -18,8 +19,9 @@ import eu.kanade.tachiyomi.util.preference.onClick
 import eu.kanade.tachiyomi.util.preference.preference
 import eu.kanade.tachiyomi.util.preference.titleRes
 import eu.kanade.tachiyomi.util.system.copyToClipboard
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toast
-import timber.log.Timber
+import logcat.LogPriority
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -39,10 +41,16 @@ class AboutController : SettingsController(), NoAppBarElevationController {
         preference {
             key = "pref_about_version"
             titleRes = R.string.version
-            summary = if (BuildConfig.DEBUG) {
-                "Preview r${BuildConfig.COMMIT_COUNT} (${BuildConfig.COMMIT_SHA}, ${getFormattedBuildTime()})"
-            } else {
-                "Stable ${BuildConfig.VERSION_NAME} (${getFormattedBuildTime()})"
+            summary = when {
+                BuildConfig.DEBUG -> {
+                    "Debug ${BuildConfig.COMMIT_SHA} (${getFormattedBuildTime()})"
+                }
+                BuildConfig.PREVIEW -> {
+                    "Preview r${BuildConfig.COMMIT_COUNT} (${BuildConfig.COMMIT_SHA}, ${getFormattedBuildTime()})"
+                }
+                else -> {
+                    "Stable ${BuildConfig.VERSION_NAME} (${getFormattedBuildTime()})"
+                }
             }
 
             onClick {
@@ -60,17 +68,14 @@ class AboutController : SettingsController(), NoAppBarElevationController {
                 onClick { checkVersion() }
             }
         }
-        preference {
-            key = "pref_about_whats_new"
-            titleRes = R.string.whats_new
+        if (!BuildConfig.DEBUG) {
+            preference {
+                key = "pref_about_whats_new"
+                titleRes = R.string.whats_new
 
-            onClick {
-                val url = if (BuildConfig.DEBUG) {
-                    "https://github.com/tachiyomiorg/tachiyomi-preview/releases/tag/r${BuildConfig.COMMIT_COUNT}"
-                } else {
-                    "https://github.com/tachiyomiorg/tachiyomi/releases/tag/v${BuildConfig.VERSION_NAME}"
+                onClick {
+                    openInBrowser(RELEASE_URL)
                 }
-                openInBrowser(url)
             }
         }
         preference {
@@ -98,11 +103,11 @@ class AboutController : SettingsController(), NoAppBarElevationController {
     private fun checkVersion() {
         if (activity == null) return
 
-        activity?.toast(R.string.update_check_look_for_updates)
+        activity!!.toast(R.string.update_check_look_for_updates)
 
         launchNow {
             try {
-                when (val result = updateChecker.checkForUpdate()) {
+                when (val result = updateChecker.checkForUpdate(activity!!)) {
                     is AppUpdateResult.NewUpdate -> {
                         NewUpdateDialogController(result).showDialog(router)
                     }
@@ -112,7 +117,7 @@ class AboutController : SettingsController(), NoAppBarElevationController {
                 }
             } catch (error: Exception) {
                 activity?.toast(error.message)
-                Timber.e(error)
+                logcat(LogPriority.ERROR, error)
             }
         }
     }

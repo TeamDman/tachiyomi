@@ -8,6 +8,8 @@ import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.util.lang.launchIO
 import timber.log.Timber
 import kotlin.math.max
+import eu.kanade.tachiyomi.util.system.logcat
+import logcat.LogPriority
 
 /**
  * Helper method for syncing a remote track with the local chapters, and back
@@ -49,7 +51,7 @@ fun syncChaptersWithTrackServiceTwoWay(db: DatabaseHelper, chapters: List<Chapte
             service.update(remoteTrack)
             db.insertTrack(remoteTrack).executeAsBlocking()
         } catch (e: Throwable) {
-            Timber.w(e)
+            logcat(LogPriority.WARN, e)
         }
     }
 }
