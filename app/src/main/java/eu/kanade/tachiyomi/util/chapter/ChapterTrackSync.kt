@@ -6,7 +6,6 @@ import eu.kanade.tachiyomi.data.database.models.Track
 import eu.kanade.tachiyomi.data.preference.PreferenceValues.MarkReadBehaviour
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.util.lang.launchIO
-import timber.log.Timber
 import kotlin.math.max
 import eu.kanade.tachiyomi.util.system.logcat
 import logcat.LogPriority
