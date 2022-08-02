@@ -866,7 +866,7 @@ class MangaPresenter(
                                         ?.map { it.chapter } ?: emptyList()
 
                                     syncChaptersWithTrackServiceTwoWay
-                                        .await(allChapters, domainTrack, it.service)
+                                        .await(allChapters, domainTrack, it.service, preferences.autoUpdateTrackersMarkReadBehaviour().get())
                                 }
                             }
                         }
@@ -906,13 +906,11 @@ class MangaPresenter(
                     item.toDomainTrack(idRequired = false)?.let { track ->
                         insertTrack.await(track)
 
-                        (service as? EnhancedTrackService)?.let { _ ->
-                            val chapters = successState.chapters
-                                .map { it.chapter }
+                        val chapters = successState.chapters
+                            .map { it.chapter }
 
-                            syncChaptersWithTrackServiceTwoWay
-                                .await(chapters, track, service)
-                        }
+                        syncChaptersWithTrackServiceTwoWay
+                            .await(chapters, track, service, preferences.autoUpdateTrackersMarkReadBehaviour().get())
                     }
                 } catch (e: Throwable) {
                     withUIContext { view?.applicationContext?.toast(e.message) }

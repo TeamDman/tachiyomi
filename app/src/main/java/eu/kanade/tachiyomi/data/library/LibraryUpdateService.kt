@@ -38,7 +38,6 @@ import eu.kanade.tachiyomi.data.preference.MANGA_HAS_UNREAD
 import eu.kanade.tachiyomi.data.preference.MANGA_NON_COMPLETED
 import eu.kanade.tachiyomi.data.preference.MANGA_NON_READ
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.track.EnhancedTrackService
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.source.SourceManager
@@ -537,21 +536,8 @@ class LibraryUpdateService(
                                 val updatedTrack = service.refresh(track.toDbTrack())
                                 insertTrack.await(updatedTrack.toDomainTrack()!!)
 
-                                if (service is EnhancedTrackService) {
-                                    val chapters = getChapterByMangaId.await(manga.id!!)
-                                    syncChaptersWithTrackServiceTwoWay.await(chapters, track, service)
-                                }
-                                /*
-                                val updatedTrack = service.refresh(track)
-                                db.insertTrack(updatedTrack).executeAsBlocking()
-                                syncChaptersWithTrackServiceTwoWay(
-                                    db,
-                                    db.getChapters(manga).executeAsBlocking(),
-                                    track,
-                                    service,
-                                    preferences.autoUpdateTrackersMarkReadBehaviour().get()
-                                )
-                                 */
+                                val chapters = getChapterByMangaId.await(manga.id!!)
+                                syncChaptersWithTrackServiceTwoWay.await(chapters, track, service, preferences.autoUpdateTrackersMarkReadBehaviour().get())
                             } catch (e: Throwable) {
                                 // Ignore errors and continue
                                 logcat(LogPriority.ERROR, e)

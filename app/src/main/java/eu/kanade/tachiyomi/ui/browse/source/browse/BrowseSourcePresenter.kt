@@ -322,17 +322,8 @@ open class BrowseSourcePresenter(
                             (service as TrackService).bind(track)
                             insertTrack.await(track.toDomainTrack()!!)
 
-                            /*
-                            syncChaptersWithTrackServiceTwoWay(
-                                db,
-                                db.getChapters(manga).executeAsBlocking(),
-                                track,
-                                service as TrackService,
-                                prefs.autoUpdateTrackersMarkReadBehaviour().get()
-                            )
-                             */
                             val chapters = getChapterByMangaId.await(manga.id!!)
-                            syncChaptersWithTrackServiceTwoWay.await(chapters, track.toDomainTrack()!!, service)
+                            syncChaptersWithTrackServiceTwoWay.await(chapters, track.toDomainTrack()!!, service, prefs.autoUpdateTrackersMarkReadBehaviour().get())
                         }
                     } catch (e: Exception) {
                         logcat(LogPriority.WARN, e) { "Could not match manga: ${manga.title} with service $service" }
