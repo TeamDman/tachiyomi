@@ -34,6 +34,7 @@
 
     <string-array name="webtoon_side_padding">
         <item>@string/webtoon_side_padding_0</item>
+        <item>@string/webtoon_side_padding_5</item>
         <item>@string/webtoon_side_padding_10</item>
         <item>@string/webtoon_side_padding_15</item>
         <item>@string/webtoon_side_padding_20</item>
@@ -42,6 +43,7 @@
 
     <string-array name="webtoon_side_padding_values">
         <item>0</item>
+        <item>5</item>
         <item>10</item>
         <item>15</item>
         <item>20</item>
@@ -53,13 +55,6 @@
         <item>@string/zoom_start_left</item>
         <item>@string/zoom_start_right</item>
         <item>@string/zoom_start_center</item>
-    </string-array>
-
-    <string-array name="zoom_start_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
     </string-array>
 
     <string-array name="rotation_type">
@@ -90,6 +85,7 @@
         <item>@string/kindlish_nav</item>
         <item>@string/edge_nav</item>
         <item>@string/right_and_left_nav</item>
+        <item>@string/disabled_nav</item>
     </string-array>
 
     <string-array name="webtoon_nav">
@@ -98,5 +94,6 @@
         <item>@string/kindlish_nav</item>
         <item>@string/edge_nav</item>
         <item>@string/right_and_left_nav</item>
+        <item>@string/disabled_nav</item>
     </string-array>
 </resources>

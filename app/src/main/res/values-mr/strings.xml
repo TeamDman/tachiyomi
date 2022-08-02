@@ -93,13 +93,11 @@
     <string name="action_mark_previous_as_read">मागील वाचलेले म्हणून चिन्हांकित करा</string>
     <string name="action_select_inverse">व्यस्त निवडा</string>
     <string name="action_global_search">जागतिक शोध</string>
-    <string name="action_sort_last_checked">शेवटून चेक केलेले</string>
     <string name="secure_screen_summary">अ‍ॅप्स स्विच करताना अॅप मधील सामग्री लपवा व स्क्रीनशॉट अवरोधित करा</string>
     <plurals name="num_categories">
         <item quantity="one">%d श्रेणी</item>
         <item quantity="other">%d श्रेण्या</item>
     </plurals>
-    <string name="pref_start_screen">प्रारंभाची पृष्ट</string>
     <string name="secure_screen">स्क्रीन सुरक्षित करा</string>
     <plurals name="lock_after_mins">
         <item quantity="one">1 मिनीटानंतर</item>
@@ -134,7 +132,6 @@
     <string name="pref_show_page_number">पृष्ठ क्रमांक दर्शवा</string>
     <string name="pref_double_tap_anim_speed">दोनदा टॅप साठी अ‍ॅनिमेशन गती</string>
     <string name="pref_page_transitions">पृष्ठ संक्रमण संजीवित करा</string>
-    <string name="pref_lock_orientation">अभिमुखता</string>
     <string name="pref_cutout_short">कटआउट क्षेत्रात सामग्री दर्शवा</string>
     <string name="obsolete_extension_message">हे एक्सटेन्शन उपलब्ध नाही.</string>
     <string name="untrusted_extension_message">हे एक्सटेन्शन एका अविश्वासू प्रमानपत्रासहित आले आहे म्हणून हे स्थापित होऊ शकले नाही. 
@@ -143,7 +140,6 @@
 \n 
 \nव अश्या एक्सटेन्शन वर विश्वास करून तुम्ही ह्या सगद्या जोखीम घेत आहेत.</string>
     <string name="untrusted_extension">अविश्वासू एक्सटेन्शन</string>
-    <string name="ext_available">उपलब्ध</string>
     <string name="ext_uninstall">विस्थापित करा</string>
     <string name="ext_untrusted">अविश्वासू</string>
     <string name="ext_trust">विश्वास</string>
@@ -162,7 +158,6 @@
     <string name="pref_update_only_non_completed">फक्त चालू असलेल्याच मांगा आधीतणीत करायचे</string>
     <string name="charging">चार्ज होत आहे</string>
     <string name="pref_library_update_restriction">लायब्ररी अद्ययावत प्रतिबंधी</string>
-    <string name="pref_library_update_prioritization">लायब्ररी अद्ययावत क्रम</string>
     <string name="double_tap_anim_speed_0">अनिमेशन नाही</string>
     <string name="zoom_start_center">सेंटर</string>
     <string name="zoom_start_right">उजवी बाजू</string>
@@ -187,7 +182,6 @@
     <string name="white_background">पांढरा</string>
     <string name="pref_reader_theme">बॅकग्राऊंड रंग</string>
     <string name="pref_read_with_long_tap">दीर्घ टॅप संवाद</string>
-    <string name="pref_read_with_tapping">टप करत राहतांना</string>
     <string name="pref_read_with_volume_keys_inverted">व्हॉल्यूम की उलटा करा</string>
     <string name="pref_read_with_volume_keys">व्हॉल्यूम की</string>
     <string name="pref_reader_navigation">नॅव्हिगेशन</string>
@@ -203,14 +197,11 @@
     <string name="pref_custom_color_filter">कस्टम रंग फिल्टर वापरा</string>
     <string name="pref_custom_brightness">कस्टम ब्राइटनेस वापरा</string>
     <string name="pref_fullscreen">फुलस्क्रीन</string>
-    <string name="ext_language_info">भाषा: %1$s</string>
-    <string name="ext_version_info">वर्जन: %1$s</string>
     <string name="update_weekly">साप्ताहिक</string>
     <string name="update_48hour">दर २ दिवसांत</string>
     <string name="update_24hour">दररोज</string>
     <string name="update_12hour">दर १२ तासाला</string>
     <string name="update_6hour">दर ६ तासाला</string>
-    <string name="update_3hour">दर ३ तासाला</string>
     <string name="update_never">स्वतः करा</string>
     <string name="pref_library_update_interval">लायब्ररी अद्यतन वारंवारता</string>
     <string name="pref_category_library_update">अद्यतने</string>

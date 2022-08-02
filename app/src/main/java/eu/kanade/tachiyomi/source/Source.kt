@@ -1,6 +1,8 @@
 package eu.kanade.tachiyomi.source
 
 import android.graphics.drawable.Drawable
+import eu.kanade.domain.source.model.SourceData
+import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.source.model.Page
 import eu.kanade.tachiyomi.source.model.SChapter
@@ -40,24 +42,34 @@ interface Source : tachiyomi.source.Source {
      *
      * @param manga the manga to update.
      */
-    @Deprecated("Use getMangaDetails instead")
-    fun fetchMangaDetails(manga: SManga): Observable<SManga>
+    @Deprecated(
+        "Use the 1.x API instead",
+        ReplaceWith("getMangaDetails"),
+    )
+    fun fetchMangaDetails(manga: SManga): Observable<SManga> = throw IllegalStateException("Not used")
 
     /**
      * Returns an observable with all the available chapters for a manga.
      *
      * @param manga the manga to update.
      */
-    @Deprecated("Use getChapterList instead")
-    fun fetchChapterList(manga: SManga): Observable<List<SChapter>>
+    @Deprecated(
+        "Use the 1.x API instead",
+        ReplaceWith("getChapterList"),
+    )
+    fun fetchChapterList(manga: SManga): Observable<List<SChapter>> = throw IllegalStateException("Not used")
 
+    // TODO: remove direct usages on this method
     /**
      * Returns an observable with the list of pages a chapter has.
      *
      * @param chapter the chapter.
      */
-    @Deprecated("Use getPageList instead")
-    fun fetchPageList(chapter: SChapter): Observable<List<Page>>
+    @Deprecated(
+        "Use the 1.x API instead",
+        ReplaceWith("getPageList"),
+    )
+    fun fetchPageList(chapter: SChapter): Observable<List<Page>> = Observable.empty()
 
     /**
      * [1.x API] Get the updated details for a manga.
@@ -92,3 +104,22 @@ interface Source : tachiyomi.source.Source {
 fun Source.icon(): Drawable? = Injekt.get<ExtensionManager>().getAppIconForSource(this)
 
 fun Source.getPreferenceKey(): String = "source_$id"
+
+fun Source.toSourceData(): SourceData = SourceData(id = id, lang = lang, name = name)
+
+fun Source.getNameForMangaInfo(): String {
+    val preferences = Injekt.get<PreferencesHelper>()
+    val enabledLanguages = preferences.enabledLanguages().get()
+        .filterNot { it in listOf("all", "other") }
+    val hasOneActiveLanguages = enabledLanguages.size == 1
+    val isInEnabledLanguages = lang in enabledLanguages
+    return when {
+        // For edge cases where user disables a source they got manga of in their library.
+        hasOneActiveLanguages && !isInEnabledLanguages -> toString()
+        // Hide the language tag when only one language is used.
+        hasOneActiveLanguages && isInEnabledLanguages -> name
+        else -> toString()
+    }
+}
+
+fun Source.isLocalOrStub(): Boolean = id == LocalSource.ID || this is SourceManager.StubSource

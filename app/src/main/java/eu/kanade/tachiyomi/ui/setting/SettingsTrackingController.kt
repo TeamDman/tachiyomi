@@ -53,23 +53,27 @@ class SettingsTrackingController :
             titleRes = R.string.services
 
             trackPreference(trackManager.myAnimeList) {
-                activity?.openInBrowser(MyAnimeListApi.authUrl(), trackManager.myAnimeList.getLogoColor())
+                activity?.openInBrowser(MyAnimeListApi.authUrl(), forceDefaultBrowser = true)
             }
             trackPreference(trackManager.aniList) {
-                activity?.openInBrowser(AnilistApi.authUrl(), trackManager.aniList.getLogoColor())
+                activity?.openInBrowser(AnilistApi.authUrl(), forceDefaultBrowser = true)
             }
             trackPreference(trackManager.kitsu) {
                 val dialog = TrackLoginDialog(trackManager.kitsu, R.string.email)
                 dialog.targetController = this@SettingsTrackingController
                 dialog.showDialog(router)
             }
+            trackPreference(trackManager.mangaUpdates) {
+                val dialog = TrackLoginDialog(trackManager.mangaUpdates, R.string.username)
+                dialog.targetController = this@SettingsTrackingController
+                dialog.showDialog(router)
+            }
             trackPreference(trackManager.shikimori) {
-                activity?.openInBrowser(ShikimoriApi.authUrl(), trackManager.shikimori.getLogoColor())
+                activity?.openInBrowser(ShikimoriApi.authUrl(), forceDefaultBrowser = true)
             }
             trackPreference(trackManager.bangumi) {
-                activity?.openInBrowser(BangumiApi.authUrl(), trackManager.bangumi.getLogoColor())
+                activity?.openInBrowser(BangumiApi.authUrl(), forceDefaultBrowser = true)
             }
-
             infoPreference(R.string.tracking_info)
         }
 
@@ -95,7 +99,7 @@ class SettingsTrackingController :
 
     private inline fun PreferenceGroup.trackPreference(
         service: TrackService,
-        crossinline login: () -> Unit
+        crossinline login: () -> Unit,
     ): TrackerPreference {
         return add(
             TrackerPreference(context).apply {
@@ -117,7 +121,7 @@ class SettingsTrackingController :
                         login()
                     }
                 }
-            }
+            },
         )
     }
 
@@ -142,7 +146,7 @@ class SettingsTrackingController :
         return super.onOptionsItemSelected(item)
     }
 
-    private fun updatePreference(id: Int) {
+    private fun updatePreference(id: Long) {
         val pref = findPreference(Keys.trackUsername(id)) as? TrackerPreference
         pref?.notifyChanged()
     }

@@ -4,10 +4,10 @@ import android.app.Dialog
 import android.os.Bundle
 import com.bluelinelabs.conductor.Controller
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import eu.kanade.domain.manga.model.Manga
+import eu.kanade.domain.manga.model.isLocal
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
-import eu.kanade.tachiyomi.util.isLocal
 
 class DeleteLibraryMangasDialog<T>(bundle: Bundle? = null) :
     DialogController(bundle) where T : Controller, T : DeleteLibraryMangasDialog.Listener {
@@ -32,7 +32,7 @@ class DeleteLibraryMangasDialog<T>(bundle: Bundle? = null) :
             .toTypedArray()
 
         val selected = items
-            .mapIndexed { i, _ -> i == 0 }
+            .map { false }
             .toBooleanArray()
         return MaterialAlertDialogBuilder(activity!!)
             .setTitle(R.string.action_remove)

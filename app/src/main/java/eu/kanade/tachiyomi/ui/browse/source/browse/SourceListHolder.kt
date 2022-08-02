@@ -2,12 +2,12 @@ package eu.kanade.tachiyomi.ui.browse.source.browse
 
 import android.view.View
 import androidx.core.view.isVisible
-import coil.clear
-import coil.loadAny
+import coil.dispose
+import coil.load
 import eu.davidea.flexibleadapter.FlexibleAdapter
+import eu.kanade.domain.manga.model.Manga
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.coil.MangaCoverFetcher
-import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.databinding.SourceListItemBinding
 import eu.kanade.tachiyomi.util.system.getResourceColor
 
@@ -50,9 +50,9 @@ class SourceListHolder(private val view: View, adapter: FlexibleAdapter<*>) :
     }
 
     override fun setImage(manga: Manga) {
-        binding.thumbnail.clear()
-        if (!manga.thumbnail_url.isNullOrEmpty()) {
-            binding.thumbnail.loadAny(manga) {
+        binding.thumbnail.dispose()
+        if (!manga.thumbnailUrl.isNullOrEmpty()) {
+            binding.thumbnail.load(manga) {
                 setParameter(MangaCoverFetcher.USE_CUSTOM_COVER, false)
             }
         }

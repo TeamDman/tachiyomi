@@ -4,17 +4,17 @@ import android.os.Bundle
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.ui.base.activity.BaseThemedActivity
+import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
+import eu.kanade.tachiyomi.ui.base.delegate.SecureActivityDelegate
 import eu.kanade.tachiyomi.util.system.AuthenticatorUtil
 import eu.kanade.tachiyomi.util.system.AuthenticatorUtil.startAuthentication
 import eu.kanade.tachiyomi.util.system.logcat
 import logcat.LogPriority
-import java.util.Date
 
 /**
  * Blank activity with a BiometricPrompt.
  */
-class UnlockActivity : BaseThemedActivity() {
+class UnlockActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +25,7 @@ class UnlockActivity : BaseThemedActivity() {
                 override fun onAuthenticationError(
                     activity: FragmentActivity?,
                     errorCode: Int,
-                    errString: CharSequence
+                    errString: CharSequence,
                 ) {
                     super.onAuthenticationError(activity, errorCode, errString)
                     logcat(LogPriority.ERROR) { errString.toString() }
@@ -34,14 +34,13 @@ class UnlockActivity : BaseThemedActivity() {
 
                 override fun onAuthenticationSucceeded(
                     activity: FragmentActivity?,
-                    result: BiometricPrompt.AuthenticationResult
+                    result: BiometricPrompt.AuthenticationResult,
                 ) {
                     super.onAuthenticationSucceeded(activity, result)
                     SecureActivityDelegate.locked = false
-                    preferences.lastAppUnlock().set(Date().time)
                     finish()
                 }
-            }
+            },
         )
     }
 }

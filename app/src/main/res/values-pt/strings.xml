@@ -52,30 +52,27 @@
     <string name="pref_category_about">Sobre</string>
     <!-- General section -->
     <string name="pref_library_columns">Itens por fila</string>
-    <string name="portrait">Retrato</string>
-    <string name="landscape">Paisagem</string>
-    <string name="pref_library_update_interval">Frequência de atualização</string>
-    <string name="update_never">Manual</string>
-    <string name="update_3hour">A cada 3 horas</string>
+    <string name="portrait">Vertical</string>
+    <string name="landscape">Horizontal</string>
+    <string name="pref_library_update_interval">Atualizações automáticas</string>
+    <string name="update_never">Desligado</string>
     <string name="update_6hour">A cada 6 horas</string>
     <string name="update_12hour">A cada 12 horas</string>
     <string name="update_24hour">Diariamente</string>
     <string name="update_48hour">A cada 2 dias</string>
     <string name="all">Tudo</string>
-    <string name="pref_library_update_restriction">Restrições sobre a atualização</string>
+    <string name="pref_library_update_restriction">Restrições do aparelho para atualizações automáticas</string>
     <string name="charging">A carregar</string>
-    <string name="pref_update_only_non_completed">Atualizar apenas mangás a decorrer</string>
-    <string name="pref_auto_update_manga_sync">Atualizar progresso do capítulo após leitura</string>
+    <string name="pref_update_only_non_completed">Com estado \'\'Terminado\'\'</string>
+    <string name="pref_auto_update_manga_sync">Atualizar progresso após a leitura</string>
     <!-- Reader section -->
     <string name="pref_fullscreen">Ecrã inteiro</string>
-    <string name="pref_lock_orientation">Bloquear orientação</string>
     <string name="pref_page_transitions">Animar transições de página</string>
     <string name="pref_show_page_number">Mostrar número de página</string>
     <string name="pref_custom_brightness">Brilho personalizado</string>
     <string name="pref_keep_screen_on">Manter o ecrã ligado</string>
     <string name="pref_reader_navigation">Navegação</string>
     <string name="pref_read_with_volume_keys">Teclas de volume</string>
-    <string name="pref_read_with_tapping">Toque</string>
     <string name="pref_reader_theme">Cor de fundo</string>
     <string name="white_background">Branco</string>
     <string name="black_background">Preto</string>
@@ -102,15 +99,15 @@
     <string name="rotation_force_landscape">Horizontal bloqueado</string>
     <!-- Downloads section -->
     <string name="pref_download_directory">Localização das Transferências</string>
-    <string name="pref_remove_after_marked_as_read">Depois de marcado como lido</string>
-    <string name="pref_remove_after_read">Automaticamente depois de lido</string>
+    <string name="pref_remove_after_marked_as_read">Após marcado como lido manualmente</string>
+    <string name="pref_remove_after_read">Eliminar automaticamente após a leitura</string>
     <string name="custom_dir">Localização personalizada</string>
     <string name="disabled">Desativado</string>
     <string name="last_read_chapter">Último capítulo</string>
-    <string name="second_to_last">Penúltimo capítulo</string>
-    <string name="third_to_last">Terceiro capítulo antes do último</string>
-    <string name="fourth_to_last">Quarto capítulo antes do último</string>
-    <string name="fifth_to_last">Quinto capítulo antes do último</string>
+    <string name="second_to_last">Penúltimo capítulo lido</string>
+    <string name="third_to_last">Antepenúltimo capítulo lido</string>
+    <string name="fourth_to_last">Quarto capítulo lido antes do último</string>
+    <string name="fifth_to_last">Quinto capítulo lido antes do último</string>
     <!-- Sync section -->
     <string name="services">Serviços</string>
     <!-- Advanced section -->
@@ -121,7 +118,7 @@
     <string name="pref_clear_cookies">Limpar cookies</string>
     <string name="cookies_cleared">Cookies limpos</string>
     <string name="pref_clear_database">Limpar base de dados</string>
-    <string name="pref_clear_database_summary">Eliminar o histórico de mangás e capítulos não presentes na biblioteca</string>
+    <string name="pref_clear_database_summary">Eliminar o histórico de mangás e capítulos não guardados na biblioteca</string>
     <string name="clear_database_confirmation">Tem certeza\? O progresso de capítulos e mangás fora da biblioteca será perdido</string>
     <string name="clear_database_completed">Eliminar entradas</string>
     <!-- About section -->
@@ -133,7 +130,6 @@
     <string name="login_title">Iniciar sessão em %1$s</string>
     <string name="username">Nome de utilizador</string>
     <string name="password">Palavra-passe</string>
-    <string name="show_password">Mostrar palavra-passe</string>
     <string name="login">Iniciar sessão</string>
     <string name="login_success">Sessão iniciada</string>
     <string name="invalid_login">Não foi possível iniciar sessão</string>
@@ -193,21 +189,19 @@
     <string name="file_select_backup">Selecionar ficheiro de cópia de segurança</string>
     <!--UpdateCheck-->
     <string name="update_check_confirm">Transferir</string>
-    <string name="update_check_ignore">Ignorar</string>
     <string name="update_check_no_new_updates">Sem atualizações disponíveis</string>
     <string name="update_check_look_for_updates">À procura de atualizações…</string>
     <!--UpdateCheck Notifications-->
     <string name="update_check_notification_download_in_progress">A transferir…</string>
-    <string name="update_check_notification_download_complete">Transferência completa</string>
+    <string name="update_check_notification_download_complete">Toque para instalar</string>
     <string name="update_check_notification_download_error">Erro na transferência</string>
     <string name="update_check_notification_update_available">Nova versão disponível!</string>
     <!--Content Description-->
-    <string name="description_cover">Imagem de capa da mangá</string>
     <!-- Information Text -->
     <string name="information_no_downloads">Sem transferências</string>
     <string name="information_no_recent">Sem atualizações recentes</string>
     <string name="information_no_recent_manga">Nada lido recentemente</string>
-    <string name="information_empty_library">A sua biblioteca está vazia. Adicione séries em Navegar.</string>
+    <string name="information_empty_library">A sua biblioteca está vazia</string>
     <!-- Download Notification -->
     <string name="download_notifier_title_error">Erro</string>
     <string name="download_notifier_unknown_error">Não foi possível transferir o capítulo devido a um erro inesperado</string>
@@ -234,7 +228,6 @@
     <string name="action_undo">Anular</string>
     <string name="action_create">Criar</string>
     <string name="update_weekly">Semanalmente</string>
-    <string name="pref_start_screen">Ecrã inicial</string>
     <string name="action_restore">Restaurar</string>
     <string name="app_not_available">App não disponível</string>
     <string name="default_category">Categoria padrão</string>
@@ -246,15 +239,12 @@
     <string name="ext_installing">A instalar</string>
     <string name="ext_installed">Instalado</string>
     <string name="ext_uninstall">Desinstalar</string>
-    <string name="ext_available">Disponível</string>
     <string name="untrusted_extension">Extensão não confiável</string>
     <string name="untrusted_extension_message">Esta extensão possui um certificado não confiável e não foi ativada.
 \n
 \nUma extensão maliciosa podia ler qualquer credencial de entrada armazenada no Tachiyomi ou executar código arbitrário.
 \n
 \nAo confiar neste certificado serão aceites estes riscos.</string>
-    <string name="ext_version_info">Versão: %1$s</string>
-    <string name="ext_language_info">Língua: %1$s</string>
     <string name="pref_crop_borders">Cortar bordas</string>
     <string name="pref_custom_color_filter">Filtro de cor personalizado</string>
     <string name="pref_read_with_volume_keys_inverted">Inverter teclas de volume</string>
@@ -286,17 +276,14 @@
     <string name="restore_completed">Restauro completo</string>
     <string name="backup_choice">O que pretende fazer cópia de segurança\?</string>
     <string name="pref_backup_slots">Máximo de cópias de segurança</string>
-    <string name="action_display_download_badge">Distintivos de transferência</string>
+    <string name="action_display_download_badge">Capítulos transferidos</string>
     <string name="ext_trust">Confiar</string>
     <string name="ext_untrusted">Não confiável</string>
     <string name="download_custom">Personalizado</string>
     <string name="pref_read_with_long_tap">Mostrar com toque longo</string>
     <string name="action_open_in_web_view">Abrir em WebView</string>
     <string name="pref_true_color">Cores 32-bit</string>
-    <string name="pref_skip_read_chapters">Saltar capítulos marcados como lido</string>
-    <string name="backup_restore_content">A restauração usa as fontes para obter dados, cobranças adicionais podem ser efetuadas pelo operador.
-\n
-\nVerifique se instalou todas as extensões necessárias e tem sessão iniciada nas fontes e serviços de monitorização antes de restaurar.</string>
+    <string name="pref_skip_read_chapters">Ignorar capítulos marcados como lido</string>
     <string name="pref_refresh_library_tracking">Atualizar monitorização</string>
     <string name="pref_refresh_library_tracking_summary">Atualiza estado, avaliações e últimos capítulos lidos dos serviços de monitorização</string>
     <string name="local_source_badge">Local</string>
@@ -318,7 +305,7 @@
     <string name="custom_download">Transferir quantidade personalizada</string>
     <string name="manga_tracking_tab">Monitorização</string>
     <string name="repeating">Relendo</string>
-    <string name="track_status">Situação</string>
+    <string name="track_status">Estado</string>
     <string name="track_start_date">Começado</string>
     <string name="track_type">Tipo</string>
     <string name="track_author">Autor</string>
@@ -341,8 +328,8 @@
     <string name="migration_dialog_what_to_include">Selecione dados para incluir</string>
     <string name="migrate">Migrar</string>
     <string name="copy">Copiar</string>
-    <string name="notification_cover_update_failed">Erro ao atualizar a capa</string>
-    <string name="information_empty_category">Não tem nenhuma categoria. Pressione o botão (+) para criar uma e organizar a sua biblioteca.</string>
+    <string name="notification_cover_update_failed">Falha ao atualizar a capa</string>
+    <string name="information_empty_category">Não tem nenhuma categoria. Toque no botão (+) para criar uma e organizar a sua biblioteca.</string>
     <string name="download_notifier_downloader_title">Gestor de transferências</string>
     <string name="download_notifier_no_network">Conexão à rede indisponível</string>
     <string name="download_notifier_download_paused">Transferência pausada</string>
@@ -354,7 +341,6 @@
     <string name="pref_color_filter_mode">Modo de mistura do filtro de cores</string>
     <string name="filter_mode_lighten">Sub-exposição / Clarear</string>
     <string name="label_help">Ajuda</string>
-    <string name="pref_library_update_prioritization">Ordem de atualização</string>
     <string name="no_results_found">Nenhum resultado encontrado</string>
     <string name="migration_selection_prompt">Selecione uma fonte da qual migrar</string>
     <string name="action_webview_back">Voltar</string>
@@ -369,9 +355,7 @@
     <string name="logout_title">Terminar sessão em %1$s\?</string>
     <string name="logout">Terminar sessão</string>
     <string name="logout_success">Sua sessão está agora encerrada</string>
-    <string name="currently_reading">Lendo atualmente</string>
     <string name="paused">Pausado</string>
-    <string name="want_to_read">Quero ler</string>
     <string name="label_more">Mais</string>
     <string name="action_sort_latest_chapter">Último capítulo</string>
     <string name="action_view_chapters">Ver capítulos</string>
@@ -383,11 +367,11 @@
     <string name="pref_manage_notifications">Gerir notificações</string>
     <string name="pref_category_security">Segurança</string>
     <string name="lock_with_biometrics">Requerer desbloqueio</string>
-    <string name="lock_when_idle">Bloquear automaticamente</string>
+    <string name="lock_when_idle">Bloquear quando inativo</string>
     <string name="lock_always">Sempre</string>
     <string name="lock_never">Nunca</string>
     <plurals name="lock_after_mins">
-        <item quantity="one">Após 1 minuto</item>
+        <item quantity="one">Após %1$s minuto</item>
         <item quantity="other">Após %1$s minutos</item>
     </plurals>
     <string name="secure_screen">Ecrã seguro</string>
@@ -397,7 +381,7 @@
     <string name="information_webview_outdated">Por favor, atualize a app de WebView para melhor compatibilidade</string>
     <string name="channel_new_chapters">Atualizações de capítulos</string>
     <string name="unlock_app">Desbloquear o Tachiyomi</string>
-    <string name="secure_screen_summary">Esconder os conteúdos da app durante a troca de apps e impedir capturas de ecrã</string>
+    <string name="secure_screen_summary">Ecrã seguro esconde os conteúdos da app durante a troca de apps e impedir capturas de ecrã</string>
     <string name="pref_category_display">Visualização</string>
     <string name="notification_chapters_single_and_more">Capítulo %1$s e %2$d mais</string>
     <string name="notification_chapters_multiple">Capítulos %1$s</string>
@@ -413,7 +397,7 @@
     <string name="email">Endereço de e-mail</string>
     <string name="pref_always_show_chapter_transition">Mostrar sempre transição entre capítulos</string>
     <plurals name="notification_new_chapters_summary">
-        <item quantity="one">Para 1 título</item>
+        <item quantity="one">Para %d título</item>
         <item quantity="other">Para %d títulos</item>
     </plurals>
     <string name="action_menu">Menu</string>
@@ -423,7 +407,7 @@
     <string name="action_move_to_top">Mover para o topo</string>
     <string name="action_move_to_bottom">Mover para o final</string>
     <plurals name="notification_chapters_generic">
-        <item quantity="one">1 novo capítulo</item>
+        <item quantity="one">%1$d novo capítulo</item>
         <item quantity="other">%1$d novos capítulos</item>
     </plurals>
     <string name="notification_chapters_single">Capítulo %1$s</string>
@@ -443,12 +427,11 @@
     <string name="pref_webtoon_side_padding">Preenchimento lateral</string>
     <string name="pref_category_reading">Lendo</string>
     <string name="vertical_plus_viewer">Vertical contínuo</string>
-    <string name="pref_skip_filtered_chapters">Saltar capítulos filtrados</string>
+    <string name="pref_skip_filtered_chapters">Ignorar capítulos filtrados</string>
     <string name="pref_enable_automatic_extension_updates">Verificar atualizações de extensão</string>
     <string name="action_unpin">Desafixar</string>
     <string name="action_pin">Fixar</string>
     <string name="action_select_inverse">Seleção inversa</string>
-    <string name="action_sort_last_checked">Última verificação</string>
     <string name="label_sources">Fontes</string>
     <string name="website">Sítio Web</string>
     <string name="restoring_backup_canceled">Restauro cancelado</string>
@@ -475,42 +458,36 @@
     <string name="restore_duration">%02d min, %02d seg</string>
     <string name="pref_search_pinned_sources_only">Apenas incluir fontes fixadas</string>
     <plurals name="download_queue_summary">
-        <item quantity="one">1 restante</item>
+        <item quantity="one">%1$s restante</item>
         <item quantity="other">%1$s restantes</item>
     </plurals>
     <string name="gray_background">Cinzento</string>
     <string name="viewer">Modo de leitura</string>
     <string name="pref_category_for_this_series">Para esta série</string>
-    <string name="pref_true_color_summary">Reduz bandas de cor, mas impacta a performance</string>
+    <string name="pref_true_color_summary">Reduz bandas de cor, mas pode impactar a performance</string>
     <plurals name="num_categories">
         <item quantity="one">%d categoria</item>
         <item quantity="other">%d categorias</item>
     </plurals>
-    <string name="action_display_unread_badge">Distintivos de não lido</string>
+    <string name="action_display_unread_badge">Capítulos não lidos</string>
     <string name="battery_optimization_setting_activity_not_found">Não foi possível abrir as definições do aparelho</string>
     <plurals name="restore_completed_message">
         <item quantity="one">Concluído em %1$s com %2$s erro</item>
         <item quantity="other">Concluído em %1$s com %2$s erros</item>
     </plurals>
-    <string name="pref_refresh_library_covers">Atualizar capas das mangás da biblioteca</string>
+    <string name="pref_refresh_library_covers">Atualizar capas da biblioteca</string>
     <string name="tracking_info">Sincronização unidirecional para atualizar o progresso dos capítulos nos serviços de monitorização. Defina a monitorização para entradas individuais das mangás no seu botão de monitorização.</string>
     <string name="unofficial_extension_message">Esta extensão não vem da lista oficial de extensões do Tachiyomi.</string>
     <string name="pref_show_reading_mode_summary">Mostra brevemente o modo atual quando o leitor é aberto</string>
     <string name="page_list_empty_error">Nenhuma página encontrada</string>
-    <plurals name="notification_update_error">
-        <item quantity="one">1 atualização falhou</item>
-        <item quantity="other">%1$d atualizações falharam</item>
-    </plurals>
     <string name="sort_by_upload_date">Por data de envio</string>
     <string name="tabs_header">Abas</string>
     <string name="badges_header">Distintivos</string>
     <string name="label_data">Dados</string>
     <string name="backup_restore_missing_sources">Fontes em falta:</string>
     <string name="invalid_backup_file_missing_manga">Cópia de segurança não contém qualquer mangá.</string>
-    <string name="invalid_backup_file_missing_data">Faltam dados no ficheiro.</string>
     <string name="invalid_backup_file">Ficheiro de cópia de segurança invalido</string>
     <string name="tracker_not_logged_in">Sessão não iniciada: %1$s</string>
-    <string name="source_not_found_name">Fonte não encontrada: %1$s</string>
     <string name="pref_show_reading_mode">Mostrar modo de leitura</string>
     <string name="ext_unofficial">Não oficial</string>
     <string name="pref_library_update_refresh_metadata_summary">Procurar nova capa e detalhes quando a biblioteca atualizar</string>
@@ -521,16 +498,15 @@
     <string name="action_disable_all">Desativar todas</string>
     <string name="action_enable_all">Ativar todas</string>
     <string name="action_start">Iniciar</string>
-    <string name="pref_jump_to_chapters">Saltar para capítulos ao abrir</string>
     <string name="action_disable">Desativar</string>
     <string name="tapping_inverted_both">Ambos</string>
     <string name="tapping_inverted_vertical">Vertical</string>
     <string name="tapping_inverted_horizontal">Horizontal</string>
     <string name="tapping_inverted_none">Nenhum</string>
-    <string name="pref_read_with_tapping_inverted">Inverter toque</string>
+    <string name="pref_read_with_tapping_inverted">Inverter zonas toque</string>
     <string name="loader_not_implemented_error">Fonte não encontrada</string>
     <plurals name="manga_num_chapters">
-        <item quantity="one">1 capítulo</item>
+        <item quantity="one">%1$s capítulo</item>
         <item quantity="other">%1$s capítulos</item>
     </plurals>
     <string name="unknown_status">Estado desconhecido</string>
@@ -546,7 +522,7 @@
     <string name="pref_category_theme">Tema</string>
     <string name="action_sort_date_added">Data de adição</string>
     <plurals name="num_trackers">
-        <item quantity="one">1 monitorizador</item>
+        <item quantity="one">%d monitorizador</item>
         <item quantity="other">%d monitorizadores</item>
     </plurals>
     <string name="no_pinned_sources">Você não possui fontes fixadas</string>
@@ -559,10 +535,10 @@
     <string name="pref_category_delete_chapters">Eliminar capítulos</string>
     <string name="ext_nsfw_warning">Pode conter conteúdo NSFW (18+)</string>
     <string name="ext_nsfw_short">18+</string>
-    <string name="parental_controls_info">Isso não impede extensões não-oficiais ou incorretamente marcadas de mostrarem counteúdo NSFW (18+) dentro do aplicativo.</string>
+    <string name="parental_controls_info">Isto não impede extensões não oficiais ou incorretamente marcadas de mostrarem conteúdo NSFW (18+) dentro da app.</string>
     <plurals name="missing_chapters_warning">
-        <item quantity="one">Existe 1 capítulo faltando</item>
-        <item quantity="other">Existem %d capítulos faltando</item>
+        <item quantity="one">Ignorando %d capítulo, ou está em falta na fonte ou foi filtrado</item>
+        <item quantity="other">Ignorando %d capítulos, ou está em falta na fonte ou foi filtrado</item>
     </plurals>
     <string name="no_chapters_error">Nenhum capítulo encontrado</string>
     <string name="chapter_settings_updated">Definições padrão de capítulo atualizadas</string>
@@ -574,7 +550,6 @@
     <string name="action_search_settings">Definições de pesquisa</string>
     <string name="downloaded_chapters">Capítulos descarregados</string>
     <string name="manga_from_library">Mangas da biblioteca</string>
-    <string name="pref_hide_bottom_bar_on_scroll">Esconder a barra inferior ao rodar</string>
     <string name="pref_incognito_mode_summary">Pausa histórico de leitura</string>
     <string name="pref_incognito_mode">Modo incógnito</string>
     <string name="pref_clear_history">Eliminar histórico</string>
@@ -584,12 +559,10 @@
     <string name="spen_next_page">Página seguinte</string>
     <string name="spen_previous_page">Página anterior</string>
     <string name="migration_help_guide">Guia de migração de fonte</string>
-    <string name="invalid_backup_file_type">Tipo de ficheiro da cópia de segurança inválido: %1$s
-\nDeve terminar com .proto.gz ou .json.</string>
     <string name="file_picker_error">Não foi encontrada app de selecção de ficheiros</string>
     <string name="myanimelist_relogin">Por favor inicie sessão no MAL novamente</string>
     <string name="pref_show_nsfw_source">Mostrar na lista de fontes e extensões</string>
-    <string name="pref_viewer_nav">Esquema de navegação</string>
+    <string name="pref_viewer_nav">Zonas de toque</string>
     <string name="kindlish_nav">Estilo Kindle</string>
     <string name="l_nav">Em forma de L</string>
     <string name="action_desc">Descendente</string>
@@ -611,17 +584,15 @@
     <string name="pref_dual_page_invert">Inverter posicionamento de divisão de página dupla</string>
     <string name="backup_restore_content_full">Os dados da cópia de segurança serão restaurados.
 \n
-\nPrecisas instalar as extensões em falta e iniciar sessão nos serviços de monitorização para usá-los depois.</string>
+\nPrecisa instalar as extensões em falta e depois iniciar sessão nos serviços de monitorização para usá-los.</string>
     <string name="nav_zone_right">Direita</string>
     <string name="nav_zone_left">Esquerda</string>
     <string name="nav_zone_next">Seguinte</string>
     <string name="nav_zone_prev">Anterior</string>
-    <string name="pref_show_navigation_mode_summary">Mostrar zonas de toque quando o leitor é aberto</string>
-    <string name="pref_show_navigation_mode">Mostrar sobreposição da disposição de navegação</string>
-    <string name="update_8hour">A cada 8 horas</string>
-    <string name="update_4hour">A cada 4 horas</string>
+    <string name="pref_show_navigation_mode_summary">Brevemente mostrar quando o leitor é aberto</string>
+    <string name="pref_show_navigation_mode">Mostrar sobreposição das zonas de toque</string>
     <string name="none">Nenhum</string>
-    <string name="pref_dns_over_https">DNS por HTTPS</string>
+    <string name="pref_dns_over_https">DNS por HTTPS (DoH)</string>
     <string name="pref_category_auto_download">Transferir automaticamente</string>
     <string name="update_check_eol">Esta versão do Android não é mais suportada</string>
     <string name="clipboard_copy_error">Falha ao copiar para a área de transferência</string>
@@ -629,8 +600,8 @@
     <string name="exclude">Excluir: %s</string>
     <string name="include">Incluir: %s</string>
     <string name="pref_library_update_categories_details">Mangá em categorias excluídas não será atualizada mesmo que também estejam nas categorias incluídas.</string>
-    <string name="action_show_errors">Mostrar erros</string>
-    <string name="action_sort_chapter_fetch_date">Data de procura</string>
+    <string name="action_show_errors">Toque para ver detalhes</string>
+    <string name="action_sort_chapter_fetch_date">Data de procura do capítulo</string>
     <string name="rotation_landscape">Horizontal</string>
     <string name="rotation_portrait">Vertical</string>
     <string name="rotation_type">Tipo de rotação</string>
@@ -650,11 +621,9 @@
     <string name="theme_strawberrydaiquiri">Daiquiri de Morango</string>
     <string name="theme_midnightdusk">Crepúsculo da Meia-Noite</string>
     <string name="theme_greenapple">Maçã Verde</string>
-    <string name="theme_blue">Azul Antigo</string>
     <string name="pref_app_theme">Tema da aplicação</string>
     <string name="action_start_downloading_now">Começar a transferir agora</string>
     <string name="cancel_all_for_series">Cancelar tudo para esta série</string>
-    <string name="action_sort_next_updated">Próxima atualização esperada</string>
     <string name="unread">Não Lido</string>
     <string name="error_sharing_cover">Erro ao partilhar capa</string>
     <string name="error_saving_cover">Erro ao guardar capa</string>
@@ -662,26 +631,26 @@
     <string name="manga_cover">Capa</string>
     <string name="notification_incognito_text">Desativar o modo incógnito</string>
     <string name="about_dont_kill_my_app">Alguns fabricantes têm restrições adicionais de aplicação que desligam os serviços em segundo plano. Este sítio web tem mais informações sobre como corrigi-lo.</string>
-    <string name="restore_miui_warning">A otimização MIUI deve estar ligada para que a restauração funcione corretamente.</string>
+    <string name="restore_miui_warning">Restauros de cópias de segurança podem não funcionar corretamente se a otimização MIUI estiver desativada.</string>
     <string name="tracking_guide">Guia de monitorização</string>
     <string name="categorized_display_settings">Configurações por categoria para ordenação e exibição</string>
     <string name="restrictions">Restrições: %s</string>
     <string name="alignment_bottom">Fundo</string>
     <string name="alignment_center">Centro</string>
     <string name="alignment_top">Topo</string>
-    <string name="pref_side_nav_icon_alignment">Alinhamento de ícones de navegação lateral</string>
+    <string name="pref_side_nav_icon_alignment">Alinhamento dos ícones de navegação lateral</string>
     <string name="pref_dark_theme_pure_black">Modo escuro preto puro</string>
     <string name="theme_yotsuba">Yotsuba</string>
-    <string name="action_display_local_badge">Distintivos locais</string>
+    <string name="action_display_local_badge">Mangás locais</string>
     <string name="information_empty_category_dialog">Ainda não tens nenhuma categoria.</string>
     <string name="notification_updating">Atualizando biblioteca… (%1$d/%2$d)</string>
     <string name="error_no_match">Nenhuma correspondência encontrada</string>
     <string name="source_unsupported">Fonte não é suportada</string>
-    <string name="enhanced_tracking_info">Serviços que oferecem funcionalidades melhoradas para fontes específicas.</string>
+    <string name="enhanced_tracking_info">Serviços que oferecem características melhoradas para fontes específicas. Mangás são automaticamente monitorizados quando adicionados à sua biblioteca.</string>
     <string name="enhanced_services">Serviços melhorados</string>
     <string name="pref_library_update_refresh_trackers">Atualizar monitorizadores automaticamente</string>
     <string name="pref_library_update_refresh_trackers_summary">Atualizar monitorizadores ao atualizar biblioteca</string>
-    <string name="getting_started_guide">Iniciar o guia de introdução</string>
+    <string name="getting_started_guide">Guia de introdução</string>
     <string name="theme_tealturquoise">Azul-petróleo e Turquesa</string>
     <string name="pref_relative_time_long">Longo (Curto+, n dias atrás)</string>
     <string name="pref_relative_time_short">Curto (Hoje, Ontem)</string>
@@ -693,4 +662,98 @@
     <string name="relative_time_today">Hoje</string>
     <string name="pref_category_navigation">Navegação</string>
     <string name="theme_monet">Dinâmico</string>
+    <string name="label_warning">Aviso</string>
+    <string name="confirm_lock_change">Autentifique-se para confirmar a mudança</string>
+    <string name="label_default">Padrão</string>
+    <string name="pref_library_update_show_tab_badge">Mostrar número de capítulos não lidos no ícone de Atualizações</string>
+    <string name="action_sort_count">Total de mangás</string>
+    <string name="action_display_language_badge">Idioma</string>
+    <string name="pref_category_appearance">Aparência</string>
+    <string name="connected_to_wifi">Só com Wi-Fi</string>
+    <string name="update_72hour">A cada 3 dias</string>
+    <string name="ext_update_all">Atualizar tudo</string>
+    <string name="ext_app_info">Informações da app</string>
+    <string name="ext_installer_shizuku_unavailable_dialog">Instale e inicie o Shizuku para utilizá-lo como o instalador de extensões.</string>
+    <string name="pref_verbose_logging_summary">Imprimir registos detalhados no registo de eventos do sistema (reduz o desempenho da app)</string>
+    <string name="action_track">Monitorizar</string>
+    <string name="save_chapter_as_cbz">Guardar como ficheiro CBZ</string>
+    <string name="clear_database_source_item_count">%1$d mangás que não estão na biblioteca na base de dados</string>
+    <string name="database_clean">Base de dados limpa</string>
+    <string name="download_queue_size_warning">Aviso: grandes downloads em massa podem levar as fontes a ficarem lentas e/ou começarem a bloquear o Tachiyomi. Toque para saber mais.</string>
+    <string name="notification_size_warning">Grandes atualizações prejudicam as fontes e podem levar a atualizações lentas e ainda ao aumento do uso da bateria. Toque para saber mais.</string>
+    <string name="library_errors_help">Para obter ajuda sobre como corrigir erros de atualização da biblioteca, veja %1$s</string>
+    <string name="pref_auto_clear_chapter_cache">Limpar a cache de capítulos ao fechar a app</string>
+    <string name="tracker_komga_warning">Este serviço de monitorização só é compatível com a fonte Komga.</string>
+    <string name="pref_update_only_completely_read">Com capítulo(s) não lidos</string>
+    <string name="pref_hide_threshold">Sensibilidade para ocultar menu ao deslocar</string>
+    <string name="pref_high">Alta</string>
+    <string name="pref_low">Baixa</string>
+    <string name="pref_lowest">Mais baixa</string>
+    <string name="pref_remove_exclude_categories">Categorias excluídas</string>
+    <string name="label_background_activity">Atividade em segundo plano</string>
+    <string name="channel_app_updates">Atualizações da app</string>
+    <string name="pref_library_update_manga_restriction">Ignorar títulos em atualização</string>
+    <string name="pref_inverted_colors">Invertido</string>
+    <string name="backup_info">Cópias de segurança automáticas são altamente recomendadas. Também deve guardar cópias em outros locais.</string>
+    <string name="pref_tablet_ui_mode">Interface de tablet</string>
+    <string name="pref_verbose_logging">Registo de eventos detalhado</string>
+    <string name="privacy_policy">Política de privacidade</string>
+    <string name="extension_api_error">Falha ao obter a lista de extensões</string>
+    <string name="ext_install_service_notif">Instalando a extensão…</string>
+    <string name="ext_installer_pref">Instalador</string>
+    <string name="ext_installer_legacy">Legado</string>
+    <string name="ext_installer_shizuku_stopped">O Shizuku não está em execução</string>
+    <string name="pref_category_timestamps">Data e hora</string>
+    <string name="pref_relative_format">Data e hora relativas</string>
+    <string name="help_translate">Ajude a traduzir</string>
+    <string name="pref_highest">Mais alta</string>
+    <string name="on_hiatus">Em hiato</string>
+    <string name="publishing_finished">Publicação concluída</string>
+    <string name="cancelled">Cancelado</string>
+    <string name="action_faq_and_guides">Perguntas frequentes e Guias</string>
+    <string name="action_show_manga">Mostrar mangá</string>
+    <string name="action_filter_started">Iniciado</string>
+    <string name="disabled_nav">Desativado</string>
+    <string name="action_display_cover_only_grid">Grelha apenas de capas</string>
+    <string name="action_close">Fechar</string>
+    <string name="battery_not_low">Bateria não fraca</string>
+    <string name="action_move_to_top_all_for_series">Mover séries para o topo</string>
+    <string name="skipped_reason_completed">Ignorado porque a séria está completa</string>
+    <string name="skipped_reason_not_started">Ignorado porque nenhum capítulo foi lido</string>
+    <string name="channel_skipped">Ignorado</string>
+    <string name="skipped_reason_not_caught_up">Ignorado porque existem capítulos não lidos</string>
+    <string name="confirm_manga_add_duplicate">Tem uma entrada na sua biblioteca com o mesmo nome mas de uma fonte diferente (%1$s)
+\n
+\nAinda deseja continuar\?</string>
+    <string name="empty_backup_error">Sem entradas na biblioteca para fazer cópia de segurança</string>
+    <string name="pref_update_only_started">Que não começaram a ser lidos</string>
+    <string name="backup_restore_invalid_uri">Erro: URI vazio</string>
+    <string name="pref_clear_webview_data">Limpar dados do WebView</string>
+    <string name="webview_data_deleted">Dados do WebView limpos</string>
+    <string name="rotation_reverse_portrait">Vertical invertido</string>
+    <string name="source_filter_empty_screen">Nenhuma fonte instalada encontrada</string>
+    <string name="notification_update_skipped">%1$d atualização(ões) ignorada(s)</string>
+    <string name="notification_update_error">%1$d actualização(ões) falhada(s)</string>
+    <string name="learn_more">Toque para saber mais</string>
+    <string name="update_check_fdroid_migration_info">Uma nova versão está disponível a partir dos lançamentos oficiais. Toque para saber como migrar de versões não oficiais do F-Droid.</string>
+    <string name="pref_navigate_pan">Navegue para mover</string>
+    <string name="pref_landscape_zoom">Ampliar imagem horizontal</string>
+    <string name="webtoon_side_padding_5">5%</string>
+    <string name="update_check_open">Abrir no GitHub</string>
+    <string name="error_saving_picture">Erro ao guardar a imagem</string>
+    <string name="pref_duplicate_pinned_sources">Mostrar fontes fixadas duplicadas</string>
+    <string name="pref_duplicate_pinned_sources_summary">Repita as fontes fixadas nos seus respetivos grupos de idiomas</string>
+    <string name="action_sort_last_manga_update">Última mangá atualizada</string>
+    <string name="action_sort_unread_count">Contagem de não lidos</string>
+    <string name="split_tall_images">Dividir automaticamente imagens altas</string>
+    <string name="split_tall_images_summary">Melhora o desempenho do leitor através da divisão de imagens altas transferidas.</string>
+    <string name="download_notifier_split_failed">Não foi possível dividir a imagem transferida</string>
+    <string name="empty_screen">Bem, isto é estranho</string>
+    <string name="pref_reset_viewer_flags_error">Não foi possível repor as definições do leitor</string>
+    <string name="pref_reset_viewer_flags_success">Todas as definições do leitor reiniciadas</string>
+    <string name="source_empty_screen">Nenhuma fonte encontrada</string>
+    <string name="download_notifier_split_page_not_found">Página %d não encontrada durante a divisão</string>
+    <string name="pref_reset_viewer_flags">Repor as definições do leitor por série</string>
+    <string name="pref_reset_viewer_flags_summary">Repõe o modo de leitura e orientação de todas as séries</string>
+    <string name="download_notifier_split_page_path_not_found">Não foi possível encontrar o caminho do ficheiro da página %d</string>
 </resources>

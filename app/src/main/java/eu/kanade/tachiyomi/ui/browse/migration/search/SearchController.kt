@@ -6,28 +6,39 @@ import androidx.core.view.isVisible
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import eu.kanade.domain.manga.interactor.GetManga
+import eu.kanade.domain.manga.model.Manga
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
-import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
+import eu.kanade.tachiyomi.ui.base.controller.pushController
 import eu.kanade.tachiyomi.ui.browse.migration.MigrationFlags
 import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchController
 import eu.kanade.tachiyomi.ui.browse.source.globalsearch.GlobalSearchPresenter
 import eu.kanade.tachiyomi.ui.manga.MangaController
+import kotlinx.coroutines.runBlocking
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
 
 class SearchController(
-    private var manga: Manga? = null
+    private var manga: Manga? = null,
 ) : GlobalSearchController(manga?.title) {
+
+    constructor(mangaId: Long) : this(
+        runBlocking {
+            Injekt.get<GetManga>()
+                .await(mangaId)
+        },
+    )
 
     private var newManga: Manga? = null
 
     override fun createPresenter(): GlobalSearchPresenter {
         return SearchPresenter(
             initialQuery,
-            manga!!
+            manga!!,
         )
     }
 
@@ -74,9 +85,9 @@ class SearchController(
         binding.progress.isVisible = isReplacingManga
         if (!isReplacingManga) {
             router.popController(this)
-            if (newManga != null) {
-                val newMangaController = RouterTransaction.with(MangaController(newManga))
-                if (router.backstack.last().controller is MangaController) {
+            if (newManga?.id != null) {
+                val newMangaController = RouterTransaction.with(MangaController(newManga.id))
+                if (router.backstack.lastOrNull()?.controller is MangaController) {
                     // Replace old MangaController
                     router.replaceTopController(newMangaController)
                 } else {
@@ -95,7 +106,7 @@ class SearchController(
         override fun onCreateDialog(savedViewState: Bundle?): Dialog {
             val prefValue = preferences.migrateFlags().get()
             val enabledFlagsPositions = MigrationFlags.getEnabledFlagsPositions(prefValue)
-            val items = MigrationFlags.titles
+            val items = MigrationFlags.titles(manga)
                 .map { resources?.getString(it) }
                 .toTypedArray()
             val selected = items
@@ -121,7 +132,7 @@ class SearchController(
                     }
                     (targetController as? SearchController)?.migrateManga(manga, newManga)
                 }
-                .setNegativeButton(R.string.copy) { _, _, ->
+                .setNegativeButton(R.string.copy) { _, _ ->
                     if (callingController != null) {
                         if (callingController.javaClass == SourceSearchController::class.java) {
                             router.popController(callingController)
@@ -129,7 +140,10 @@ class SearchController(
                     }
                     (targetController as? SearchController)?.copyManga(manga, newManga)
                 }
-                .setNeutralButton(android.R.string.cancel, null)
+                .setNeutralButton(activity?.getString(R.string.action_show_manga)) { _, _ ->
+                    dismissDialog()
+                    router.pushController(MangaController(newManga!!.id))
+                }
                 .create()
         }
     }
@@ -137,6 +151,6 @@ class SearchController(
     override fun onTitleClick(source: CatalogueSource) {
         presenter.preferences.lastUsedSource().set(source.id)
 
-        router.pushController(SourceSearchController(manga, source, presenter.query).withFadeTransaction())
+        router.pushController(SourceSearchController(manga, source, presenter.query))
     }
 }

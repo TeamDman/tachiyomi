@@ -2,13 +2,13 @@ package eu.kanade.tachiyomi.ui.browse.migration.search
 
 import android.os.Bundle
 import android.view.View
-import eu.kanade.tachiyomi.data.database.models.Manga
+import eu.kanade.domain.manga.model.Manga
 import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceController
 import eu.kanade.tachiyomi.ui.browse.source.browse.SourceItem
 
 class SourceSearchController(
-    bundle: Bundle
+    bundle: Bundle,
 ) : BrowseSourceController(bundle) {
 
     constructor(manga: Manga? = null, source: CatalogueSource, searchQuery: String? = null) : this(
@@ -18,7 +18,7 @@ class SourceSearchController(
             if (searchQuery != null) {
                 putString(SEARCH_QUERY_KEY, searchQuery)
             }
-        }
+        },
     )
     private var oldManga: Manga? = args.getSerializable(MANGA_KEY) as Manga?
     private var newManga: Manga? = null

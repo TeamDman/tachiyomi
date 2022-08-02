@@ -18,7 +18,6 @@ object Notifications {
      * Common notification channel and ids used anywhere.
      */
     const val CHANNEL_COMMON = "common_channel"
-    const val ID_UPDATER = 1
     const val ID_DOWNLOAD_IMAGE = 2
 
     /**
@@ -27,8 +26,11 @@ object Notifications {
     private const val GROUP_LIBRARY = "group_library"
     const val CHANNEL_LIBRARY_PROGRESS = "library_progress_channel"
     const val ID_LIBRARY_PROGRESS = -101
+    const val ID_LIBRARY_SIZE_WARNING = -103
     const val CHANNEL_LIBRARY_ERROR = "library_errors_channel"
     const val ID_LIBRARY_ERROR = -102
+    const val CHANNEL_LIBRARY_SKIPPED = "library_skipped_channel"
+    const val ID_LIBRARY_SKIPPED = -104
 
     /**
      * Notification channel and ids used by the downloader.
@@ -47,13 +49,6 @@ object Notifications {
     const val CHANNEL_NEW_CHAPTERS = "new_chapters_channel"
     const val ID_NEW_CHAPTERS = -301
     const val GROUP_NEW_CHAPTERS = "eu.kanade.tachiyomi.NEW_CHAPTERS"
-
-    /**
-     * Notification channel and ids used by the library updater.
-     */
-    const val CHANNEL_UPDATES_TO_EXTS = "updates_ext_channel"
-    const val ID_UPDATES_TO_EXTS = -401
-    const val ID_EXTENSION_INSTALLER = -402
 
     /**
      * Notification channel and ids used by the backup/restore system.
@@ -78,10 +73,23 @@ object Notifications {
     const val CHANNEL_INCOGNITO_MODE = "incognito_mode_channel"
     const val ID_INCOGNITO_MODE = -701
 
+    /**
+     * Notification channel and ids used for app and extension updates.
+     */
+    private const val GROUP_APK_UPDATES = "group_apk_updates"
+    const val CHANNEL_APP_UPDATE = "app_apk_update_channel"
+    const val ID_APP_UPDATER = 1
+    const val ID_APP_UPDATE_PROMPT = 2
+    const val CHANNEL_EXTENSIONS_UPDATE = "ext_apk_update_channel"
+    const val ID_UPDATES_TO_EXTS = -401
+    const val ID_EXTENSION_INSTALLER = -402
+
     private val deprecatedChannels = listOf(
         "downloader_channel",
         "backup_restore_complete_channel",
         "library_channel",
+        "library_progress_channel",
+        "updates_ext_channel",
     )
 
     /**
@@ -92,6 +100,9 @@ object Notifications {
      */
     fun createChannels(context: Context) {
         val notificationService = NotificationManagerCompat.from(context)
+
+        // Delete old notification channels
+        deprecatedChannels.forEach(notificationService::deleteNotificationChannel)
 
         notificationService.createNotificationChannelGroupsCompat(
             listOf(
@@ -104,7 +115,10 @@ object Notifications {
                 buildNotificationChannelGroup(GROUP_LIBRARY) {
                     setName(context.getString(R.string.label_library))
                 },
-            )
+                buildNotificationChannelGroup(GROUP_APK_UPDATES) {
+                    setName(context.getString(R.string.label_recent_updates))
+                },
+            ),
         )
 
         notificationService.createNotificationChannelsCompat(
@@ -119,6 +133,11 @@ object Notifications {
                 },
                 buildNotificationChannel(CHANNEL_LIBRARY_ERROR, IMPORTANCE_LOW) {
                     setName(context.getString(R.string.channel_errors))
+                    setGroup(GROUP_LIBRARY)
+                    setShowBadge(false)
+                },
+                buildNotificationChannel(CHANNEL_LIBRARY_SKIPPED, IMPORTANCE_LOW) {
+                    setName(context.getString(R.string.channel_skipped))
                     setGroup(GROUP_LIBRARY)
                     setShowBadge(false)
                 },
@@ -157,13 +176,15 @@ object Notifications {
                 buildNotificationChannel(CHANNEL_INCOGNITO_MODE, IMPORTANCE_LOW) {
                     setName(context.getString(R.string.pref_incognito_mode))
                 },
-                buildNotificationChannel(CHANNEL_UPDATES_TO_EXTS, IMPORTANCE_DEFAULT) {
+                buildNotificationChannel(CHANNEL_APP_UPDATE, IMPORTANCE_DEFAULT) {
+                    setGroup(GROUP_APK_UPDATES)
+                    setName(context.getString(R.string.channel_app_updates))
+                },
+                buildNotificationChannel(CHANNEL_EXTENSIONS_UPDATE, IMPORTANCE_DEFAULT) {
+                    setGroup(GROUP_APK_UPDATES)
                     setName(context.getString(R.string.channel_ext_updates))
                 },
-            )
+            ),
         )
-
-        // Delete old notification channels
-        deprecatedChannels.forEach(notificationService::deleteNotificationChannel)
     }
 }

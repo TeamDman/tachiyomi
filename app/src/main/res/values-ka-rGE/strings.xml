@@ -15,13 +15,12 @@
     <string name="action_menu">მენიუ</string>
     <string name="action_filter">ფილტრი</string>
     <string name="action_filter_downloaded">გადმოწერილი</string>
-    <string name="action_filter_bookmarked">მონიშნული</string>
+    <string name="action_filter_bookmarked">ჩანიშნული</string>
     <string name="action_filter_unread">წაუკითხავი</string>
     <string name="action_filter_empty">ფილტრის წაშლა</string>
     <string name="action_sort_alpha">ანბანის მიხედვით</string>
     <string name="action_sort_total">თავების რაოდენობა</string>
     <string name="action_sort_last_read">ბოლოს წაკითხული</string>
-    <string name="action_sort_last_checked">ბოლოს ნანახი</string>
     <string name="action_sort_latest_chapter">ბოლო თავი</string>
     <string name="action_search">ძებნა</string>
     <string name="action_select_all">ყველას მონიშვნა</string>
@@ -81,7 +80,7 @@
     <string name="app_not_available">აპლიკაცია არ არის ხელმისაწვდომი</string>
     <string name="pref_category_general">ზოგადი</string>
     <string name="pref_category_library">ბიბლიოთეკა</string>
-    <string name="pref_category_reader">მკითხველი</string>
+    <string name="pref_category_reader">წამკითხველი</string>
     <string name="pref_category_downloads">გადმოწერები</string>
     <string name="pref_category_tracking">თვალყურის დევნება</string>
     <string name="pref_category_advanced">დამატებით</string>
@@ -89,7 +88,7 @@
     <string name="pref_theme_mode">ბნელი რეჟიმი</string>
     <string name="theme_system">სისტემური</string>
     <string name="theme_light">მსუბუქი</string>
-    <string name="theme_dark">ბნელი</string>
+    <string name="theme_dark">ჩართული</string>
     <string name="pref_date_format">თარიღის ფორმატი</string>
     <string name="pref_confirm_exit">გამოსვლის დადასტურება</string>
     <string name="pref_manage_notifications">შეტყობინებების მართვა</string>
@@ -107,13 +106,11 @@
     <string name="pref_category_library_update">განახლებები</string>
     <string name="pref_library_update_interval">ბიბლიოთეკის განახლების სიხშირე</string>
     <string name="update_never">ხელით</string>
-    <string name="update_3hour">ყოველ 3 საათში</string>
     <string name="update_6hour">ყოველ 6 საათში</string>
     <string name="update_12hour">ყოველ 12 საათში</string>
     <string name="update_24hour">ყოველდღე</string>
     <string name="update_48hour">ყოველ 2 დღეში ერთხელ</string>
     <string name="update_weekly">ყოველ კვირა</string>
-    <string name="pref_library_update_prioritization">ბიბლიოთეკის განახლების რიგითობა</string>
     <string name="pref_library_update_restriction">ბიბლიოთეკის განახლების შეზღუდვები</string>
     <string name="charging">იტენება</string>
     <string name="pref_update_only_non_completed">მხოლოდ განაახლე მიმდინარე მანგა</string>
@@ -131,12 +128,8 @@
     <string name="ext_pending">მოლოდინში</string>
     <string name="ext_unofficial">არაოფიციცალური</string>
     <string name="ext_uninstall">წაშლა</string>
-    <string name="ext_available">ხელმისაწვდომია</string>
-    <string name="ext_version_info">ვერსია: %1$s</string>
-    <string name="ext_language_info">ენა: %1$s</string>
     <string name="pref_fullscreen">მთლიან ეკრანზე</string>
     <string name="pref_cutout_short">კონტენტის ჩვენება ჩამოჭრილ ადგილზე</string>
-    <string name="pref_lock_orientation">ორიენტაციის დაფიქსირება</string>
     <string name="pref_page_transitions">გვერდის გადასვლების ანიმირება</string>
     <string name="pref_show_page_number">გვერდის ნომრის ჩვენება</string>
     <string name="pref_show_reading_mode">კითხვის რეჟიმის ჩვენება</string>
@@ -153,7 +146,6 @@
     <string name="pref_reader_navigation">ნავიგაცია</string>
     <string name="pref_read_with_volume_keys">ხმის კლავიშები</string>
     <string name="pref_read_with_volume_keys_inverted">ხმის კლავიშების ფუნქციების გაცვლა</string>
-    <string name="pref_read_with_tapping">შეხება</string>
     <string name="pref_reader_theme">ფონის ფერი</string>
     <string name="white_background">თეთრი</string>
     <string name="gray_background">ნაცრისფერი</string>
@@ -216,11 +208,9 @@
     <string name="pref_backup_service_category">ავტომატურად რეზერვის შექმნა</string>
     <string name="pref_backup_interval">რეზერვის შექმნის სიხშირე</string>
     <string name="pref_backup_slots">მაქსიმალური რეზერვი</string>
-    <string name="source_not_found_name">წყაროს პოვნა ვერ მოხერხდა: %1$s</string>
     <string name="tracker_not_logged_in">არ არის შესული: %1$s</string>
     <string name="backup_created">რეზერვი შექმნილია</string>
     <string name="invalid_backup_file">არასწორი სარეზერვო ფაილი</string>
-    <string name="invalid_backup_file_missing_data">ფაილს აკლია მონაცემები.</string>
     <string name="invalid_backup_file_missing_manga">რეზერვი არ შეიცავს არცერთ მანგას.</string>
     <string name="backup_restore_missing_sources">დაკარგული წყაროები:</string>
     <string name="restore_completed">აღდგენა შესრულებულია</string>
@@ -259,7 +249,6 @@
     <string name="username">მომხმარებლის სახელი</string>
     <string name="email">ელ. ფოსტა</string>
     <string name="password">პაროლი</string>
-    <string name="show_password">პაროლის ჩვენება</string>
     <string name="login">შესვლა</string>
     <string name="login_success">შესულია</string>
     <string name="logout_title">გამოვიდე %1$s-დან?</string>
@@ -321,13 +310,11 @@
     <string name="manga_tracking_tab">თვალტყურის დევნება</string>
     <string name="add_tracking">თვალი ადევნე</string>
     <string name="reading">ვკითხულობ</string>
-    <string name="currently_reading">ამჟამად ვკითხულობ</string>
     <string name="completed">შესრულებულია</string>
     <string name="dropped">გადაგდებული</string>
     <string name="on_hold">ლოდინის რეჟიმში</string>
     <string name="paused">დაპაუზებული</string>
     <string name="plan_to_read">ვგეგმავ წაკითხვას</string>
-    <string name="want_to_read">მსურს წაკითხვა</string>
     <string name="repeating">თავიდან ვკითხულობ</string>
     <string name="score">შეფასება</string>
     <string name="title">სათაური</string>
@@ -373,14 +360,12 @@
     <string name="file_select_cover">ამოირჩიე ყდის სურათი</string>
     <string name="file_select_backup">ამოირჩიე რეზერვის ფაილი</string>
     <string name="update_check_confirm">გადმოწერა</string>
-    <string name="update_check_ignore">დაიგნორება</string>
     <string name="update_check_no_new_updates">განახლება ვერ მოიძებნა</string>
     <string name="update_check_look_for_updates">განახლების ძებნა…</string>
     <string name="update_check_notification_download_in_progress">გადმოწერა…</string>
     <string name="update_check_notification_download_complete">გადმოწერა დასრულებულია</string>
     <string name="update_check_notification_download_error">გადმოწერის შეცდომა</string>
     <string name="update_check_notification_update_available">ხელმისაწვდომია ახალი ვერსია!</string>
-    <string name="description_cover">მანგას ყდა</string>
     <string name="information_no_downloads">გადმოწერები არ არის</string>
     <string name="information_no_recent">განახლებები არ არის</string>
     <string name="information_empty_library">შენი ბიბლიოთეკა ცარიელია, დაამატე სერიები შენს ბიბლიოთეკაში \"დაათვალიერე\"-დან.</string>
@@ -397,14 +382,13 @@
     <string name="label_extensions">გავრცობები</string>
     <string name="label_extension_info">გავრცობის შესახებ</string>
     <string name="unlock_app">Tachiyomi-ს განბლოკვა</string>
-    <string name="confirm_exit">დააჭირე ისებ ღილაკს \"უკან\" გამოსასვლელად</string>
+    <string name="confirm_exit">გასასვლელად დააჭირეთ ისევ უკან</string>
     <string name="action_global_search">გლობალური ძებნა</string>
     <string name="action_move_category">კატეგორიების მინიჭება</string>
     <string name="action_edit_cover">ყდის რედაქტირება</string>
     <string name="action_migrate">მიგრაცია</string>
     <string name="action_pin">მიმაგრება</string>
     <string name="action_unpin">მიმაგრების მოხსნა</string>
-    <string name="pref_start_screen">საწყისი გვერდი</string>
     <string name="pref_library_update_refresh_metadata_summary">ბიბლიოთეკის განახლებისას მოძებნე ახალი ყდები და დეტალები</string>
     <string name="ext_updates_pending">განახლებები მოლოდინის რეჟიმშია</string>
     <string name="ext_obsolete">მოძველებული</string>
@@ -448,9 +432,6 @@
 \n
 \nამ სერტიფიკატის ნდობით თქვენ თქვენს თავზე იღებთ რისკებს და პასუხისმგებლობას.</string>
     <string name="tracking_info">ცალმხრივი სინქრონიზაცია თვალყურის სადევნებელ სერვისებში თავების პროგრესის განსაახლებლად. მიადევნე თვალყური ინდივიდუალურ მანგებს მათი ჩანართებიდან</string>
-    <string name="backup_restore_content">აღდგენა იყენებს წყაროებს მონაცემების გადმოსაწერად.
-\n
-\nდარწმუნდი რომ გაქვს დაინსტალირებული ყველა საჭირო დამატება და ხარ დალოგინებული წყაროებში და თვალყურის სადევნებელ სერვისებში ააღდგენამდე.</string>
     <string name="pref_refresh_library_tracking_summary">ანახლებს სტატუსს, შეფასებას და ბოლო თავს წაკითხულს თვალყურის სადევნებელ სერვისებიდან</string>
     <string name="filter_mode_overlay">გადაფარება</string>
     <string name="information_cloudflare_bypass_failure">ვერ მოხერხდა CloudFlare-ს შემოვლა</string>
@@ -462,10 +443,6 @@
     <plurals name="update_check_notification_ext_updates">
         <item quantity="one">ნაპოვნია გაფართოების განახლება</item>
         <item quantity="other">ნაპოვნია %d გაფართოების განახლება</item>
-    </plurals>
-    <plurals name="notification_update_error">
-        <item quantity="one">1 განახლების შეცდომა</item>
-        <item quantity="other">%1$d განახლების შეცდომა</item>
     </plurals>
     <plurals name="notification_chapters_multiple_and_more">
         <item quantity="one">თავები %1$s და კიდევ 1</item>
@@ -505,7 +482,6 @@
         <item quantity="one">%d კატეგორია</item>
         <item quantity="other">%d კატეგორიები</item>
     </plurals>
-    <string name="pref_jump_to_chapters">გახსნილ თავებთან გადასვლა</string>
     <plurals name="lock_after_mins">
         <item quantity="one">1 წუთის შემდეგ</item>
         <item quantity="other">%1$s წუთის შემდეგ</item>
@@ -524,4 +500,16 @@
     <string name="parental_controls_info">ეს არ აღმოფხვრავს პროგრამაში NSFW (18+) შიგთავსის არაოფიციალურ, ან შესაძლო არასწორად მონიშნული გაფართოებებოიდან გამოჩენას.</string>
     <string name="action_display_show_number_of_items">საგნების რაოდენობის ჩვენება</string>
     <string name="action_search_settings">პარამეტრების ძიება</string>
+    <string name="action_start_downloading_now">დაიწყე ჩამოტვირთვა</string>
+    <string name="theme_greenapple">მწვანე ვაშლი</string>
+    <string name="action_filter_started">დაწყებული</string>
+    <string name="theme_monet">დინამიური</string>
+    <string name="pref_app_theme">აპლიკაციის თემა</string>
+    <string name="label_warning">გაფრთხილება</string>
+    <string name="confirm_lock_change">აუთენტიკაცია ცვლილების დასადასტურებლად</string>
+    <string name="action_faq_and_guides">ხდკ და სახელმძღვანელოები</string>
+    <string name="pref_category_appearance">გარეგნობა</string>
+    <string name="label_default">ნაგულისხმევი</string>
+    <string name="pref_category_navigation">ნავიგაცია</string>
+    <string name="action_show_errors">დააჭირე დეტალების სანახავად</string>
 </resources>

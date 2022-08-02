@@ -18,12 +18,14 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import okhttp3.CacheControl
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import uy.kohesive.injekt.injectLazy
 import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 class BangumiApi(private val client: OkHttpClient, interceptor: BangumiInterceptor) {
 
@@ -60,8 +62,8 @@ class BangumiApi(private val client: OkHttpClient, interceptor: BangumiIntercept
             authClient.newCall(
                 POST(
                     "$apiUrl/subject/${track.media_id}/update/watched_eps",
-                    body = body
-                )
+                    body = body,
+                ),
             ).await()
 
             track
@@ -70,7 +72,7 @@ class BangumiApi(private val client: OkHttpClient, interceptor: BangumiIntercept
 
     suspend fun search(search: String): List<TrackSearch> {
         return withIOContext {
-            val url = "$apiUrl/search/subject/${URLEncoder.encode(search, Charsets.UTF_8.name())}"
+            val url = "$apiUrl/search/subject/${URLEncoder.encode(search, StandardCharsets.UTF_8.name())}"
                 .toUri()
                 .buildUpon()
                 .appendQueryParameter("max_results", "20")
@@ -105,7 +107,7 @@ class BangumiApi(private val client: OkHttpClient, interceptor: BangumiIntercept
             0
         }
         return TrackSearch.create(TrackManager.BANGUMI).apply {
-            media_id = obj["id"]!!.jsonPrimitive.int
+            media_id = obj["id"]!!.jsonPrimitive.long
             title = obj["name_cn"]!!.jsonPrimitive.content
             cover_url = coverUrl
             summary = obj["name"]!!.jsonPrimitive.content
@@ -167,7 +169,7 @@ class BangumiApi(private val client: OkHttpClient, interceptor: BangumiIntercept
             .add("client_secret", clientSecret)
             .add("code", code)
             .add("redirect_uri", redirectUrl)
-            .build()
+            .build(),
     )
 
     companion object {
@@ -200,7 +202,7 @@ class BangumiApi(private val client: OkHttpClient, interceptor: BangumiIntercept
                 .add("client_secret", clientSecret)
                 .add("refresh_token", token)
                 .add("redirect_uri", redirectUrl)
-                .build()
+                .build(),
         )
     }
 }

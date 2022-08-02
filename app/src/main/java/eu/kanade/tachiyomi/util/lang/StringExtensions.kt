@@ -1,6 +1,8 @@
 package eu.kanade.tachiyomi.util.lang
 
+import androidx.core.text.parseAsHtml
 import net.greypanther.natsort.CaseInsensitiveSimpleNaturalComparator
+import java.nio.charset.StandardCharsets
 import kotlin.math.floor
 
 /**
@@ -41,7 +43,7 @@ fun String.compareToCaseInsensitiveNaturalOrder(other: String): Int {
  * Returns the size of the string as the number of bytes.
  */
 fun String.byteSize(): Int {
-    return toByteArray(Charsets.UTF_8).size
+    return toByteArray(StandardCharsets.UTF_8).size
 }
 
 /**
@@ -49,10 +51,17 @@ fun String.byteSize(): Int {
  * string is shorter.
  */
 fun String.takeBytes(n: Int): String {
-    val bytes = toByteArray(Charsets.UTF_8)
+    val bytes = toByteArray(StandardCharsets.UTF_8)
     return if (bytes.size <= n) {
         this
     } else {
         bytes.decodeToString(endIndex = n).replace("\uFFFD", "")
     }
+}
+
+/**
+ * HTML-decode the string
+ */
+fun String.htmlDecode(): String {
+    return this.parseAsHtml().toString()
 }

@@ -22,7 +22,7 @@ class SetTrackChaptersDialog<T> : DialogController
     private lateinit var listener: Listener
 
     constructor(target: T, listener: Listener, item: TrackItem) : super(
-        bundleOf(KEY_ITEM_TRACK to item.track)
+        bundleOf(KEY_ITEM_TRACK to item.track),
     ) {
         targetController = target
         this.listener = listener
@@ -32,7 +32,7 @@ class SetTrackChaptersDialog<T> : DialogController
     @Suppress("unused")
     constructor(bundle: Bundle) : super(bundle) {
         val track = bundle.getSerializable(KEY_ITEM_TRACK) as Track
-        val service = Injekt.get<TrackManager>().getService(track.sync_id)!!
+        val service = Injekt.get<TrackManager>().getService(track.sync_id.toLong())!!
         item = TrackItem(track, service)
     }
 

@@ -7,7 +7,8 @@ import androidx.core.view.inputmethod.EditorInfoCompat
 import com.google.android.material.textfield.TextInputEditText
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.asImmediateFlow
+import eu.kanade.tachiyomi.util.preference.asHotFlow
+import eu.kanade.tachiyomi.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,7 +26,7 @@ import uy.kohesive.injekt.api.get
 class TachiyomiTextInputEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.editTextStyle
+    defStyleAttr: Int = R.attr.editTextStyle,
 ) : TextInputEditText(context, attrs, defStyleAttr) {
 
     private var scope: CoroutineScope? = null
@@ -48,7 +49,7 @@ class TachiyomiTextInputEditText @JvmOverloads constructor(
          * if [PreferencesHelper.incognitoMode] is true. Some IMEs may not respect this flag.
          */
         fun EditText.setIncognito(viewScope: CoroutineScope) {
-            Injekt.get<PreferencesHelper>().incognitoMode().asImmediateFlow {
+            Injekt.get<PreferencesHelper>().incognitoMode().asHotFlow {
                 imeOptions = if (it) {
                     imeOptions or EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING
                 } else {

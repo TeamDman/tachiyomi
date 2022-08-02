@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -11,11 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import eu.kanade.tachiyomi.databinding.DialogStubQuadstatemultichoiceBinding
 import eu.kanade.tachiyomi.databinding.DialogStubTextinputBinding
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 fun MaterialAlertDialogBuilder.setTextInput(
     hint: String? = null,
     prefill: String? = null,
-    onTextChanged: (String) -> Unit
+    onTextChanged: (String) -> Unit,
 ): MaterialAlertDialogBuilder {
     val binding = DialogStubTextinputBinding.inflate(LayoutInflater.from(context))
     binding.textField.hint = hint
@@ -43,7 +46,7 @@ fun MaterialAlertDialogBuilder.setQuadStateMultiChoiceItems(
     items: List<CharSequence>,
     initialSelected: IntArray,
     disabledIndices: IntArray? = null,
-    selection: QuadStateMultiChoiceListener
+    selection: QuadStateMultiChoiceListener,
 ): MaterialAlertDialogBuilder {
     val binding = DialogStubQuadstatemultichoiceBinding.inflate(LayoutInflater.from(context))
     binding.list.layoutManager = LinearLayoutManager(context)
@@ -52,7 +55,7 @@ fun MaterialAlertDialogBuilder.setQuadStateMultiChoiceItems(
         disabledItems = disabledIndices,
         initialSelected = initialSelected,
         isActionList = isActionList,
-        listener = selection
+        listener = selection,
     )
     val updateScrollIndicators = {
         binding.scrollIndicatorUp.isVisible = binding.list.canScrollVertically(-1)
@@ -70,4 +73,20 @@ fun MaterialAlertDialogBuilder.setQuadStateMultiChoiceItems(
         binding.message.isVisible = true
     }
     return setView(binding.root)
+}
+
+suspend fun MaterialAlertDialogBuilder.await(
+    @StringRes positiveLabelId: Int,
+    @StringRes negativeLabelId: Int,
+    @StringRes neutralLabelId: Int? = null,
+) = suspendCancellableCoroutine<Int> { cont ->
+    setPositiveButton(positiveLabelId) { _, _ -> cont.resume(AlertDialog.BUTTON_POSITIVE) }
+    setNegativeButton(negativeLabelId) { _, _ -> cont.resume(AlertDialog.BUTTON_NEGATIVE) }
+    if (neutralLabelId != null) {
+        setNeutralButton(neutralLabelId) { _, _ -> cont.resume(AlertDialog.BUTTON_NEUTRAL) }
+    }
+    setOnDismissListener { cont.cancel() }
+
+    val dialog = show()
+    cont.invokeOnCancellation { dialog.dismiss() }
 }

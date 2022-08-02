@@ -16,15 +16,6 @@ class BangumiInterceptor(val bangumi: Bangumi) : Interceptor {
      */
     private var oauth: OAuth? = bangumi.restoreToken()
 
-    fun addToken(token: String, oidFormBody: FormBody): FormBody {
-        val newFormBody = FormBody.Builder()
-        for (i in 0 until oidFormBody.size) {
-            newFormBody.add(oidFormBody.name(i), oidFormBody.value(i))
-        }
-        newFormBody.add("access_token", token)
-        return newFormBody.build()
-    }
-
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
 
@@ -43,7 +34,7 @@ class BangumiInterceptor(val bangumi: Bangumi) : Interceptor {
             .header("User-Agent", "Tachiyomi")
             .url(
                 originalRequest.url.newBuilder()
-                    .addQueryParameter("access_token", currAuth.access_token).build()
+                    .addQueryParameter("access_token", currAuth.access_token).build(),
             )
             .build() else originalRequest.newBuilder()
             .post(addToken(currAuth.access_token, originalRequest.body as FormBody))
@@ -60,9 +51,18 @@ class BangumiInterceptor(val bangumi: Bangumi) : Interceptor {
             System.currentTimeMillis() / 1000,
             oauth.expires_in,
             oauth.refresh_token,
-            this.oauth?.user_id
+            this.oauth?.user_id,
         )
 
         bangumi.saveToken(oauth)
+    }
+
+    private fun addToken(token: String, oidFormBody: FormBody): FormBody {
+        val newFormBody = FormBody.Builder()
+        for (i in 0 until oidFormBody.size) {
+            newFormBody.add(oidFormBody.name(i), oidFormBody.value(i))
+        }
+        newFormBody.add("access_token", token)
+        return newFormBody.build()
     }
 }

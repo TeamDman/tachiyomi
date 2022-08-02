@@ -2,12 +2,16 @@ package eu.kanade.tachiyomi.ui.base.controller
 
 import android.app.Activity
 import android.os.Bundle
+import android.text.style.CharacterStyle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.SearchView
+import androidx.core.text.getSpans
+import androidx.core.widget.doAfterTextChanged
 import androidx.viewbinding.ViewBinding
+import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -17,8 +21,7 @@ import reactivecircus.flowbinding.appcompat.queryTextEvents
 /**
  * Implementation of the NucleusController that has a built-in ViewSearch
  */
-abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*>>
-(bundle: Bundle? = null) : NucleusController<VB, P>(bundle) {
+abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*>>(bundle: Bundle? = null) : NucleusController<VB, P>(bundle) {
 
     enum class SearchViewState { LOADING, LOADED, COLLAPSING, FOCUSED }
 
@@ -41,7 +44,7 @@ abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*
         menuId: Int,
         searchItemId: Int,
         @StringRes queryHint: Int? = null,
-        restoreCurrentQuery: Boolean = true
+        restoreCurrentQuery: Boolean = true,
     ) {
         // Inflate menu
         inflater.inflate(menuId, menu)
@@ -51,6 +54,14 @@ abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*
         val searchView = searchItem.actionView as SearchView
         searchItem.fixExpand(onExpand = { invalidateMenuOnExpand() })
         searchView.maxWidth = Int.MAX_VALUE
+
+        // Remove formatting from pasted text
+        val searchAutoComplete: SearchView.SearchAutoComplete = searchView.findViewById(
+            R.id.search_src_text,
+        )
+        searchAutoComplete.doAfterTextChanged { editable ->
+            editable?.getSpans<CharacterStyle>()?.forEach { editable.removeSpan(it) }
+        }
 
         searchView.queryTextEvents()
             .onEach {
@@ -115,12 +126,12 @@ abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*
 
         searchItem.setOnActionExpandListener(
             object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
                     onSearchMenuItemActionExpand(item)
                     return true
                 }
 
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     val localSearchView = searchItem.actionView as SearchView
 
                     // if it is blank the flow event won't trigger so we would stay in a COLLAPSING state
@@ -131,7 +142,7 @@ abstract class SearchableNucleusController<VB : ViewBinding, P : BasePresenter<*
                     onSearchMenuItemActionCollapse(item)
                     return true
                 }
-            }
+            },
         )
     }
 

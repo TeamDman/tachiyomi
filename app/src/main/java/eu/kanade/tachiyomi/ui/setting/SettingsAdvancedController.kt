@@ -1,31 +1,39 @@
 package eu.kanade.tachiyomi.ui.setting
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
+import android.webkit.WebStorage
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.preference.PreferenceScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import eu.kanade.tachiyomi.BuildConfig
+import eu.kanade.domain.manga.repository.MangaRepository
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.cache.ChapterCache
-import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.library.LibraryUpdateService
 import eu.kanade.tachiyomi.data.library.LibraryUpdateService.Target
 import eu.kanade.tachiyomi.data.preference.PreferenceValues
+import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.network.NetworkHelper
+import eu.kanade.tachiyomi.network.PREF_DOH_360
 import eu.kanade.tachiyomi.network.PREF_DOH_ADGUARD
+import eu.kanade.tachiyomi.network.PREF_DOH_ALIDNS
 import eu.kanade.tachiyomi.network.PREF_DOH_CLOUDFLARE
+import eu.kanade.tachiyomi.network.PREF_DOH_DNSPOD
 import eu.kanade.tachiyomi.network.PREF_DOH_GOOGLE
-import eu.kanade.tachiyomi.ui.base.controller.DialogController
+import eu.kanade.tachiyomi.network.PREF_DOH_QUAD101
+import eu.kanade.tachiyomi.network.PREF_DOH_QUAD9
 import eu.kanade.tachiyomi.ui.base.controller.openInBrowser
+import eu.kanade.tachiyomi.ui.base.controller.pushController
+import eu.kanade.tachiyomi.ui.setting.database.ClearDatabaseController
 import eu.kanade.tachiyomi.util.CrashLogUtil
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.withUIContext
+import eu.kanade.tachiyomi.util.preference.bindTo
 import eu.kanade.tachiyomi.util.preference.defaultValue
+import eu.kanade.tachiyomi.util.preference.editTextPreference
 import eu.kanade.tachiyomi.util.preference.entriesRes
 import eu.kanade.tachiyomi.util.preference.intListPreference
 import eu.kanade.tachiyomi.util.preference.listPreference
@@ -36,26 +44,34 @@ import eu.kanade.tachiyomi.util.preference.preferenceCategory
 import eu.kanade.tachiyomi.util.preference.summaryRes
 import eu.kanade.tachiyomi.util.preference.switchPreference
 import eu.kanade.tachiyomi.util.preference.titleRes
-import eu.kanade.tachiyomi.util.system.MiuiUtil
+import eu.kanade.tachiyomi.util.system.DeviceUtil
+import eu.kanade.tachiyomi.util.system.isDevFlavor
 import eu.kanade.tachiyomi.util.system.isPackageInstalled
-import eu.kanade.tachiyomi.util.system.isTablet
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.powerManager
+import eu.kanade.tachiyomi.util.system.setDefaultSettings
 import eu.kanade.tachiyomi.util.system.toast
+import logcat.LogPriority
+import rikka.sui.Sui
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
+import java.io.File
 import eu.kanade.tachiyomi.data.preference.PreferenceKeys as Keys
 
-class SettingsAdvancedController : SettingsController() {
+class SettingsAdvancedController(
+    private val mangaRepository: MangaRepository = Injekt.get(),
+) : SettingsController() {
+
     private val network: NetworkHelper by injectLazy()
-
     private val chapterCache: ChapterCache by injectLazy()
-
-    private val db: DatabaseHelper by injectLazy()
+    private val trackManager: TrackManager by injectLazy()
 
     @SuppressLint("BatteryLife")
     override fun setupPreferenceScreen(screen: PreferenceScreen) = screen.apply {
         titleRes = R.string.pref_category_advanced
 
-        if (BuildConfig.FLAVOR != "dev") {
+        if (isDevFlavor.not()) {
             switchPreference {
                 key = "acra.enable"
                 titleRes = R.string.pref_enable_acra
@@ -78,7 +94,7 @@ class SettingsAdvancedController : SettingsController() {
             key = Keys.verboseLogging
             titleRes = R.string.pref_verbose_logging
             summaryRes = R.string.pref_verbose_logging_summary
-            defaultValue = false
+            defaultValue = isDevFlavor
 
             onChange {
                 activity?.toast(R.string.requires_app_restart)
@@ -133,15 +149,18 @@ class SettingsAdvancedController : SettingsController() {
 
                 onClick { clearChapterCache() }
             }
+            switchPreference {
+                key = Keys.autoClearChapterCache
+                titleRes = R.string.pref_auto_clear_chapter_cache
+                defaultValue = false
+            }
             preference {
                 key = "pref_clear_database"
                 titleRes = R.string.pref_clear_database
                 summaryRes = R.string.pref_clear_database_summary
 
                 onClick {
-                    val ctrl = ClearDatabaseDialogController()
-                    ctrl.targetController = this@SettingsAdvancedController
-                    ctrl.showDialog(router)
+                    router.pushController(ClearDatabaseController())
                 }
             }
         }
@@ -158,6 +177,12 @@ class SettingsAdvancedController : SettingsController() {
                     activity?.toast(R.string.cookies_cleared)
                 }
             }
+            preference {
+                key = "pref_clear_webview_data"
+                titleRes = R.string.pref_clear_webview_data
+
+                onClick { clearWebViewData() }
+            }
             intListPreference {
                 key = Keys.dohProvider
                 titleRes = R.string.pref_dns_over_https
@@ -166,12 +191,22 @@ class SettingsAdvancedController : SettingsController() {
                     "Cloudflare",
                     "Google",
                     "AdGuard",
+                    "Quad9",
+                    "AliDNS",
+                    "DNSPod",
+                    "360",
+                    "Quad 101",
                 )
                 entryValues = arrayOf(
                     "-1",
                     PREF_DOH_CLOUDFLARE.toString(),
                     PREF_DOH_GOOGLE.toString(),
                     PREF_DOH_ADGUARD.toString(),
+                    PREF_DOH_QUAD9.toString(),
+                    PREF_DOH_ALIDNS.toString(),
+                    PREF_DOH_DNSPOD.toString(),
+                    PREF_DOH_360.toString(),
+                    PREF_DOH_QUAD101.toString(),
                 )
                 defaultValue = "-1"
                 summary = "%s"
@@ -179,6 +214,28 @@ class SettingsAdvancedController : SettingsController() {
                 onChange {
                     activity?.toast(R.string.requires_app_restart)
                     true
+                }
+            }
+            editTextPreference {
+                key = Keys.defaultUserAgent
+                titleRes = R.string.pref_user_agent_string
+                text = preferences.defaultUserAgent().get()
+                summary = network.defaultUserAgent
+
+                onChange {
+                    activity?.toast(R.string.requires_app_restart)
+                    true
+                }
+            }
+            if (preferences.defaultUserAgent().isSet()) {
+                preference {
+                    key = "pref_reset_user_agent"
+                    titleRes = R.string.pref_reset_user_agent_string
+
+                    onClick {
+                        preferences.defaultUserAgent().delete()
+                        activity?.toast(R.string.requires_app_restart)
+                    }
                 }
             }
         }
@@ -192,12 +249,21 @@ class SettingsAdvancedController : SettingsController() {
 
                 onClick { LibraryUpdateService.start(context, target = Target.COVERS) }
             }
-            preference {
-                key = "pref_refresh_library_tracking"
-                titleRes = R.string.pref_refresh_library_tracking
-                summaryRes = R.string.pref_refresh_library_tracking_summary
+            if (trackManager.hasLoggedServices()) {
+                preference {
+                    key = "pref_refresh_library_tracking"
+                    titleRes = R.string.pref_refresh_library_tracking
+                    summaryRes = R.string.pref_refresh_library_tracking_summary
 
-                onClick { LibraryUpdateService.start(context, target = Target.TRACKING) }
+                    onClick { LibraryUpdateService.start(context, target = Target.TRACKING) }
+                }
+            }
+            preference {
+                key = "pref_reset_viewer_flags"
+                titleRes = R.string.pref_reset_viewer_flags
+                summaryRes = R.string.pref_reset_viewer_flags_summary
+
+                onClick { resetViewerFlags() }
             }
         }
 
@@ -205,24 +271,24 @@ class SettingsAdvancedController : SettingsController() {
             titleRes = R.string.label_extensions
 
             listPreference {
-                key = Keys.extensionInstaller
+                bindTo(preferences.extensionInstaller())
                 titleRes = R.string.ext_installer_pref
                 summary = "%s"
-                entriesRes = arrayOf(
-                    R.string.ext_installer_legacy,
-                    R.string.ext_installer_packageinstaller,
-                    R.string.ext_installer_shizuku,
-                )
-                entryValues = PreferenceValues.ExtensionInstaller.values().map { it.name }.toTypedArray()
-                defaultValue = if (MiuiUtil.isMiui()) {
-                    PreferenceValues.ExtensionInstaller.LEGACY
+
+                // PackageInstaller doesn't work on MIUI properly for non-allowlisted apps
+                val values = if (DeviceUtil.isMiui) {
+                    PreferenceValues.ExtensionInstaller.values()
+                        .filter { it != PreferenceValues.ExtensionInstaller.PACKAGEINSTALLER }
                 } else {
-                    PreferenceValues.ExtensionInstaller.PACKAGEINSTALLER
-                }.name
+                    PreferenceValues.ExtensionInstaller.values().toList()
+                }
+
+                entriesRes = values.map { it.titleResId }.toTypedArray()
+                entryValues = values.map { it.name }.toTypedArray()
 
                 onChange {
                     if (it == PreferenceValues.ExtensionInstaller.SHIZUKU.name &&
-                        !context.isPackageInstalled("moe.shizuku.privileged.api")
+                        !(context.isPackageInstalled("moe.shizuku.privileged.api") || Sui.isSui())
                     ) {
                         MaterialAlertDialogBuilder(context)
                             .setTitle(R.string.ext_installer_shizuku)
@@ -244,16 +310,11 @@ class SettingsAdvancedController : SettingsController() {
             titleRes = R.string.pref_category_display
 
             listPreference {
-                key = Keys.tabletUiMode
+                bindTo(preferences.tabletUiMode())
                 titleRes = R.string.pref_tablet_ui_mode
                 summary = "%s"
-                entriesRes = arrayOf(R.string.lock_always, R.string.landscape, R.string.lock_never)
+                entriesRes = PreferenceValues.TabletUiMode.values().map { it.titleResId }.toTypedArray()
                 entryValues = PreferenceValues.TabletUiMode.values().map { it.name }.toTypedArray()
-                defaultValue = if (context.isTablet()) {
-                    PreferenceValues.TabletUiMode.ALWAYS
-                } else {
-                    PreferenceValues.TabletUiMode.NEVER
-                }.name
 
                 onChange {
                     activity?.toast(R.string.requires_app_restart)
@@ -264,37 +325,53 @@ class SettingsAdvancedController : SettingsController() {
     }
 
     private fun clearChapterCache() {
-        if (activity == null) return
+        val activity = activity ?: return
         launchIO {
             try {
                 val deletedFiles = chapterCache.clear()
                 withUIContext {
-                    activity?.toast(resources?.getString(R.string.cache_deleted, deletedFiles))
+                    activity.toast(resources?.getString(R.string.cache_deleted, deletedFiles))
                     findPreference(CLEAR_CACHE_KEY)?.summary =
                         resources?.getString(R.string.used_cache, chapterCache.readableSize)
                 }
             } catch (e: Throwable) {
-                withUIContext { activity?.toast(R.string.cache_delete_error) }
+                logcat(LogPriority.ERROR, e)
+                withUIContext { activity.toast(R.string.cache_delete_error) }
             }
         }
     }
 
-    class ClearDatabaseDialogController : DialogController() {
-        override fun onCreateDialog(savedViewState: Bundle?): Dialog {
-            return MaterialAlertDialogBuilder(activity!!)
-                .setMessage(R.string.clear_database_confirmation)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    (targetController as? SettingsAdvancedController)?.clearDatabase()
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
+    private fun clearWebViewData() {
+        val activity = activity ?: return
+        try {
+            val webview = WebView(activity)
+            webview.setDefaultSettings()
+            webview.clearCache(true)
+            webview.clearFormData()
+            webview.clearHistory()
+            webview.clearSslPreferences()
+            WebStorage.getInstance().deleteAllData()
+            activity.applicationInfo?.dataDir?.let { File("$it/app_webview/").deleteRecursively() }
+            activity.toast(R.string.webview_data_deleted)
+        } catch (e: Throwable) {
+            logcat(LogPriority.ERROR, e)
+            activity.toast(R.string.cache_delete_error)
         }
     }
 
-    private fun clearDatabase() {
-        db.deleteMangasNotInLibrary().executeAsBlocking()
-        db.deleteHistoryNoLastRead().executeAsBlocking()
-        activity?.toast(R.string.clear_database_completed)
+    private fun resetViewerFlags() {
+        val activity = activity ?: return
+        launchIO {
+            val success = mangaRepository.resetViewerFlags()
+            withUIContext {
+                val message = if (success) {
+                    R.string.pref_reset_viewer_flags_success
+                } else {
+                    R.string.pref_reset_viewer_flags_error
+                }
+                activity.toast(message)
+            }
+        }
     }
 }
 

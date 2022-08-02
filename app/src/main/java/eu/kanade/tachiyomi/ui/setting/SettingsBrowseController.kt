@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceScreen
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.extension.ExtensionUpdateJob
+import eu.kanade.tachiyomi.util.preference.bindTo
 import eu.kanade.tachiyomi.util.preference.defaultValue
 import eu.kanade.tachiyomi.util.preference.infoPreference
 import eu.kanade.tachiyomi.util.preference.onChange
@@ -21,12 +22,21 @@ class SettingsBrowseController : SettingsController() {
         titleRes = R.string.browse
 
         preferenceCategory {
+            titleRes = R.string.label_sources
+
+            switchPreference {
+                bindTo(preferences.duplicatePinnedSources())
+                titleRes = R.string.pref_duplicate_pinned_sources
+                summaryRes = R.string.pref_duplicate_pinned_sources_summary
+            }
+        }
+
+        preferenceCategory {
             titleRes = R.string.label_extensions
 
             switchPreference {
-                key = Keys.automaticExtUpdates
+                bindTo(preferences.automaticExtUpdates())
                 titleRes = R.string.pref_enable_automatic_extension_updates
-                defaultValue = true
 
                 onChange { newValue ->
                     val checked = newValue as Boolean
@@ -50,10 +60,9 @@ class SettingsBrowseController : SettingsController() {
             titleRes = R.string.pref_category_nsfw_content
 
             switchPreference {
-                key = Keys.showNsfwSource
+                bindTo(preferences.showNsfwSource())
                 titleRes = R.string.pref_show_nsfw_source
                 summaryRes = R.string.requires_app_restart
-                defaultValue = true
 
                 if (context.isAuthenticationSupported() && activity != null) {
                     requireAuthentication(

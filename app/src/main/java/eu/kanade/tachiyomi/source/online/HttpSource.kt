@@ -15,6 +15,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import rx.Observable
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
 import java.net.URI
 import java.net.URISyntaxException
@@ -29,13 +30,6 @@ abstract class HttpSource : CatalogueSource {
      * Network service.
      */
     protected val network: NetworkHelper by injectLazy()
-
-//    /**
-//     * Preferences that a source may need.
-//     */
-//    val preferences: SharedPreferences by lazy {
-//        Injekt.get<Application>().getSharedPreferences(source.getPreferenceKey(), Context.MODE_PRIVATE)
-//    }
 
     /**
      * Base url of the website without the trailing slash, like: http://mysite.com
@@ -74,7 +68,7 @@ abstract class HttpSource : CatalogueSource {
      * Headers builder for requests. Implementations can override this method for custom headers.
      */
     protected open fun headersBuilder() = Headers.Builder().apply {
-        add("User-Agent", DEFAULT_USER_AGENT)
+        add("User-Agent", network.defaultUserAgent)
     }
 
     /**
@@ -119,8 +113,15 @@ abstract class HttpSource : CatalogueSource {
      * @param filters the list of filters to apply.
      */
     override fun fetchSearchManga(page: Int, query: String, filters: FilterList): Observable<MangasPage> {
-        return client.newCall(searchMangaRequest(page, query, filters))
-            .asObservableSuccess()
+        return Observable.defer {
+            try {
+                client.newCall(searchMangaRequest(page, query, filters)).asObservableSuccess()
+            } catch (e: NoClassDefFoundError) {
+                // RxJava doesn't handle Errors, which tends to happen during global searches
+                // if an old extension using non-existent classes is still around
+                throw RuntimeException(e)
+            }
+        }
             .map { response ->
                 searchMangaParse(response)
             }
@@ -362,15 +363,10 @@ abstract class HttpSource : CatalogueSource {
      * @param chapter the chapter to be added.
      * @param manga the manga of the chapter.
      */
-    open fun prepareNewChapter(chapter: SChapter, manga: SManga) {
-    }
+    open fun prepareNewChapter(chapter: SChapter, manga: SManga) {}
 
     /**
      * Returns the list of filters for the source.
      */
     override fun getFilterList() = FilterList()
-
-    companion object {
-        const val DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36 Edg/88.0.705.63"
-    }
 }

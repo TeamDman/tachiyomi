@@ -1,9 +1,10 @@
 package eu.kanade.tachiyomi.data.backup.full.models
 
+import eu.kanade.domain.manga.model.Manga
 import eu.kanade.tachiyomi.data.database.models.ChapterImpl
-import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.MangaImpl
 import eu.kanade.tachiyomi.data.database.models.TrackImpl
+import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 
@@ -28,14 +29,14 @@ data class BackupManga(
     @ProtoNumber(14) var viewer: Int = 0, // Replaced by viewer_flags
     // @ProtoNumber(15) val flags: Int = 0, 1.x value, not used in 0.x
     @ProtoNumber(16) var chapters: List<BackupChapter> = emptyList(),
-    @ProtoNumber(17) var categories: List<Int> = emptyList(),
+    @ProtoNumber(17) var categories: List<Long> = emptyList(),
     @ProtoNumber(18) var tracking: List<BackupTracking> = emptyList(),
     // Bump by 100 for values that are not saved/implemented in 1.x but are used in 0.x
     @ProtoNumber(100) var favorite: Boolean = true,
     @ProtoNumber(101) var chapterFlags: Int = 0,
     @ProtoNumber(102) var brokenHistory: List<BrokenBackupHistory> = emptyList(),
     @ProtoNumber(103) var viewer_flags: Int? = null,
-    @ProtoNumber(104) var history: List<BackupHistory> = emptyList()
+    @ProtoNumber(104) var history: List<BackupHistory> = emptyList(),
 ) {
     fun getMangaImpl(): MangaImpl {
         return MangaImpl().apply {
@@ -75,15 +76,15 @@ data class BackupManga(
                 artist = manga.artist,
                 author = manga.author,
                 description = manga.description,
-                genre = manga.getGenres() ?: emptyList(),
-                status = manga.status,
-                thumbnailUrl = manga.thumbnail_url,
+                genre = manga.genre ?: emptyList(),
+                status = manga.status.toInt(),
+                thumbnailUrl = manga.thumbnailUrl,
                 favorite = manga.favorite,
                 source = manga.source,
-                dateAdded = manga.date_added,
-                viewer = manga.readingModeType,
-                viewer_flags = manga.viewer_flags,
-                chapterFlags = manga.chapter_flags
+                dateAdded = manga.dateAdded,
+                viewer = (manga.viewerFlags.toInt() and ReadingModeType.MASK),
+                viewer_flags = manga.viewerFlags.toInt(),
+                chapterFlags = manga.chapterFlags.toInt(),
             )
         }
     }

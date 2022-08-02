@@ -1,99 +1,20 @@
 package eu.kanade.tachiyomi.ui.library
 
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.FrameLayout
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.RecyclerView
-import com.tfcporciuncula.flow.Preference
-import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.davidea.flexibleadapter.items.AbstractFlexibleItem
-import eu.davidea.flexibleadapter.items.IFilterable
-import eu.davidea.flexibleadapter.items.IFlexible
-import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.LibraryManga
-import eu.kanade.tachiyomi.databinding.SourceComfortableGridItemBinding
-import eu.kanade.tachiyomi.databinding.SourceCompactGridItemBinding
 import eu.kanade.tachiyomi.source.SourceManager
-import eu.kanade.tachiyomi.ui.library.setting.DisplayModeSetting
-import eu.kanade.tachiyomi.widget.AutofitRecyclerView
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
 class LibraryItem(
     val manga: LibraryManga,
-    private val shouldSetFromCategory: Preference<Boolean>,
-    private val defaultLibraryDisplayMode: Preference<DisplayModeSetting>
-) :
-    AbstractFlexibleItem<LibraryHolder<*>>(), IFilterable<String> {
+    private val sourceManager: SourceManager = Injekt.get(),
+) {
 
-    private val sourceManager: SourceManager = Injekt.get()
-
-    var displayMode: Int = -1
+    var displayMode: Long = -1
     var downloadCount = -1
     var unreadCount = -1
     var isLocal = false
     var sourceLanguage = ""
-
-    private fun getDisplayMode(): DisplayModeSetting {
-        return if (shouldSetFromCategory.get() && manga.category != 0) {
-            DisplayModeSetting.fromFlag(displayMode)
-        } else {
-            defaultLibraryDisplayMode.get()
-        }
-    }
-
-    override fun getLayoutRes(): Int {
-        return when (getDisplayMode()) {
-            DisplayModeSetting.COMPACT_GRID -> R.layout.source_compact_grid_item
-            DisplayModeSetting.COMFORTABLE_GRID -> R.layout.source_comfortable_grid_item
-            DisplayModeSetting.LIST -> R.layout.source_list_item
-        }
-    }
-
-    override fun createViewHolder(view: View, adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>): LibraryHolder<*> {
-        return when (getDisplayMode()) {
-            DisplayModeSetting.COMPACT_GRID -> {
-                val binding = SourceCompactGridItemBinding.bind(view)
-                val parent = adapter.recyclerView as AutofitRecyclerView
-                val coverHeight = parent.itemWidth / 3 * 4
-                view.apply {
-                    binding.card.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, coverHeight)
-                    binding.gradient.layoutParams = FrameLayout.LayoutParams(
-                        MATCH_PARENT,
-                        coverHeight / 2,
-                        Gravity.BOTTOM
-                    )
-                }
-                LibraryCompactGridHolder(view, adapter)
-            }
-            DisplayModeSetting.COMFORTABLE_GRID -> {
-                val binding = SourceComfortableGridItemBinding.bind(view)
-                val parent = adapter.recyclerView as AutofitRecyclerView
-                val coverHeight = parent.itemWidth / 3 * 4
-                view.apply {
-                    binding.card.layoutParams = ConstraintLayout.LayoutParams(
-                        MATCH_PARENT,
-                        coverHeight
-                    )
-                }
-                LibraryComfortableGridHolder(view, adapter)
-            }
-            DisplayModeSetting.LIST -> {
-                LibraryListHolder(view, adapter)
-            }
-        }
-    }
-
-    override fun bindViewHolder(
-        adapter: FlexibleAdapter<IFlexible<RecyclerView.ViewHolder>>,
-        holder: LibraryHolder<*>,
-        position: Int,
-        payloads: List<Any?>?
-    ) {
-        holder.onSetValues(this)
-    }
 
     /**
      * Filters a manga depending on a query.
@@ -101,7 +22,7 @@ class LibraryItem(
      * @param constraint the query to apply.
      * @return true if the manga should be included, false otherwise.
      */
-    override fun filter(constraint: String): Boolean {
+    fun filter(constraint: String): Boolean {
         val sourceName by lazy { sourceManager.getOrStub(manga.source).name }
         val genres by lazy { manga.getGenres() }
         return manga.title.contains(constraint, true) ||

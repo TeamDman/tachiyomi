@@ -64,8 +64,6 @@
     <string name="action_sort_date_added">Дата дадання</string>
     <string name="action_sort_chapter_fetch_date">Дата атрымання</string>
     <string name="action_sort_latest_chapter">Апошняя частка</string>
-    <string name="action_sort_next_updated">Наступнае чаканае абнаўленне</string>
-    <string name="action_sort_last_checked">Апошняя праверка</string>
     <string name="action_sort_last_read">Апошняе чытанне</string>
     <string name="action_sort_total">Усяго частак</string>
     <string name="action_sort_alpha">У алфавітным парадку</string>
@@ -132,19 +130,14 @@
     <string name="restrictions">Абмежаванні: %s</string>
     <string name="charging">Зарадка</string>
     <string name="pref_library_update_restriction">Абмежаванні на абнаўленне</string>
-    <string name="pref_library_update_prioritization">Парадак абнаўлення</string>
     <string name="update_weekly">Штотыдзень</string>
     <string name="update_48hour">Кожныя 2 дні</string>
     <string name="update_24hour">Штодня</string>
     <string name="update_12hour">Кожныя 12 гадзін</string>
-    <string name="update_8hour">Кожныя 8 гадзін</string>
     <string name="update_6hour">Кожныя 6 гадзін</string>
-    <string name="update_4hour">Кожныя 4 гадзіны</string>
-    <string name="update_3hour">Кожныя 3 гадзіны</string>
     <string name="update_never">Уручную</string>
     <string name="pref_library_update_interval">Частата абнаўлення</string>
     <string name="pref_category_library_update">Глабальнае абнаўленне</string>
-    <string name="pref_jump_to_chapters">Перайсці да частак пры запуску</string>
     <string name="landscape">Гарызантальная</string>
     <string name="portrait">Партрэтная</string>
     <string name="pref_library_columns">Элементы ў радку</string>
@@ -171,10 +164,8 @@
     <string name="alignment_center">Пасярэдзіне</string>
     <string name="alignment_top">Паверсе</string>
     <string name="pref_side_nav_icon_alignment">Выраўноўванне значкоў бакавой навігацыі</string>
-    <string name="pref_hide_bottom_bar_on_scroll">Схаваць ніжнюю паласу пры прагортцы</string>
     <string name="pref_confirm_exit">Пацвярджаць выхад</string>
     <string name="pref_date_format">Фармат даты</string>
-    <string name="pref_start_screen">Пачатковы экран</string>
     <string name="pref_dark_theme_pure_black">Чысты чорны цёмны рэжым</string>
     <string name="theme_yotsuba">Ёцуба</string>
     <string name="theme_yinyang">Інь і Ян</string>
@@ -182,7 +173,6 @@
     <string name="theme_strawberrydaiquiri">Клубнічны дайкiры</string>
     <string name="theme_midnightdusk">Паўночнае змярканне</string>
     <string name="theme_greenapple">Зялёны яблык</string>
-    <string name="theme_blue">Сіні</string>
     <string name="theme_monet">Дынамічная</string>
     <string name="pref_app_theme">Тэма прыкладання</string>
     <string name="theme_dark">Уключаны</string>
@@ -216,7 +206,6 @@
     <string name="information_no_recent">Ніякіх апошніх абнаўленняў</string>
     <string name="information_no_downloads">Ніякіх загрузак</string>
     <string name="pref_page_transitions">Анімацыя пераходаў паміж старонкамі</string>
-    <string name="pref_lock_orientation">Блакаваць арыентацыю</string>
     <string name="pref_cutout_short">Паказваць змесціва ў галіне выраза</string>
     <string name="pref_dual_page_invert_summary">Калі размяшчэнне падзелу на дзве старонкі не адпавядае кірунку чытання</string>
     <string name="pref_dual_page_invert">Інвертаваць размяшчэнне з падзелам на дзве старонкі</string>
@@ -226,8 +215,6 @@
     <string name="pref_fullscreen">Поўнаэкранны рэжым</string>
     <string name="ext_nsfw_warning">Можа ўтрымліваць кантэнт NSFW (18+)</string>
     <string name="ext_nsfw_short">18+</string>
-    <string name="ext_language_info">Мова: %1$s</string>
-    <string name="ext_version_info">Версія: %1$s</string>
     <string name="unofficial_extension_message">Гэта пашырэнне не ўваходзіць у афіцыйны спіс пашырэньні Tachiyomi.</string>
     <string name="obsolete_extension_message">Гэта пашырэнне больш недаступна.</string>
     <string name="untrusted_extension_message">Гэта пашырэнне было падпісана ненадзейным сертыфікатам і не было актывавана.
@@ -236,7 +223,6 @@
 \n
 \nДавяраючы гэтаму сертыфікату, вы прымаеце на сябе гэтыя рызыкі.</string>
     <string name="untrusted_extension">Ненадзейнае пашырэнне</string>
-    <string name="ext_available">Даступна</string>
     <string name="pref_viewer_nav">Схема навігацыі</string>
     <string name="pager_viewer">Пастаронкава</string>
     <string name="vertical_plus_viewer">Бесперапынна вертыкальна</string>
@@ -267,7 +253,6 @@
     <string name="tapping_inverted_horizontal">Гарызантальна</string>
     <string name="tapping_inverted_none">Не</string>
     <string name="pref_read_with_tapping_inverted">Націск наадварот</string>
-    <string name="pref_read_with_tapping">Націск</string>
     <string name="pref_read_with_volume_keys_inverted">Інвертаваць клавішы рэгулявання гучнасці</string>
     <string name="pref_read_with_volume_keys">Клавішы рэгулявання гучнасці</string>
     <string name="pref_reader_navigation">Навігацыя</string>
@@ -375,4 +360,6 @@
     <string name="rotation_force_portrait">Заблакаваная партрэтная</string>
     <string name="rotation_type">Тып арыентацыі</string>
     <string name="pref_rotation_type">Тып арыентацыі па змаўчанні</string>
+    <string name="action_filter_started">Пачата</string>
+    <string name="label_warning">Папярэджанне</string>
 </resources>

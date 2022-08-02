@@ -9,14 +9,14 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 data class ALManga(
-    val media_id: Int,
+    val media_id: Long,
     val title_user_pref: String,
     val image_url_lge: String,
     val description: String?,
     val format: String,
     val publishing_status: String,
     val start_date_fuzzy: Long,
-    val total_chapters: Int
+    val total_chapters: Int,
 ) {
 
     fun toTrack() = TrackSearch.create(TrackManager.ANILIST).apply {
@@ -46,7 +46,7 @@ data class ALUserManga(
     val chapters_read: Int,
     val start_date_fuzzy: Long,
     val completed_date_fuzzy: Long,
-    val manga: ALManga
+    val manga: ALManga,
 ) {
 
     fun toTrack() = Track.create(TrackManager.ANILIST).apply {
@@ -64,10 +64,10 @@ data class ALUserManga(
     fun toTrackStatus() = when (list_status) {
         "CURRENT" -> Anilist.READING
         "COMPLETED" -> Anilist.COMPLETED
-        "PAUSED" -> Anilist.PAUSED
+        "PAUSED" -> Anilist.ON_HOLD
         "DROPPED" -> Anilist.DROPPED
-        "PLANNING" -> Anilist.PLANNING
-        "REPEATING" -> Anilist.REPEATING
+        "PLANNING" -> Anilist.PLAN_TO_READ
+        "REPEATING" -> Anilist.REREADING
         else -> throw NotImplementedError("Unknown status: $list_status")
     }
 }
@@ -75,10 +75,10 @@ data class ALUserManga(
 fun Track.toAnilistStatus() = when (status) {
     Anilist.READING -> "CURRENT"
     Anilist.COMPLETED -> "COMPLETED"
-    Anilist.PAUSED -> "PAUSED"
+    Anilist.ON_HOLD -> "PAUSED"
     Anilist.DROPPED -> "DROPPED"
-    Anilist.PLANNING -> "PLANNING"
-    Anilist.REPEATING -> "REPEATING"
+    Anilist.PLAN_TO_READ -> "PLANNING"
+    Anilist.REREADING -> "REPEATING"
     else -> throw NotImplementedError("Unknown status: $status")
 }
 

@@ -17,10 +17,10 @@ import kotlin.math.abs
 /**
  * Implementation of a [RecyclerView] used by the webtoon reader.
  */
-open class WebtoonRecyclerView @JvmOverloads constructor(
+class WebtoonRecyclerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyle: Int = 0
+    defStyle: Int = 0,
 ) : RecyclerView(context, attrs, defStyle) {
 
     private var isZooming = false
@@ -94,7 +94,7 @@ open class WebtoonRecyclerView @JvmOverloads constructor(
         fromX: Float,
         toX: Float,
         fromY: Float,
-        toY: Float
+        toY: Float,
     ) {
         isZooming = true
         val animatorSet = AnimatorSet()
@@ -164,7 +164,7 @@ open class WebtoonRecyclerView @JvmOverloads constructor(
         currentScale *= scaleFactor
         currentScale = currentScale.coerceIn(
             MIN_RATE,
-            MAX_SCALE_RATE
+            MAX_SCALE_RATE,
         )
 
         setScaleRate(currentScale)

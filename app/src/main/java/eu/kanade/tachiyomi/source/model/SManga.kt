@@ -1,5 +1,6 @@
 package eu.kanade.tachiyomi.source.model
 
+import data.Mangas
 import tachiyomi.source.model.MangaInfo
 import java.io.Serializable
 
@@ -22,6 +23,11 @@ interface SManga : Serializable {
     var thumbnail_url: String?
 
     var initialized: Boolean
+
+    fun getGenres(): List<String>? {
+        if (genre.isNullOrBlank()) return null
+        return genre?.split(", ")?.map { it.trim() }?.filterNot { it.isBlank() }?.distinct()
+    }
 
     fun copyFrom(other: SManga) {
         if (other.author != null) {
@@ -51,11 +57,42 @@ interface SManga : Serializable {
         }
     }
 
+    fun copyFrom(other: Mangas) {
+        if (other.author != null) {
+            author = other.author
+        }
+
+        if (other.artist != null) {
+            artist = other.artist
+        }
+
+        if (other.description != null) {
+            description = other.description
+        }
+
+        if (other.genre != null) {
+            genre = other.genre.joinToString(separator = ", ")
+        }
+
+        if (other.thumbnail_url != null) {
+            thumbnail_url = other.thumbnail_url
+        }
+
+        status = other.status.toInt()
+
+        if (!initialized) {
+            initialized = other.initialized
+        }
+    }
+
     companion object {
         const val UNKNOWN = 0
         const val ONGOING = 1
         const val COMPLETED = 2
         const val LICENSED = 3
+        const val PUBLISHING_FINISHED = 4
+        const val CANCELLED = 5
+        const val ON_HIATUS = 6
 
         fun create(): SManga {
             return SMangaImpl()
@@ -70,9 +107,9 @@ fun SManga.toMangaInfo(): MangaInfo {
         artist = this.artist ?: "",
         author = this.author ?: "",
         description = this.description ?: "",
-        genres = this.genre?.split(", ") ?: emptyList(),
+        genres = this.getGenres() ?: emptyList(),
         status = this.status,
-        cover = this.thumbnail_url ?: ""
+        cover = this.thumbnail_url ?: "",
     )
 }
 

@@ -5,25 +5,17 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
 import androidx.coordinatorlayout.R
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 import androidx.core.view.doOnLayout
+import androidx.core.view.isVisible
 import androidx.customview.view.AbsSavedState
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
-import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.tabs.TabLayout
 import eu.kanade.tachiyomi.util.system.isTablet
 import eu.kanade.tachiyomi.util.view.findChild
-import eu.kanade.tachiyomi.util.view.findDescendant
-import eu.kanade.tachiyomi.util.view.getActivePageView
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import reactivecircus.flowbinding.android.view.HierarchyChangeEvent
-import reactivecircus.flowbinding.android.view.hierarchyChangeEvents
 
 /**
  * [CoordinatorLayout] with its own app bar lift state handler.
@@ -32,56 +24,18 @@ import reactivecircus.flowbinding.android.view.hierarchyChangeEvents
  * 1. When nested scroll detected, lift state will be decided from the nested
  * scroll target. (See [onNestedScroll])
  *
- * 2. When a descendant ViewPager active page is changed and the page contains RecyclerView,
- * lift state will be decided from the said RecyclerView. (See [pageChangeListener])
- *
- *
  * With those conditions, this view expects the following direct child:
  *
  * 1. An [AppBarLayout].
- *
- * 2. A [ChangeHandlerFrameLayout] that contains an optional [ViewPager].
  */
 class TachiyomiCoordinatorLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.coordinatorLayoutStyle
+    defStyleAttr: Int = R.attr.coordinatorLayoutStyle,
 ) : CoordinatorLayout(context, attrs, defStyleAttr) {
 
-    /**
-     * Keep lifted state and do nothing on tablet UI
-     */
-    private val isTablet = context.isTablet()
-
     private var appBarLayout: AppBarLayout? = null
-    private var viewPager: ViewPager? = null
-        set(value) {
-            field?.removeOnPageChangeListener(pageChangeListener)
-            field = value
-            field?.addOnPageChangeListener(pageChangeListener)
-        }
-
-    private val pageChangeListener = object : ViewPager.SimpleOnPageChangeListener() {
-        override fun onPageScrollStateChanged(state: Int) {
-            // Wait until idle to make sure all the views laid out properly before checked
-            if (canLiftAppBarOnScroll && state == ViewPager.SCROLL_STATE_IDLE) {
-                appBarLayout?.isLifted = (viewPager?.getActivePageView() as? ViewGroup)
-                    ?.findDescendant<RecyclerView>()
-                    ?.canScrollVertically(-1) ?: false
-            }
-        }
-    }
-
-    /**
-     * If true, [AppBarLayout] child will be lifted on nested scroll.
-     */
-    var isLiftAppBarOnScroll = true
-
-    /**
-     * Internal check
-     */
-    private val canLiftAppBarOnScroll
-        get() = !isTablet && isLiftAppBarOnScroll
+    private var tabLayout: TabLayout? = null
 
     override fun onNestedScroll(
         target: View,
@@ -90,35 +44,34 @@ class TachiyomiCoordinatorLayout @JvmOverloads constructor(
         dxUnconsumed: Int,
         dyUnconsumed: Int,
         type: Int,
-        consumed: IntArray
+        consumed: IntArray,
     ) {
         super.onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type, consumed)
-        if (canLiftAppBarOnScroll) {
-            appBarLayout?.isLifted = dyConsumed != 0 || dyUnconsumed >= 0
+        // Disable elevation overlay when tabs are visible
+        if (context.isTablet().not()) {
+            if (target is ComposeView) {
+                val scrollCondition = if (type == ViewCompat.TYPE_NON_TOUCH) {
+                    dyUnconsumed >= 0
+                } else {
+                    dyConsumed != 0 || dyUnconsumed >= 0
+                }
+                appBarLayout?.isLifted = scrollCondition && tabLayout?.isVisible == false
+            } else {
+                appBarLayout?.isLifted = (dyConsumed != 0 || dyUnconsumed >= 0) && tabLayout?.isVisible == false
+            }
         }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         appBarLayout = findChild()
-        viewPager = findChild<ChangeHandlerFrameLayout>()?.findDescendant()
-
-        // Updates ViewPager reference when controller is changed
-        findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.let { scope ->
-            findChild<ChangeHandlerFrameLayout>()?.hierarchyChangeEvents()
-                ?.onEach {
-                    if (it is HierarchyChangeEvent.ChildRemoved) {
-                        viewPager = (it.parent as? ViewGroup)?.findDescendant()
-                    }
-                }
-                ?.launchIn(scope)
-        }
+        tabLayout = appBarLayout?.findChild()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         appBarLayout = null
-        viewPager = null
+        tabLayout = null
     }
 
     override fun onSaveInstanceState(): Parcelable? {

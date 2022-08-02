@@ -19,6 +19,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.PreferenceManager
 import androidx.preference.PreferenceScreen
+import androidx.preference.get
+import androidx.preference.getOnBindEditTextListener
+import androidx.preference.isNotEmpty
 import androidx.recyclerview.widget.LinearLayoutManager
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.SharedPreferencesDataStore
@@ -42,7 +45,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
     private var preferenceScreen: PreferenceScreen? = null
 
     constructor(sourceId: Long) : this(
-        bundleOf(SOURCE_ID to sourceId)
+        bundleOf(SOURCE_ID to sourceId),
     )
 
     override fun createBinding(inflater: LayoutInflater): SourcePreferencesControllerBinding {
@@ -68,7 +71,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
         val themedContext by lazy { getPreferenceThemeContext() }
         val manager = PreferenceManager(themedContext)
         val dataStore = SharedPreferencesDataStore(
-            context.getSharedPreferences(source.getPreferenceKey(), Context.MODE_PRIVATE)
+            context.getSharedPreferences(source.getPreferenceKey(), Context.MODE_PRIVATE),
         )
         manager.preferenceDataStore = dataStore
         manager.onDisplayPreferenceDialogListener = this
@@ -110,14 +113,16 @@ class SourcePreferencesController(bundle: Bundle? = null) :
             source.setupPreferenceScreen(newScreen)
 
             // Reparent the preferences
-            while (newScreen.preferenceCount != 0) {
-                val pref = newScreen.getPreference(0)
+            while (newScreen.isNotEmpty()) {
+                val pref = newScreen[0]
                 pref.isIconSpaceReserved = false
                 pref.order = Int.MAX_VALUE // reset to default order
 
                 // Apply incognito IME for EditTextPreference
                 if (pref is EditTextPreference) {
+                    val setListener = pref.getOnBindEditTextListener()
                     pref.setOnBindEditTextListener {
+                        setListener?.onBindEditText(it)
                         it.setIncognito(viewScope)
                     }
                 }
@@ -140,7 +145,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
         val screen = preference.parent!!
 
         lastOpenPreferencePosition = (0 until screen.preferenceCount).indexOfFirst {
-            screen.getPreference(it) === preference
+            screen[it] === preference
         }
 
         val f = when (preference) {
@@ -155,7 +160,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
                     .newInstance(preference.getKey())
             else -> throw IllegalArgumentException(
                 "Tried to display dialog for unknown " +
-                    "preference type. Did you forget to override onDisplayPreferenceDialog()?"
+                    "preference type. Did you forget to override onDisplayPreferenceDialog()?",
             )
         }
         f.targetController = this
@@ -166,7 +171,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
     override fun <T : Preference> findPreference(key: CharSequence): T? {
         // We track [lastOpenPreferencePosition] when displaying the dialog
         // [key] isn't useful since there may be duplicates
-        return preferenceScreen!!.getPreference(lastOpenPreferencePosition!!) as T
+        return preferenceScreen!![lastOpenPreferencePosition!!] as T
     }
 }
 

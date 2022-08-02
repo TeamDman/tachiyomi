@@ -1,8 +1,13 @@
 package eu.kanade.tachiyomi.ui.browse.source.globalsearch
 
 import android.os.Bundle
-import eu.kanade.tachiyomi.data.database.DatabaseHelper
+import eu.kanade.domain.manga.interactor.GetManga
+import eu.kanade.domain.manga.interactor.InsertManga
+import eu.kanade.domain.manga.interactor.UpdateManga
+import eu.kanade.domain.manga.model.toDbManga
+import eu.kanade.domain.manga.model.toMangaUpdate
 import eu.kanade.tachiyomi.data.database.models.Manga
+import eu.kanade.tachiyomi.data.database.models.toDomainManga
 import eu.kanade.tachiyomi.data.database.models.toMangaInfo
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.extension.ExtensionManager
@@ -16,6 +21,7 @@ import eu.kanade.tachiyomi.ui.base.presenter.BasePresenter
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourcePresenter
 import eu.kanade.tachiyomi.util.lang.runAsObservable
 import eu.kanade.tachiyomi.util.system.logcat
+import kotlinx.coroutines.runBlocking
 import logcat.LogPriority
 import rx.Observable
 import rx.Subscription
@@ -35,11 +41,13 @@ import uy.kohesive.injekt.injectLazy
  * @param preferences manages the preference calls.
  */
 open class GlobalSearchPresenter(
-    val initialQuery: String? = "",
-    val initialExtensionFilter: String? = null,
+    private val initialQuery: String? = "",
+    private val initialExtensionFilter: String? = null,
     val sourceManager: SourceManager = Injekt.get(),
-    val db: DatabaseHelper = Injekt.get(),
-    val preferences: PreferencesHelper = Injekt.get()
+    val preferences: PreferencesHelper = Injekt.get(),
+    private val getManga: GetManga = Injekt.get(),
+    private val insertManga: InsertManga = Injekt.get(),
+    private val updateManga: UpdateManga = Injekt.get(),
 ) : BasePresenter<GlobalSearchController>() {
 
     /**
@@ -75,7 +83,7 @@ open class GlobalSearchPresenter(
         // Perform a search with previous or initial state
         search(
             savedState?.getString(BrowseSourcePresenter::query.name)
-                ?: initialQuery.orEmpty()
+                ?: initialQuery.orEmpty(),
         )
     }
 
@@ -92,7 +100,7 @@ open class GlobalSearchPresenter(
     }
 
     /**
-     * Returns a list of enabled sources ordered by language and name, with pinned catalogues
+     * Returns a list of enabled sources ordered by language and name, with pinned sources
      * prioritized.
      *
      * @return list containing enabled sources.
@@ -170,9 +178,9 @@ open class GlobalSearchPresenter(
                         .map { it.mangas }
                         .map { list -> list.map { networkToLocalManga(it, source.id) } } // Convert to local manga
                         .doOnNext { fetchImage(it, source) } // Load manga covers
-                        .map { list -> createCatalogueSearchItem(source, list.map { GlobalSearchCardItem(it) }) }
+                        .map { list -> createCatalogueSearchItem(source, list.map { GlobalSearchCardItem(it.toDomainManga()!!) }) }
                 },
-                5
+                5,
             )
             .observeOn(AndroidSchedulers.mainThread())
             // Update matching source with the obtained results
@@ -185,8 +193,8 @@ open class GlobalSearchPresenter(
                             { it.results.isNullOrEmpty() },
                             // Same as initial sort, i.e. pinned first then alphabetically
                             { it.source.id.toString() !in pinnedSourceIds },
-                            { "${it.source.name.lowercase()} (${it.source.lang})" }
-                        )
+                            { "${it.source.name.lowercase()} (${it.source.lang})" },
+                        ),
                     )
             }
             // Update current state
@@ -199,7 +207,7 @@ open class GlobalSearchPresenter(
                 },
                 { _, error ->
                     logcat(LogPriority.ERROR, error)
-                }
+                },
             )
     }
 
@@ -222,7 +230,7 @@ open class GlobalSearchPresenter(
                 Observable.from(first)
                     .filter { it.thumbnail_url == null && !it.initialized }
                     .map { Pair(it, source) }
-                    .concatMap { runAsObservable({ getMangaDetails(it.first, it.second) }) }
+                    .concatMap { runAsObservable { getMangaDetails(it.first, it.second) } }
                     .map { Pair(source as CatalogueSource, it) }
             }
             .onBackpressureBuffer()
@@ -230,11 +238,11 @@ open class GlobalSearchPresenter(
             .subscribe(
                 { (source, manga) ->
                     @Suppress("DEPRECATION")
-                    view?.onMangaInitialized(source, manga)
+                    view?.onMangaInitialized(source, manga.toDomainManga()!!)
                 },
                 { error ->
                     logcat(LogPriority.ERROR, error)
-                }
+                },
             )
     }
 
@@ -248,7 +256,7 @@ open class GlobalSearchPresenter(
         val networkManga = source.getMangaDetails(manga.toMangaInfo())
         manga.copyFrom(networkManga.toSManga())
         manga.initialized = true
-        db.insertManga(manga).executeAsBlocking()
+        runBlocking { updateManga.await(manga.toDomainManga()!!.toMangaUpdate()) }
         return manga
     }
 
@@ -260,14 +268,21 @@ open class GlobalSearchPresenter(
      * @return a manga from the database.
      */
     protected open fun networkToLocalManga(sManga: SManga, sourceId: Long): Manga {
-        var localManga = db.getManga(sManga.url, sourceId).executeAsBlocking()
+        var localManga = runBlocking { getManga.await(sManga.url, sourceId) }
         if (localManga == null) {
             val newManga = Manga.create(sManga.url, sManga.title, sourceId)
             newManga.copyFrom(sManga)
-            val result = db.insertManga(newManga).executeAsBlocking()
-            newManga.id = result.insertedId()
-            localManga = newManga
+            newManga.id = -1
+            val result = runBlocking {
+                val id = insertManga.await(newManga.toDomainManga()!!)
+                getManga.await(id!!)
+            }
+            localManga = result
+        } else if (!localManga.favorite) {
+            // if the manga isn't a favorite, set its display title from source
+            // if it later becomes a favorite, updated title will go to db
+            localManga = localManga.copy(title = sManga.title)
         }
-        return localManga
+        return localManga!!.toDbManga()
     }
 }

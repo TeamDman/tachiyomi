@@ -7,7 +7,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.inputmethod.EditorInfoCompat
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.asImmediateFlow
+import eu.kanade.tachiyomi.util.preference.asHotFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,7 +23,7 @@ import uy.kohesive.injekt.api.get
 class TachiyomiSearchView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = R.attr.searchViewStyle
+    defStyleAttr: Int = R.attr.searchViewStyle,
 ) : SearchView(context, attrs, defStyleAttr) {
 
     private var scope: CoroutineScope? = null
@@ -31,7 +31,7 @@ class TachiyomiSearchView @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-        Injekt.get<PreferencesHelper>().incognitoMode().asImmediateFlow {
+        Injekt.get<PreferencesHelper>().incognitoMode().asHotFlow {
             imeOptions = if (it) {
                 imeOptions or EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING
             } else {

@@ -5,11 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
 import eu.kanade.tachiyomi.databinding.TrackSearchItemBinding
-import eu.kanade.tachiyomi.util.view.applyElevationOverlay
 
 class TrackSearchAdapter(
     private val currentTrackUrl: String?,
-    private val onSelectionChanged: (TrackSearch?) -> Unit
+    private val onSelectionChanged: (TrackSearch?) -> Unit,
 ) : RecyclerView.Adapter<TrackSearchHolder>() {
     var selectedItemPosition = -1
         set(value) {
@@ -35,7 +34,6 @@ class TrackSearchAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackSearchHolder {
         val binding = TrackSearchItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        binding.root.applyElevationOverlay()
         return TrackSearchHolder(binding, this)
     }
 

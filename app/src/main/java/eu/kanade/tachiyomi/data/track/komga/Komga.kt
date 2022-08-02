@@ -4,23 +4,19 @@ import android.content.Context
 import android.graphics.Color
 import androidx.annotation.StringRes
 import eu.kanade.tachiyomi.R
-import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.database.models.Track
 import eu.kanade.tachiyomi.data.track.EnhancedTrackService
 import eu.kanade.tachiyomi.data.track.NoLoginTrackService
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.data.track.model.TrackSearch
+import eu.kanade.tachiyomi.source.Source
 import okhttp3.Dns
 import okhttp3.OkHttpClient
-import uy.kohesive.injekt.Injekt
-import uy.kohesive.injekt.api.get
+import eu.kanade.domain.manga.model.Manga as DomainManga
+import eu.kanade.domain.track.model.Track as DomainTrack
 
-class Komga(
-    private val context: Context,
-    id: Int,
-    private val db: DatabaseHelper = Injekt.get(),
-) : TrackService(id), EnhancedTrackService, NoLoginTrackService {
+class Komga(private val context: Context, id: Long) : TrackService(id), EnhancedTrackService, NoLoginTrackService {
 
     companion object {
         const val UNREAD = 1
@@ -47,7 +43,7 @@ class Komga(
     override fun getStatus(status: Int): String = with(context) {
         when (status) {
             UNREAD -> getString(R.string.unread)
-            READING -> getString(R.string.currently_reading)
+            READING -> getString(R.string.reading)
             COMPLETED -> getString(R.string.completed)
             else -> ""
         }
@@ -66,7 +62,11 @@ class Komga(
     override suspend fun update(track: Track, didReadChapter: Boolean): Track {
         if (track.status != COMPLETED) {
             if (didReadChapter) {
-                track.status = READING
+                if (track.last_chapter_read.toInt() == track.total_chapters && track.total_chapters > 0) {
+                    track.status = COMPLETED
+                } else {
+                    track.status = READING
+                }
             }
         }
 
@@ -104,6 +104,16 @@ class Komga(
         try {
             api.getTrackSearch(manga.url)
         } catch (e: Exception) {
+            null
+        }
+
+    override fun isTrackFrom(track: DomainTrack, manga: DomainManga, source: Source?): Boolean =
+        track.remoteUrl == manga.url && source?.let { accept(it) } == true
+
+    override fun migrateTrack(track: DomainTrack, manga: DomainManga, newSource: Source): DomainTrack? =
+        if (accept(newSource)) {
+            track.copy(remoteUrl = manga.url)
+        } else {
             null
         }
 }

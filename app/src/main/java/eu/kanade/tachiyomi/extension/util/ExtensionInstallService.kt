@@ -22,7 +22,7 @@ class ExtensionInstallService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val notification = notificationBuilder(Notifications.CHANNEL_DOWNLOADER_PROGRESS) {
+        val notification = notificationBuilder(Notifications.CHANNEL_EXTENSIONS_UPDATE) {
             setSmallIcon(R.drawable.ic_tachi)
             setAutoCancel(false)
             setOngoing(true)
@@ -72,7 +72,7 @@ class ExtensionInstallService : Service() {
             context: Context,
             downloadId: Long,
             uri: Uri,
-            installer: PreferenceValues.ExtensionInstaller
+            installer: PreferenceValues.ExtensionInstaller,
         ): Intent {
             return Intent(context, ExtensionInstallService::class.java)
                 .setDataAndType(uri, ExtensionInstaller.APK_MIME)

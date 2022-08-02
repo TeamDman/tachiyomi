@@ -3,42 +3,73 @@
 package eu.kanade.tachiyomi.util.view
 
 import android.annotation.SuppressLint
-import android.graphics.Point
-import android.text.TextUtils
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.TooltipCompat
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.children
 import androidx.core.view.descendants
 import androidx.core.view.forEach
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
-import com.google.android.material.elevation.ElevationOverlayProvider
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
+import eu.kanade.presentation.theme.TachiyomiTheme
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.util.system.getResourceColor
-import eu.kanade.tachiyomi.util.system.isNightMode
 
-/**
- * Returns coordinates of view.
- * Used for animation
- *
- * @return coordinates of view
- */
-fun View.getCoordinates() = Point((left + right) / 2, (top + bottom) / 2)
+inline fun ComposeView.setComposeContent(crossinline content: @Composable () -> Unit) {
+    consumeWindowInsets = false
+    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+    setContent {
+        TachiyomiTheme {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+            ) {
+                content()
+            }
+        }
+    }
+}
+
+inline fun ComponentActivity.setComposeContent(
+    parent: CompositionContext? = null,
+    crossinline content: @Composable () -> Unit,
+) {
+    setContent(parent) {
+        TachiyomiTheme {
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodySmall,
+                LocalContentColor provides MaterialTheme.colorScheme.onBackground,
+            ) {
+                content()
+            }
+        }
+    }
+}
 
 /**
  * Shows a snackbar in this view.
@@ -50,7 +81,7 @@ fun View.getCoordinates() = Point((left + right) / 2, (top + bottom) / 2)
 inline fun View.snack(
     message: String,
     length: Int = 10_000,
-    f: Snackbar.() -> Unit = {}
+    f: Snackbar.() -> Unit = {},
 ): Snackbar {
     val snack = Snackbar.make(this, message, length)
     snack.f()
@@ -86,7 +117,7 @@ inline fun View.setTooltip(text: String) {
 inline fun View.popupMenu(
     @MenuRes menuRes: Int,
     noinline initMenu: (Menu.() -> Unit)? = null,
-    noinline onMenuItemClick: MenuItem.() -> Unit
+    noinline onMenuItemClick: MenuItem.() -> Unit,
 ): PopupMenu {
     val popup = PopupMenu(context, this, Gravity.NO_GRAVITY, R.attr.actionOverflowMenuStyle, 0)
     popup.menuInflater.inflate(menuRes, popup.menu)
@@ -114,7 +145,7 @@ inline fun View.popupMenu(
 inline fun View.popupMenu(
     items: List<Pair<Int, Int>>,
     selectedItemId: Int? = null,
-    noinline onMenuItemClick: MenuItem.() -> Unit
+    noinline onMenuItemClick: MenuItem.() -> Unit,
 ): PopupMenu {
     val popup = PopupMenu(context, this, Gravity.NO_GRAVITY, R.attr.actionOverflowMenuStyle, 0)
     items.forEach { (id, stringRes) ->
@@ -163,49 +194,6 @@ inline fun ExtendedFloatingActionButton.shrinkOnScroll(recycler: RecyclerView): 
 }
 
 /**
- * Replaces chips in a ChipGroup.
- *
- * @param items List of strings that are shown as individual chips.
- * @param onClick Optional on click listener for each chip.
- * @param onLongClick Optional on long click listener for each chip.
- */
-inline fun ChipGroup.setChips(
-    items: List<String>?,
-    noinline onClick: ((item: String) -> Unit)? = null,
-    noinline onLongClick: ((item: String) -> Unit)? = null
-) {
-    removeAllViews()
-
-    items?.forEach { item ->
-        val chip = Chip(context).apply {
-            text = item
-            if (onClick != null) { setOnClickListener { onClick(item) } }
-            if (onLongClick != null) { setOnLongClickListener { onLongClick(item); true } }
-        }
-
-        addView(chip)
-    }
-}
-
-/**
- * Applies elevation overlay to a MaterialCardView
- */
-inline fun MaterialCardView.applyElevationOverlay() {
-    if (context.isNightMode()) {
-        val provider = ElevationOverlayProvider(context)
-        setCardBackgroundColor(provider.compositeOverlay(cardBackgroundColor.defaultColor, cardElevation))
-    }
-}
-
-/**
- * Sets TextView max lines dynamically. Can only be called when the view is already laid out.
- */
-inline fun TextView.setMaxLinesAndEllipsize(_ellipsize: TextUtils.TruncateAt = TextUtils.TruncateAt.END) = post {
-    maxLines = (measuredHeight - paddingTop - paddingBottom) / lineHeight
-    ellipsize = _ellipsize
-}
-
-/**
  * Callback will be run immediately when no animation running
  */
 fun RecyclerView.onAnimationsFinished(callback: (RecyclerView) -> Unit) = post(
@@ -219,7 +207,7 @@ fun RecyclerView.onAnimationsFinished(callback: (RecyclerView) -> Unit) = post(
                 callback(this@onAnimationsFinished)
             }
         }
-    }
+    },
 )
 
 /**
@@ -237,24 +225,25 @@ inline fun <reified T> ViewGroup.findDescendant(): T? {
 }
 
 /**
- * Returns the active child view of a ViewPager according to the LayoutParams
+ * Returns a deep copy of the provided [Drawable]
  */
-fun ViewPager.getActivePageView(): View? {
-    if (null == adapter || adapter?.count == 0 || childCount == 0) {
-        return null
-    }
-
-    val positionField = ViewPager.LayoutParams::class.java.getDeclaredField("position")
-    positionField.isAccessible = true
-    return children.find { child ->
-        val layoutParams = child.layoutParams as ViewPager.LayoutParams
-        try {
-            if (!layoutParams.isDecor && positionField.getInt(layoutParams) == currentItem) {
-                return@find true
-            }
-        } catch (e: NoSuchFieldException) {
-        } catch (e: IllegalAccessException) {
+inline fun <reified T : Drawable> T.copy(context: Context): T? {
+    return (constantState?.newDrawable()?.mutate() as? T).apply {
+        if (this is MaterialShapeDrawable) {
+            initializeElevationOverlay(context)
         }
-        false
     }
+}
+
+fun View?.isVisibleOnScreen(): Boolean {
+    if (this == null) {
+        return false
+    }
+    if (!this.isShown) {
+        return false
+    }
+    val actualPosition = Rect()
+    this.getGlobalVisibleRect(actualPosition)
+    val screen = Rect(0, 0, Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels)
+    return actualPosition.intersect(screen)
 }

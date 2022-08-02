@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.animation.doOnEnd
 import androidx.core.view.updatePadding
+import androidx.preference.Preference
 import androidx.preference.PreferenceController
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceScreen
@@ -23,10 +24,12 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.ui.base.controller.BaseController
 import eu.kanade.tachiyomi.ui.base.controller.RootController
+import eu.kanade.tachiyomi.util.preference.asHotFlow
 import eu.kanade.tachiyomi.util.system.getResourceColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 
@@ -94,7 +97,7 @@ abstract class SettingsController : PreferenceController() {
         activity!!.theme.resolveAttribute(R.attr.preferenceTheme, tv, true)
         themedContext = ContextThemeWrapper(activity, tv.resourceId)
 
-        val screen = preferenceManager.createPreferenceScreen(themedContext)
+        val screen = preferenceManager.createPreferenceScreen(themedContext!!)
         preferenceScreen = screen
         setupPreferenceScreen(screen)
     }
@@ -132,5 +135,10 @@ abstract class SettingsController : PreferenceController() {
         }
 
         (activity as? AppCompatActivity)?.supportActionBar?.title = getTitle()
+    }
+
+    inline fun <T> Preference.visibleIf(preference: com.fredporciuncula.flow.preferences.Preference<T>, crossinline block: (T) -> Boolean) {
+        preference.asHotFlow { isVisible = block(it) }
+            .launchIn(viewScope)
     }
 }
