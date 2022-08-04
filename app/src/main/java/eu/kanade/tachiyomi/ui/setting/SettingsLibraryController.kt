@@ -11,31 +11,13 @@ import eu.kanade.domain.category.interactor.GetCategories
 import eu.kanade.domain.category.model.Category
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
-import eu.kanade.tachiyomi.data.preference.DEVICE_BATTERY_NOT_LOW
-import eu.kanade.tachiyomi.data.preference.DEVICE_CHARGING
-import eu.kanade.tachiyomi.data.preference.DEVICE_NETWORK_NOT_METERED
-import eu.kanade.tachiyomi.data.preference.DEVICE_ONLY_ON_WIFI
-import eu.kanade.tachiyomi.data.preference.MANGA_HAS_UNREAD
-import eu.kanade.tachiyomi.data.preference.MANGA_NON_COMPLETED
-import eu.kanade.tachiyomi.data.preference.MANGA_NON_READ
-import eu.kanade.tachiyomi.data.preference.PreferencesHelper
+import eu.kanade.tachiyomi.data.preference.*
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.databinding.PrefLibraryColumnsBinding
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.ui.base.controller.pushController
 import eu.kanade.tachiyomi.ui.category.CategoryController
-import eu.kanade.tachiyomi.util.preference.bindTo
-import eu.kanade.tachiyomi.util.preference.defaultValue
-import eu.kanade.tachiyomi.util.preference.entriesRes
-import eu.kanade.tachiyomi.util.preference.intListPreference
-import eu.kanade.tachiyomi.util.preference.multiSelectListPreference
-import eu.kanade.tachiyomi.util.preference.onChange
-import eu.kanade.tachiyomi.util.preference.onClick
-import eu.kanade.tachiyomi.util.preference.preference
-import eu.kanade.tachiyomi.util.preference.preferenceCategory
-import eu.kanade.tachiyomi.util.preference.summaryRes
-import eu.kanade.tachiyomi.util.preference.switchPreference
-import eu.kanade.tachiyomi.util.preference.titleRes
+import eu.kanade.tachiyomi.util.preference.*
 import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import eu.kanade.tachiyomi.widget.materialdialogs.setQuadStateMultiChoiceItems
 import kotlinx.coroutines.flow.combine
@@ -284,14 +266,14 @@ class SettingsLibraryController : SettingsController() {
                     entriesRes = arrayOf(
                         R.string.pref_library_update_refresh_trackers_mark_read_behaviour_always_mark_read,
                         R.string.pref_library_update_refresh_trackers_mark_read_behaviour_never_mark_read,
-                        R.string.pref_library_update_refresh_trackers_mark_read_behaviour_mark_read_except_special
+                        R.string.pref_library_update_refresh_trackers_mark_read_behaviour_mark_read_except_special,
                     )
                     entryValues = arrayOf(
-                        MarkReadBehaviour.ALWAYS.name,
-                        MarkReadBehaviour.NEVER.name,
-                        MarkReadBehaviour.NOT_SPECIAL.name
+                        PreferenceValues.MarkReadBehaviour.ALWAYS.name,
+                        PreferenceValues.MarkReadBehaviour.NEVER.name,
+                        PreferenceValues.MarkReadBehaviour.NOT_SPECIAL.name,
                     )
-                    defaultValue = MarkReadBehaviour.NEVER.name
+                    defaultValue = PreferenceValues.MarkReadBehaviour.NEVER.name
                     summary = "%s"
                 }
             }
